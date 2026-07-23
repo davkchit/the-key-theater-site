@@ -4,22 +4,17 @@ import { colors } from '../../theme/tokens'
 import { shows } from '../../data/shows'
 
 export const ROW_HEIGHT = 108
+/** Date-block width at sm+ (matches the `sm:w-32` class below) -- the single
+ *  continuous divider line in AfishaBlock is positioned off this constant so
+ *  the two can never drift out of alignment. */
+export const DATE_COL_WIDTH = 128
+
+export type AfishaVariant = 'card' | 'flat'
 
 interface AfishaRowProps {
   item: AfishaItem
   ticketTo: string
-}
-
-const rowBgClass: Record<AfishaItem['band'], string> = {
-  paper: 'bg-paper',
-  red: 'bg-brand-red',
-  blue: 'bg-brand-blue',
-}
-
-const rowTextClass: Record<AfishaItem['band'], string> = {
-  paper: 'text-ink',
-  red: 'text-paper',
-  blue: 'text-paper',
+  variant: AfishaVariant
 }
 
 const accentHex: Record<AfishaItem['accent'], string> = {
@@ -28,32 +23,40 @@ const accentHex: Record<AfishaItem['accent'], string> = {
   paper: colors.paper,
 }
 
+/** Row background/text for a given band, aware of the block's variant --
+ *  'card' (home preview, floating black card) renders the neutral band as
+ *  black instead of cream, since the card itself is already black and a
+ *  cream row there needs its own border to read as distinct. 'flat' (the
+ *  /afisha page, which is black end-to-end already) keeps the neutral band
+ *  cream, since there's a full black page around it instead of a nested card. */
+function rowStyle(band: AfishaItem['band'], variant: AfishaVariant) {
+  if (band === 'red') return { bg: 'bg-brand-red', text: 'text-paper', dark: true }
+  if (band === 'blue') return { bg: 'bg-brand-blue', text: 'text-paper', dark: true }
+  return variant === 'card' ? { bg: 'bg-ink', text: 'text-paper', dark: true } : { bg: 'bg-paper', text: 'text-ink', dark: false }
+}
+
 /** One flush row of the afisha strip -- background + date/time + title only.
- *  The per-show illustration is rendered separately by AfishaBlock so it can
- *  overlap into neighbouring rows instead of being clipped to this one.
- *  The date column has a fixed width so its right border lines up identically
- *  on every row, reading as one continuous rule down the whole list.
- *  Height is fixed only from md up (where the illustration overlay needs a
- *  predictable row height to align against) -- below md the row grows to
- *  fit a wrapping title instead of the ticket link overlapping it, and the
- *  ticket link drops to its own line since the date+title group takes the
- *  full row width there. */
-export function AfishaRow({ item, ticketTo }: AfishaRowProps) {
+ *  The per-show illustration and the column divider are rendered separately
+ *  by AfishaBlock: the illustration so it can overlap into the row below
+ *  instead of being clipped to its own row, and the divider so it's one
+ *  genuine line down the whole list instead of per-row borders that break
+ *  visual continuity wherever the row colour changes.
+ *  Height is fixed only from md up (where the illustration overlay and the
+ *  divider need a predictable row height to align against) -- below md the
+ *  row grows to fit a wrapping title instead of the ticket link overlapping
+ *  it, and the ticket link drops to its own line since the date+title group
+ *  takes the full row width there. */
+export function AfishaRow({ item, ticketTo, variant }: AfishaRowProps) {
+  const { bg, text, dark } = rowStyle(item.band, variant)
+  // the neutral band's date number always takes the item's accent colour for
+  // a pop of red/blue, whether that row itself renders cream (flat) or black
+  // (card) -- only red/blue rows force the number to plain paper for contrast
   const dateColor = item.band === 'paper' ? accentHex[item.accent] : colors.paper
   const based = shows.find((s) => s.title === item.title)?.based
 
   return (
-    <div
-      className={[
-        'relative flex flex-wrap items-center gap-y-1 py-3 pr-5 md:h-27 md:flex-nowrap md:py-0 md:pr-9',
-        rowBgClass[item.band],
-        rowTextClass[item.band],
-      ].join(' ')}
-    >
-      <span
-        className="absolute top-2 left-2 font-heading text-[9px] font-semibold opacity-50"
-        style={{ color: item.band === 'paper' ? colors.ink : colors.paper }}
-      >
+    <div className={['relative flex flex-wrap items-center gap-y-1 py-3 pr-5 md:h-27 md:flex-nowrap md:py-0 md:pr-9', bg, text].join(' ')}>
+      <span className="absolute top-2 left-2 font-heading text-[9px] font-semibold opacity-50" style={{ color: dark ? colors.paper : colors.ink }}>
         {item.age}
       </span>
 
@@ -71,7 +74,7 @@ export function AfishaRow({ item, ticketTo }: AfishaRowProps) {
           </div>
         </div>
 
-        <div className="min-w-0 flex-1 border-l border-black/20 pl-3.5 md:pl-6">
+        <div className="min-w-0 flex-1 pl-3.5 md:pl-6">
           <div className="font-heading text-[clamp(19px,2.6vw,28px)] leading-[1.05] font-bold uppercase">{item.title}</div>
           {based && <div className="mt-0.5 truncate text-[12px] opacity-70">{based}</div>}
         </div>

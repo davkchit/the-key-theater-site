@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { AfishaItem } from '../../types/content'
 import { StarIcon } from '../ui/StarIcon'
-import { AfishaRow, ROW_HEIGHT } from './AfishaRow'
+import { AfishaRow, ROW_HEIGHT, DATE_COL_WIDTH, type AfishaVariant } from './AfishaRow'
 import elFace from '../../../assets/el-face.svg'
 import elChair from '../../../assets/el-chair.svg'
 import elStar from '../../../assets/el-star.svg'
@@ -18,6 +18,13 @@ interface AfishaBlockProps {
   items: AfishaItem[]
   ticketTo: string
   footer?: ReactNode
+  /** 'card' (default): floating rounded black card, used on the home page
+   *  preview -- neutral rows render black, list breaks fully out of the
+   *  card's own padding since there's no colour clash to guard against.
+   *  'flat': no card shell at all, used on the /afisha page where the whole
+   *  page is already black -- neutral rows stay cream, list uses the page's
+   *  own padding instead of breaking out of anything. */
+  variant?: AfishaVariant
 }
 
 // One of the brand book's hand-drawn line-art elements per show, not a
@@ -35,20 +42,36 @@ const rowArt: Record<string, string> = {
 
 /**
  * Shared shell for the afisha strip -- used by both the home page preview
- * and the /afisha page, so the row styling only has to be right in one place.
+ * and the /afisha page, so the row styling only has to be right in one place
+ * even though the two now look different (see `variant`).
  * Rows render flush (no gaps/per-row rounding); each show's brand line-art
  * is layered on top afterwards, sized taller than a row so it can bleed
- * into the row below, matching the brand-book mockup.
+ * into the row below; a single absolutely-positioned rule -- not a per-row
+ * border -- divides the date column from the title column down the whole
+ * list, so it stays one continuous line regardless of how the row colour
+ * underneath it changes.
  */
-export function AfishaBlock({ eyebrow, heading, headingAs, headingClassName, topRight, items, ticketTo, footer }: AfishaBlockProps) {
+export function AfishaBlock({
+  eyebrow,
+  heading,
+  headingAs,
+  headingClassName,
+  topRight,
+  items,
+  ticketTo,
+  footer,
+  variant = 'card',
+}: AfishaBlockProps) {
   const Heading = headingAs
+  const isCard = variant === 'card'
   // modest bleed -- tall enough to visibly spill into the next row without
   // reaching far enough to collide with that row's own illustration, no
   // matter how many rows the list ends up with
   const artHeight = ROW_HEIGHT * 1.28
+  const listHeight = items.length * ROW_HEIGHT
 
   return (
-    <div className="relative overflow-hidden rounded-[20px] bg-ink p-6.5 text-paper md:p-12">
+    <div className={isCard ? 'relative overflow-hidden rounded-[20px] bg-ink p-6.5 text-paper md:p-12' : 'relative text-paper'}>
       <StarIcon className="pointer-events-none absolute top-11 right-15 h-29.5 opacity-13 invert" />
 
       <div className="relative flex flex-wrap items-end justify-between gap-5">
@@ -59,15 +82,24 @@ export function AfishaBlock({ eyebrow, heading, headingAs, headingClassName, top
         {topRight}
       </div>
 
-      {/* partial breakout, not a full one: keeps a thin black margin on both
-          sides so a paper-colored row doesn't fuse into the page's own
-          paper background right at the card's edge */}
-      <div className="relative mt-7 -mx-3.5 md:-mx-9">
+      {/* card: breaks fully out of the shell's own padding (neutral rows are
+          black now, so there's nothing left for a side margin to protect
+          against). flat: no shell padding to break out of in the first
+          place -- the page itself already supplies the margin. */}
+      <div className={['relative mt-7', isCard ? '-mx-6.5 md:-mx-12' : ''].join(' ')}>
         <div className="flex flex-col">
           {items.map((item, i) => (
-            <AfishaRow key={`${item.day}-${item.title}-${i}`} item={item} ticketTo={ticketTo} />
+            <AfishaRow key={`${item.day}-${item.title}-${i}`} item={item} ticketTo={ticketTo} variant={variant} />
           ))}
         </div>
+
+        {/* the one continuous divider -- light on the all-dark 'card' rows,
+            dark on 'flat's cream/red/blue mix -- only from md up, where row
+            height is fixed and this pixel math is valid */}
+        <div
+          className={['pointer-events-none absolute top-0 hidden w-px md:block', isCard ? 'bg-paper/25' : 'bg-black/70'].join(' ')}
+          style={{ left: DATE_COL_WIDTH, height: listHeight }}
+        />
 
         {items.map((item, i) => {
           const art = rowArt[item.title]
