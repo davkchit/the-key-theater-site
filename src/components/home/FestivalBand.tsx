@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import elKey from '../../../assets/el-key.png'
-import elStar from '../../../assets/el-star.png'
+import elKey from '../../../assets/el-key-hanging.svg'
+import elStar from '../../../assets/el-star.svg'
 
 export function FestivalBand() {
   return (

@@ -1,8 +1,8 @@
 import type { Band } from '../types/content'
-import elLadder from '../../assets/el-ladder.png'
-import elChair from '../../assets/el-chair.png'
+import elLadder from '../../assets/el-ladder.svg'
+import elChair from '../../assets/el-chair.svg'
 import elLove from '../../assets/el-love.png'
-import elKey from '../../assets/el-key.png'
+import elKey from '../../assets/el-key-hanging.svg'
 
 export const bands: Band[] = [
   { num: '01', word: 'Свобода', note: 'жизнь без границ', color: 'yellow', icon: elLadder },

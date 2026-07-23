@@ -1,12 +1,16 @@
 import { NavLink } from 'react-router-dom'
 import { StarIcon } from '../ui/StarIcon'
 import { SwallowIcon } from '../ui/SwallowIcon'
+import elKey from '../../../assets/el-key-hanging.svg'
+import boyOnFence from '../../../assets/el-boy-fence.svg'
 
 export function ManifestoDirector() {
   return (
     <section className="mt-16.5">
       <div className="mx-auto max-w-320 px-6.5">
         <div className="relative overflow-hidden rounded-[18px] bg-ink p-7.5 text-paper md:p-16.5">
+          <img src={elKey} alt="" className="pointer-events-none absolute top-8 left-8 h-32 w-auto rotate-6 opacity-14 invert" />
+          <img src={boyOnFence} alt="" className="pointer-events-none absolute bottom-0 left-[8%] h-44 w-auto opacity-10 invert" />
           <StarIcon spin className="pointer-events-none absolute top-6.5 right-10 h-15 w-15 text-brand-yellow" />
           <svg
             viewBox="0 0 640 130"

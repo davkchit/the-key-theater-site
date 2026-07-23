@@ -4,6 +4,7 @@ import { StarIcon } from '../components/ui/StarIcon'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { awards } from '../data/awards'
 import photo2 from '../../assets/photo-2.jpg'
+import elFace from '../../assets/el-face.svg'
 
 export default function AboutPage() {
   return (
@@ -18,8 +19,9 @@ export default function AboutPage() {
           </p>
           <p className="mb-4.5">
             Мы родились 23 октября 2003 года — с премьеры «Крысолова» по поэме Марины Цветаевой. Начинали как
-            подростковая студия при ЦДТ «Огниво», в 2008–2018 годах жили в общежитии Набережночелнинского
-            педагогического института, а с 2018-го обосновались в молодёжном центре «Нур» и получили статус АНО.
+            подростковая студия при ЦДТ «Огниво», а в 2008–2018 годах жили в общежитии Набережночелнинского
+            педагогического института. В 2018-м новое руководство вуза не продлило аренду — пришлось искать новый
+            дом срочно. Так мы оказались в молодёжном центре «Нур» и в том же году получили статус АНО.
           </p>
           <p className="mb-4.5">
             За эти годы мы выпустили больше 50 спектаклей и обучили актёрскому мастерству больше 1000 человек —
@@ -34,8 +36,9 @@ export default function AboutPage() {
           <p>У нас много наград и регалий — и каждой мы гордимся так же, как гордимся каждым человеком, который был в нашем театре.</p>
         </div>
 
-        <Reveal className="self-start rounded-3.5 bg-brand-blue p-6.5 text-paper">
-          <div className="font-script text-2xl">Ваша</div>
+        <Reveal className="relative self-start overflow-hidden rounded-3.5 bg-brand-blue p-6.5 text-paper">
+          <img src={elFace} alt="" className="pointer-events-none absolute -top-2 -right-4 h-40 w-auto opacity-16 invert" />
+          <div className="relative font-script text-2xl">Ваша</div>
           <div className="mt-0.5 font-heading text-2xl leading-[.98] font-bold uppercase">
             Софья
             <br />

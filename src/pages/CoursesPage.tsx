@@ -7,7 +7,7 @@ import { Reveal } from '../components/ui/Reveal'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { courses } from '../data/courses'
 import logoKeymark from '../../assets/logo-keymark.png'
-import elKey from '../../assets/el-key.png'
+import elKey from '../../assets/el-key-hanging.svg'
 
 export default function CoursesPage() {
   const [searchParams, setSearchParams] = useSearchParams()
