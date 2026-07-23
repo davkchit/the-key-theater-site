@@ -18,19 +18,19 @@ export function Header() {
           scrolled ? 'bg-ink/70 shadow-[0_10px_30px_rgba(0,0,0,.28)] backdrop-blur-lg backdrop-saturate-180' : 'bg-ink',
         ].join(' ')}
       >
-        <div className="mx-auto flex max-w-320 items-center gap-5.5 px-6.5 py-4">
+        <div className="mx-auto flex max-w-320 items-center gap-7 px-6.5 py-4.5">
           <NavLink to="/" className="flex flex-shrink-0 items-center text-paper">
-            <img src={logoWordmark} alt="Театр Ключ" className="h-13 w-auto object-contain" />
+            <img src={logoWordmark} alt="Театр Ключ" className="h-15 w-auto object-contain" />
           </NavLink>
 
-          <nav className="ml-auto hidden items-center gap-6.5 md:flex">
+          <nav className="ml-auto hidden items-center gap-7 md:flex">
             {navItems.map((item) => (
               <NavLink
                 key={item.key}
                 to={item.to}
                 className={({ isActive }) =>
                   [
-                    'border-b-2 py-1.5 font-heading text-sm font-medium tracking-[.1em] uppercase transition-colors duration-200 hover:text-brand-yellow',
+                    'border-b-2 py-1.5 font-heading text-[15px] font-semibold tracking-[.1em] uppercase transition-colors duration-200 hover:text-brand-yellow',
                     isActive ? 'border-brand-yellow text-brand-yellow' : 'border-transparent text-paper',
                   ].join(' ')
                 }

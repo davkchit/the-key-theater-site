@@ -24,8 +24,6 @@ export interface AfishaItem {
   time: string
   /** row background: 'paper' -> cream neutral card, else the brand color */
   band: 'paper' | 'red' | 'blue'
-  /** date-number color when band is 'paper' (ignored otherwise, date is always paper-on-color) */
-  accent: 'red' | 'blue' | 'paper'
   thumb: string
 }
 

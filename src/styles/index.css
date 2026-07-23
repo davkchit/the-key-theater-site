@@ -69,6 +69,19 @@
   }
 }
 
+/* Scrollable containers that still need to scroll (e.g. a modal card taller
+   than the viewport) but shouldn't show the browser's own scrollbar chrome --
+   which reads as a stray grey bar over otherwise on-brand UI. */
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Reduced motion: CSS backstop for anything not driven by Framer Motion's
    useReducedMotion() (which gates the JS-driven variants directly). */
 @media (prefers-reduced-motion: reduce) {

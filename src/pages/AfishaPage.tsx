@@ -10,10 +10,14 @@ const months = [
 
 export default function AfishaPage() {
   return (
-    <div className="bg-ink">
-      <main className="mx-auto max-w-320 px-6.5 pt-7.5 pb-13 text-paper">
+    // -mb-17.5 cancels the global Footer's own mt-17.5 -- that margin exists
+    // to give the black footer breathing room against a *cream* page below
+    // it, but this page is already black right down to its own bottom edge,
+    // so the same margin was showing up as a stray cream sliver between the
+    // two black areas instead
+    <div className="-mb-17.5 overflow-hidden rounded-[2px] bg-ink">
+      <main className="mx-auto max-w-320 px-6.5 pt-7.5 pb-20 text-paper">
         <AfishaBlock
-          variant="flat"
           eyebrow="Сезон 2026 / 2027"
           heading="Афиша"
           headingAs="h1"
@@ -23,21 +27,19 @@ export default function AfishaPage() {
           topRight={
             <div className="flex gap-5.5 pb-2 font-heading text-base tracking-[.06em] uppercase">
               {months.map((m) => (
-                <span key={m.label} className={m.active ? 'border-b-3 border-brand-yellow pb-1.5 font-semibold text-paper' : 'text-[#6B655A]'}>
+                <span
+                  key={m.label}
+                  className={m.active ? 'border-b-3 border-brand-yellow pb-1.5 font-bold text-brand-yellow' : 'text-[#6B655A]'}
+                >
                   {m.label}
                 </span>
               ))}
             </div>
           }
           footer={
-            <div className="relative mt-6.5 flex justify-center">
-              <NavLink
-                to="/repertuar"
-                className="border-b-2 border-brand-yellow pb-1 font-heading text-sm font-medium tracking-[.1em] text-paper uppercase"
-              >
-                Весь репертуар
-              </NavLink>
-            </div>
+            <NavLink to="/repertuar" className="font-heading text-sm font-semibold tracking-[.12em] uppercase hover:underline">
+              Весь репертуар
+            </NavLink>
           }
         />
         <p className="mt-4.5 text-[13px] text-paper/45">

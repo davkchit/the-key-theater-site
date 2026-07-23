@@ -1,75 +1,60 @@
-# React + TypeScript + Vite
+# Театр Ключ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Сайт молодёжного театра «Ключ» (Набережные Челны) — афиша, репертуар, курсы, команда, галерея и контакты.
 
-Currently, two official plugins are available:
+## Стек
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [Vite](https://vite.dev) + React 19 + TypeScript (strict)
+- [React Router](https://reactrouter.com) — клиентский роутинг
+- [Tailwind CSS v4](https://tailwindcss.com) — стили
+- [Motion](https://motion.dev) — анимации и переходы между страницами
+- [React Hook Form](https://react-hook-form.com) + [Zod](https://zod.dev) — форма записи на курс
 
-## React Compiler
+## Команды
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install     # установка зависимостей
+npm run dev     # локальный сервер разработки
+npm run build   # проверка типов (tsc -b) + продакшн-сборка
+npm run lint    # ESLint
+npm run preview # предпросмотр собранного билда
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Структура
 
 ```
+src/
+  pages/        по одному компоненту на каждый маршрут
+  components/
+    layout/      Header, Footer, мобильное меню, переход между страницами
+    home/        секции главной страницы
+    afisha/      строка/список афиши (используется и на главной, и на /afisha)
+    repertoire/  карточки спектаклей
+    courses/     карточки курсов, форма записи
+    team/        карточки и карусель команды
+    ui/          мелкие переиспользуемые элементы (иконки, модалка, декор)
+  data/          контент сайта: спектакли, курсы, команда, афиша и т.д.
+  types/         общие TypeScript-типы контента
+  theme/         JS-зеркало Tailwind-темы (цвета, шрифты) — для мест,
+                 где нужен реальный hex/значение, а не класс
+  hooks/         небольшие переиспользуемые хуки
+assets/          изображения и SVG (вне src, импортируются напрямую)
+```
+
+## Маршруты
+
+| Путь | Страница |
+|---|---|
+| `/` | Главная |
+| `/afisha` | Афиша (полное расписание) |
+| `/repertuar` | Репертуар |
+| `/o-teatre` | О театре |
+| `/komanda` | Команда |
+| `/galereya` | Галерея |
+| `/kursy` | Курсы (+ форма записи) |
+| `/kontakty` | Контакты |
+
+## Заметки
+
+- Контент (спектакли, расписание, команда) — реальные данные театра, лежат в `src/data/`; правки контента чаще всего сводятся к правке одного файла там, без изменений в компонентах.
+- Афиша на главной странице и на `/afisha` — один и тот же компонент (`components/afisha/AfishaBlock`), просто с разными данными и обёрткой.

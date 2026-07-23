@@ -50,7 +50,7 @@ export function Modal({ open, onClose, children, labelledBy, shakeKey }: ModalPr
             role="dialog"
             aria-modal="true"
             aria-labelledby={labelledBy}
-            className="relative max-h-[90vh] w-full max-w-[460px] overflow-hidden overflow-y-auto rounded-[18px] border-2 border-ink bg-paper p-8"
+            className="no-scrollbar relative max-h-[90vh] w-full max-w-[460px] overflow-hidden overflow-y-auto rounded-[18px] border-2 border-ink bg-paper p-8"
             initial={{ opacity: 0, scale: 0.92, y: 10, filter: 'blur(6px)' }}
             animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, scale: 0.94, y: 6, filter: 'blur(4px)' }}
