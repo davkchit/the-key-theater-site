@@ -7,7 +7,7 @@ interface SocialIconProps {
 
 export function SocialIcon({ social, className }: SocialIconProps) {
   return (
-    <a href={social.href} aria-label={social.label} className={className}>
+    <a href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className={className}>
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
         <path d={social.path} />
       </svg>
