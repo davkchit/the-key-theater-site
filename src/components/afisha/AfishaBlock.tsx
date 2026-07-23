@@ -42,7 +42,10 @@ const rowArt: Record<string, string> = {
  */
 export function AfishaBlock({ eyebrow, heading, headingAs, headingClassName, topRight, items, ticketTo, footer }: AfishaBlockProps) {
   const Heading = headingAs
-  const artHeight = ROW_HEIGHT * 1.7
+  // modest bleed -- tall enough to visibly spill into the next row without
+  // reaching far enough to collide with that row's own illustration, no
+  // matter how many rows the list ends up with
+  const artHeight = ROW_HEIGHT * 1.28
 
   return (
     <div className="relative overflow-hidden rounded-[20px] bg-ink p-6.5 text-paper md:p-12">
@@ -56,7 +59,10 @@ export function AfishaBlock({ eyebrow, heading, headingAs, headingClassName, top
         {topRight}
       </div>
 
-      <div className="relative mt-7 -mx-6.5 md:-mx-12">
+      {/* partial breakout, not a full one: keeps a thin black margin on both
+          sides so a paper-colored row doesn't fuse into the page's own
+          paper background right at the card's edge */}
+      <div className="relative mt-7 -mx-3.5 md:-mx-9">
         <div className="flex flex-col">
           {items.map((item, i) => (
             <AfishaRow key={`${item.day}-${item.title}-${i}`} item={item} ticketTo={ticketTo} />
