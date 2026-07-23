@@ -22,9 +22,9 @@ export interface AfishaItem {
   age: string
   hall: string
   time: string
-  /** row background: 'dark' -> near-black #242424, else the brand color */
-  band: 'dark' | 'red' | 'blue'
-  /** date-number color when band is 'dark' (ignored otherwise, date is always paper-on-color) */
+  /** row background: 'paper' -> cream neutral card, else the brand color */
+  band: 'paper' | 'red' | 'blue'
+  /** date-number color when band is 'paper' (ignored otherwise, date is always paper-on-color) */
   accent: 'red' | 'blue' | 'paper'
   thumb: string
 }
