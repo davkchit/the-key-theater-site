@@ -2,6 +2,12 @@ import type { ReactNode } from 'react'
 import type { AfishaItem } from '../../types/content'
 import { StarIcon } from '../ui/StarIcon'
 import { AfishaRow, ROW_HEIGHT } from './AfishaRow'
+import elFace from '../../../assets/el-face.svg'
+import elChair from '../../../assets/el-chair.svg'
+import elStar from '../../../assets/el-star.svg'
+import elBoyFence from '../../../assets/el-boy-fence.svg'
+import elFlower from '../../../assets/el-flower.svg'
+import elScribbleX from '../../../assets/el-scribble-x.svg'
 
 interface AfishaBlockProps {
   eyebrow: string
@@ -14,16 +20,29 @@ interface AfishaBlockProps {
   footer?: ReactNode
 }
 
+// One of the brand book's hand-drawn line-art elements per show, not a
+// poster crop -- matches how the mockup illustrates each row. No brand
+// asset exists yet for "Никаких последствий" specifically, so it borrows
+// the flower (closest in tone to a romance-driven story).
+const rowArt: Record<string, string> = {
+  Симон: elFace,
+  'Никаких последствий': elFlower,
+  'Ева Кюн': elChair,
+  'Тратить деньги и хихикать': elScribbleX,
+  'Сказки на гранях': elStar,
+  'Эмиль из Леннеберги': elBoyFence,
+}
+
 /**
  * Shared shell for the afisha strip -- used by both the home page preview
  * and the /afisha page, so the row styling only has to be right in one place.
- * Rows render flush (no gaps/per-row rounding); each show's poster/photo is
- * layered on top afterwards, absolutely positioned taller than a row so it
- * can bleed into the row below, matching the brand-book mockup.
+ * Rows render flush (no gaps/per-row rounding); each show's brand line-art
+ * is layered on top afterwards, sized taller than a row so it can bleed
+ * into the row below, matching the brand-book mockup.
  */
 export function AfishaBlock({ eyebrow, heading, headingAs, headingClassName, topRight, items, ticketTo, footer }: AfishaBlockProps) {
   const Heading = headingAs
-  const bleed = 44
+  const artHeight = ROW_HEIGHT * 1.7
 
   return (
     <div className="relative overflow-hidden rounded-[20px] bg-ink p-6.5 text-paper md:p-12">
@@ -45,15 +64,17 @@ export function AfishaBlock({ eyebrow, heading, headingAs, headingClassName, top
         </div>
 
         {items.map((item, i) => {
+          const art = rowArt[item.title]
+          if (!art) return null
           const isLast = i === items.length - 1
-          const h = ROW_HEIGHT + (isLast ? 0 : bleed)
+          const h = isLast ? ROW_HEIGHT * 0.8 : artHeight
           return (
             <img
               key={`art-${item.day}-${item.title}-${i}`}
-              src={item.thumb}
+              src={art}
               alt=""
-              className="pointer-events-none absolute right-35 hidden object-cover md:right-45 md:block"
-              style={{ top: i * ROW_HEIGHT, height: h, width: h * 0.71 }}
+              className="pointer-events-none absolute right-40 hidden object-contain object-top md:right-52 md:block"
+              style={{ top: i * ROW_HEIGHT, height: h }}
             />
           )
         })}
