@@ -12,7 +12,7 @@ interface TeamCarouselProps {
  */
 export function TeamCarousel({ members }: TeamCarouselProps) {
   return (
-    <div className="flex snap-x snap-mandatory gap-3.5 overflow-x-auto pb-3 [scroll-padding-left:26px] md:hidden">
+    <div className="no-scrollbar flex snap-x snap-mandatory gap-3.5 overflow-x-auto pb-3 [scroll-padding-left:26px] md:hidden">
       {members.map((m) => (
         <TeamCard key={m.name} member={m} className="w-[74%] flex-none snap-center" />
       ))}

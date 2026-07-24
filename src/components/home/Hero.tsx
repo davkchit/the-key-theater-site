@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { StarIcon } from '../ui/StarIcon'
 import { SwallowIcon } from '../ui/SwallowIcon'
 import photo1 from '../../../assets/photo-1.jpg'
+import logoBadge from '../../../assets/logo-badge.png'
 
 export function Hero() {
   return (
@@ -66,6 +67,14 @@ export function Hero() {
             </div>
           </div>
           <StarIcon spin className="absolute -top-6 -left-4.5 h-19.5 w-19.5 text-brand-yellow" />
+          {/* same "stamped seal on the photo corner" idiom as the star above,
+              opposite corner -- the hand-drawn round emblem, slow-spinning
+              like every other kl-spin mark on the page */}
+          <img
+            src={logoBadge}
+            alt=""
+            className="animate-kl-spin pointer-events-none absolute -right-6 -bottom-7 h-26 w-26 drop-shadow-[0_6px_14px_rgba(0,0,0,.35)]"
+          />
         </div>
       </div>
     </section>
