@@ -1,8 +1,6 @@
 import type { TeamMember } from '../../types/content'
-import { StarIcon } from '../ui/StarIcon'
 import { SwallowIcon } from '../ui/SwallowIcon'
 import { WavyUnderline } from '../ui/WavyUnderline'
-import { brandColorHex } from '../../theme/tokens'
 
 interface TeamCardProps {
   member: TeamMember
@@ -30,17 +28,15 @@ export function TeamCard({ member, className }: TeamCardProps) {
       ].join(' ')}
     >
       <div className="group relative aspect-3/4 overflow-hidden bg-ink">
-        <StarIcon
-          className="absolute top-3 right-3 z-2 h-6.5 w-6.5"
-          style={{ color: brandColorHex[member.bg] }}
-          stroke="var(--color-paper)"
-          strokeWidth={4}
-        />
-        <img
-          src={member.photo}
-          alt={member.name}
-          className="h-full w-full object-cover opacity-82 transition-transform duration-500 group-hover:scale-105"
-        />
+        {member.photo ? (
+          <img
+            src={member.photo}
+            alt={member.name}
+            className="h-full w-full object-cover opacity-82 transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="h-full w-full bg-paper" />
+        )}
       </div>
       <div className="relative overflow-hidden p-4">
         <SwallowIcon className="pointer-events-none absolute -right-4.5 -bottom-3.5 h-23 -rotate-10 opacity-12" />

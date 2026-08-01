@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { Course } from '../../types/content'
+import { submitToSheet } from '../../data/sheetsForms'
 
 const contactFields = {
   phone: z.string().trim().min(1, 'Укажите телефон'),
@@ -62,23 +63,36 @@ export function SignupForm({ course, onSuccess, onInvalid }: SignupFormProps) {
         {course.price} · {course.start}
       </p>
       {course.isChild ? (
-        <ChildForm onSuccess={onSuccess} onInvalid={onInvalid} />
+        <ChildForm course={course} onSuccess={onSuccess} onInvalid={onInvalid} />
       ) : (
-        <AdultForm onSuccess={onSuccess} onInvalid={onInvalid} />
+        <AdultForm course={course} onSuccess={onSuccess} onInvalid={onInvalid} />
       )}
     </>
   )
 }
 
-function ChildForm({ onSuccess, onInvalid }: { onSuccess: () => void; onInvalid: () => void }) {
+function ChildForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess: () => void; onInvalid: () => void }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ChildValues>({ resolver: zodResolver(childSchema), defaultValues: { consent: false } })
 
+  const submit = async (values: ChildValues) => {
+    await submitToSheet('courses', {
+      Курс: course.name,
+      Имя: values.parentName,
+      Ребёнок: values.childName,
+      Возраст: String(values.childAge),
+      Телефон: values.phone,
+      Email: values.email,
+      Согласие: 'да',
+    })
+    onSuccess()
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSuccess, onInvalid)} className="relative flex flex-col gap-3">
+    <form onSubmit={handleSubmit(submit, onInvalid)} className="relative flex flex-col gap-3">
       <input {...register('parentName')} placeholder="Ваше имя" className={inputClass} />
       <FieldError message={errors.parentName?.message} />
       <input {...register('childName')} placeholder="Имя ребёнка" className={inputClass} />
@@ -95,15 +109,28 @@ function ChildForm({ onSuccess, onInvalid }: { onSuccess: () => void; onInvalid:
   )
 }
 
-function AdultForm({ onSuccess, onInvalid }: { onSuccess: () => void; onInvalid: () => void }) {
+function AdultForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess: () => void; onInvalid: () => void }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<AdultValues>({ resolver: zodResolver(adultSchema), defaultValues: { consent: false } })
 
+  const submit = async (values: AdultValues) => {
+    await submitToSheet('courses', {
+      Курс: course.name,
+      Имя: values.name,
+      Ребёнок: '',
+      Возраст: String(values.age),
+      Телефон: values.phone,
+      Email: values.email,
+      Согласие: 'да',
+    })
+    onSuccess()
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSuccess, onInvalid)} className="relative flex flex-col gap-3">
+    <form onSubmit={handleSubmit(submit, onInvalid)} className="relative flex flex-col gap-3">
       <input {...register('name')} placeholder="Ваше имя" className={inputClass} />
       <FieldError message={errors.name?.message} />
       <input {...register('age', { valueAsNumber: true })} type="number" min={14} placeholder="Ваш возраст" className={inputClass} />

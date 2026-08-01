@@ -1,6 +1,7 @@
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { PageTransition } from './components/layout/PageTransition'
+import { Mascot } from './components/mascot/Mascot'
 import bgPattern from '../assets/bg-pattern.png'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <Header />
       <PageTransition />
       <Footer />
+      <Mascot />
     </div>
   )
 }
