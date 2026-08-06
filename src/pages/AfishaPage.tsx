@@ -23,7 +23,7 @@ export default function AfishaPage() {
           headingAs="h1"
           headingClassName="mt-2 font-heading text-[clamp(46px,8vw,104px)] leading-[.84] font-bold uppercase"
           items={afishaFull}
-          ticketTo="/kursy"
+          ticketTo="/kontakty"
           topRight={
             <div className="flex gap-5.5 pb-2 font-heading text-base tracking-[.06em] uppercase">
               {months.map((m) => (

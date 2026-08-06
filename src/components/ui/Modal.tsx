@@ -54,7 +54,7 @@ export function Modal({ open, onClose, children, labelledBy, shakeKey }: ModalPr
             initial={{ opacity: 0, scale: 0.92, y: 10, filter: 'blur(6px)' }}
             animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, scale: 0.94, y: 6, filter: 'blur(4px)' }}
-            transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
             onClick={(e) => e.stopPropagation()}
           >
             <motion.div animate={shakeControls}>{children}</motion.div>

@@ -3,6 +3,7 @@ import { SocialIcon } from '../components/ui/SocialIcon'
 import { StarIcon } from '../components/ui/StarIcon'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { WavyUnderline } from '../components/ui/WavyUnderline'
+import { AudienceSignupForm } from '../components/contacts/AudienceSignupForm'
 import { socials } from '../data/socials'
 import photo3 from '../../assets/photo-3.jpg'
 
@@ -63,6 +64,25 @@ export default function ContactsPage() {
           </div>
         </Reveal>
       </div>
+
+      <Reveal index={2} className="relative mt-5 overflow-hidden rounded-3.5 bg-ink p-7.5 text-paper md:p-9">
+        <StarIcon spin className="pointer-events-none absolute top-7 right-7 h-14 w-14 text-brand-yellow opacity-70" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_.9fr] md:items-center">
+          <div>
+            <div className="font-script text-2xl text-brand-yellow">Не пропустите</div>
+            <h2 className="mt-1 font-heading text-[clamp(26px,3.4vw,38px)] leading-[1.02] font-bold uppercase">
+              Премьеры, фестиваль и новости театра
+            </h2>
+            <p className="mt-2.5 max-w-110 text-sm leading-[1.55] text-[#D8D2C4]">
+              Оставьте контакты — напишем, когда выйдет новый спектакль, откроется набор на курс или начнётся приём
+              заявок на фестиваль «Действующие лица».
+            </p>
+          </div>
+          <div className="max-w-100">
+            <AudienceSignupForm />
+          </div>
+        </div>
+      </Reveal>
     </main>
   )
 }

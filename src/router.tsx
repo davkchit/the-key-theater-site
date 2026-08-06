@@ -12,7 +12,9 @@ import AboutPage from './pages/AboutPage'
 import TeamPage from './pages/TeamPage'
 import GalleryPage from './pages/GalleryPage'
 import CoursesPage from './pages/CoursesPage'
+import CourseGroupPage from './pages/CourseGroupPage'
 import ContactsPage from './pages/ContactsPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 export const router = createHashRouter([
@@ -27,7 +29,9 @@ export const router = createHashRouter([
       { path: 'komanda', element: <TeamPage /> },
       { path: 'galereya', element: <GalleryPage /> },
       { path: 'kursy', element: <CoursesPage /> },
+      { path: 'kursy/:groupKey', element: <CourseGroupPage /> },
       { path: 'kontakty', element: <ContactsPage /> },
+      { path: 'politika', element: <PrivacyPolicyPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

@@ -2,7 +2,7 @@
 // theatre's own Google Sheet (see the `SHEETS` map in that script for the
 // sheet/column layout each formType maps to). No auth, no server of our
 // own -- deliberate for a small non-profit's traffic and budget.
-const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwlYYFXQCNy-e7sP7jZrdZiPiYzu9m5SHoTYoNGg2qQ24Edkn3vLJbrxLFFm2ssuPKm3Q/exec'
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwZCo7Na2ZaR8ZFeEqghhzU5RcmcdiD1SFuLlkEyqxNaCO691EGv5EPTD7NiLbPY3hH/exec'
 
 export type SheetFormType = 'courses' | 'audience' | 'festival'
 

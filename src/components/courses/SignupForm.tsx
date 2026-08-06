@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { NavLink } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -18,12 +19,14 @@ const childSchema = z.object({
   parentName: z.string().trim().min(1, 'Укажите ваше имя'),
   childName: z.string().trim().min(1, 'Укажите имя ребёнка'),
   childAge: z.number({ error: 'Укажите возраст' }).min(0, 'Некорректный возраст').max(17, 'Некорректный возраст'),
+  freeTime: z.string().trim().optional(),
   ...contactFields,
 })
 
 const adultSchema = z.object({
   name: z.string().trim().min(1, 'Укажите ваше имя'),
   age: z.number({ error: 'Укажите возраст' }).min(14, 'Курс рассчитан на 14+'),
+  freeTime: z.string().trim().optional(),
   ...contactFields,
 })
 
@@ -43,7 +46,7 @@ const courseBgVar: Record<Course['bg'], string> = {
 
 interface SignupFormProps {
   course: Course
-  onSuccess: () => void
+  onSuccess: (name: string) => void
   onInvalid: () => void
 }
 
@@ -71,24 +74,25 @@ export function SignupForm({ course, onSuccess, onInvalid }: SignupFormProps) {
   )
 }
 
-function ChildForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess: () => void; onInvalid: () => void }) {
+function ChildForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess: (name: string) => void; onInvalid: () => void }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ChildValues>({ resolver: zodResolver(childSchema), defaultValues: { consent: false } })
 
   const submit = async (values: ChildValues) => {
     await submitToSheet('courses', {
-      Курс: course.name,
+      Курс: course.isChild ? 'Детский' : 'Взрослый',
       Имя: values.parentName,
-      Ребёнок: values.childName,
-      Возраст: String(values.childAge),
+      'Имя ребёнка': values.childName,
+      'Возраст ребёнка': String(values.childAge),
       Телефон: values.phone,
       Email: values.email,
+      'Свободное время': values.freeTime ?? '',
       Согласие: 'да',
     })
-    onSuccess()
+    onSuccess(values.parentName)
   }
 
   return (
@@ -103,30 +107,31 @@ function ChildForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess
       <FieldError message={errors.phone?.message} />
       <input {...register('email')} type="email" placeholder="Email для рассылок" className={inputClass} />
       <FieldError message={errors.email?.message} />
+      <input {...register('freeTime')} placeholder="Свободное время для посещения (необязательно)" className={inputClass} />
       <ConsentField register={register('consent')} message={errors.consent?.message} />
-      <SubmitButton />
+      <SubmitButton pending={isSubmitting} />
     </form>
   )
 }
 
-function AdultForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess: () => void; onInvalid: () => void }) {
+function AdultForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess: (name: string) => void; onInvalid: () => void }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<AdultValues>({ resolver: zodResolver(adultSchema), defaultValues: { consent: false } })
 
   const submit = async (values: AdultValues) => {
     await submitToSheet('courses', {
-      Курс: course.name,
+      Курс: course.isChild ? 'Детский' : 'Взрослый',
       Имя: values.name,
-      Ребёнок: '',
       Возраст: String(values.age),
       Телефон: values.phone,
       Email: values.email,
+      'Свободное время': values.freeTime ?? '',
       Согласие: 'да',
     })
-    onSuccess()
+    onSuccess(values.name)
   }
 
   return (
@@ -139,8 +144,9 @@ function AdultForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess
       <FieldError message={errors.phone?.message} />
       <input {...register('email')} type="email" placeholder="Email для рассылок" className={inputClass} />
       <FieldError message={errors.email?.message} />
+      <input {...register('freeTime')} placeholder="Свободное время для посещения (необязательно)" className={inputClass} />
       <ConsentField register={register('consent')} message={errors.consent?.message} />
-      <SubmitButton />
+      <SubmitButton pending={isSubmitting} />
     </form>
   )
 }
@@ -163,11 +169,9 @@ function ConsentField({
         <input {...register} type="checkbox" className="mt-0.5 h-4.5 w-4.5 flex-shrink-0 cursor-pointer accent-brand-red" />
         <span>
           Отправляя заявку, вы подтверждаете, что ознакомлены с{' '}
-          {/* placeholder until a real policy page exists -- a <button> here, not an <a href="#">,
-              since it doesn't navigate anywhere yet (jsx-a11y/anchor-is-valid) */}
-          <button type="button" className="text-brand-red underline">
+          <NavLink to="/politika" target="_blank" className="text-brand-red underline">
             согласием на обработку персональных данных
-          </button>
+          </NavLink>
         </span>
       </label>
       <FieldError message={message} />
@@ -175,13 +179,14 @@ function ConsentField({
   )
 }
 
-function SubmitButton(): ReactNode {
+function SubmitButton({ pending }: { pending?: boolean }): ReactNode {
   return (
     <button
       type="submit"
-      className="rounded-lg bg-brand-red py-4 font-heading text-[15px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-[.96]"
+      disabled={pending}
+      className="rounded-lg bg-brand-red py-4 font-heading text-[15px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-[.96] disabled:opacity-60 disabled:hover:translate-y-0 disabled:active:scale-100"
     >
-      Отправить заявку
+      {pending ? 'Отправляем…' : 'Отправить заявку'}
     </button>
   )
 }

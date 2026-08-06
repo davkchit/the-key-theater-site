@@ -4,7 +4,7 @@ import { navItems } from '../../data/nav'
 import { useScrolled } from '../../hooks/useScrolled'
 import { Burger } from './Burger'
 import { MobileMenu } from './MobileMenu'
-import logoWordmark from '../../../assets/logo-wordmark.png'
+import logoBadge from '../../../assets/logo-badge.png'
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -20,7 +20,7 @@ export function Header() {
       >
         <div className="mx-auto flex max-w-320 items-center gap-7 px-6.5 py-4.5">
           <NavLink to="/" className="flex flex-shrink-0 items-center text-paper">
-            <img src={logoWordmark} alt="Театр Ключ" className="h-15 w-auto object-contain" />
+            <img src={logoBadge} alt="Театр Ключ" className="h-13 w-13 object-contain" />
           </NavLink>
 
           <nav className="ml-auto hidden items-center gap-7 md:flex">

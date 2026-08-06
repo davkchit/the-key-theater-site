@@ -1,12 +1,23 @@
-import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
 import { Reveal } from '../components/ui/Reveal'
 import { StarIcon } from '../components/ui/StarIcon'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
+import { Modal } from '../components/ui/Modal'
+import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { awards } from '../data/awards'
 import photo2 from '../../assets/photo-2.jpg'
 import elFace from '../../assets/el-face.svg'
 
 export default function AboutPage() {
+  const [festivalOpen, setFestivalOpen] = useState(false)
+  const [festivalSent, setFestivalSent] = useState(false)
+  const [shakeKey, setShakeKey] = useState(0)
+
+  const openFestival = () => {
+    setFestivalSent(false)
+    setFestivalOpen(true)
+  }
+
   return (
     <main className="mx-auto max-w-320 px-6.5 pt-13">
       <div className="font-heading text-[13px] font-medium tracking-[.18em] text-[#6B655A] uppercase">О театре</div>
@@ -81,14 +92,31 @@ export default function AboutPage() {
             Проводим с 2004 года — к нам приезжают театральные коллективы со всей России. В программе — показы и
             мастерские для участников.
           </p>
-          <NavLink
-            to="/kontakty"
+          <button
+            onClick={openFestival}
             className="relative mt-5 inline-block rounded-md bg-ink px-6.5 py-3.25 font-heading text-[13px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95"
           >
             Стать участником
-          </NavLink>
+          </button>
         </Reveal>
       </div>
+
+      <Modal open={festivalOpen} onClose={() => setFestivalOpen(false)} shakeKey={shakeKey} labelledBy="festival-signup-title">
+        <button
+          onClick={() => setFestivalOpen(false)}
+          aria-label="Закрыть"
+          className="absolute top-4.5 right-4.5 h-9.5 w-9.5 rounded-lg border-2 border-ink text-base transition-transform duration-150 active:scale-90"
+        >
+          ✕
+        </button>
+        {festivalSent ? (
+          <div className="rounded-[10px] bg-brand-blue/8 p-4.5 text-[14px] leading-[1.5] font-semibold text-brand-blue">
+            ✳ Спасибо! Заявка отправлена — мы запомнили ваш коллектив и напишем сами.
+          </div>
+        ) : (
+          <FestivalSignupForm onSuccess={() => setFestivalSent(true)} onInvalid={() => setShakeKey((k) => k + 1)} />
+        )}
+      </Modal>
 
       <Reveal className="relative mt-4 grid grid-cols-1 gap-6 overflow-hidden rounded-3.5 bg-brand-blue p-7.5 text-paper md:grid-cols-2">
         <div>

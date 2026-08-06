@@ -10,8 +10,13 @@ const GREETING = 'Мяу! Я котик-помощник театра «Ключ
 
 // bottom-edge positions (px from the right edge) the mascot occasionally
 // wanders between -- a short walk along the footer strip, never into the
-// middle of the page where it could sit on top of real content
-const WALK_SPOTS = [24, 200, 420, 90]
+// middle of the page where it could sit on top of real content. These are
+// desktop-scale distances; on a narrow phone screen `right: 420` alone would
+// push the whole mascot past the left edge, so they get clamped against the
+// live viewport width below rather than used as-is.
+const BASE_WALK_SPOTS = [24, 200, 420, 90]
+// mascot's own footprint (h-16.5/w-16.5 = 66px) plus a little breathing room
+const MASCOT_FOOTPRINT = 90
 
 const buttonClass =
   'w-full rounded-[10px] border-2 border-ink bg-paper px-3.5 py-2.5 text-left text-[13.5px] font-semibold transition-colors hover:bg-brand-yellow'
@@ -21,6 +26,7 @@ export function Mascot() {
   const [categoryId, setCategoryId] = useState<string | null>(null)
   const [itemId, setItemId] = useState<string | null>(null)
   const [spotIndex, setSpotIndex] = useState(0)
+  const [viewportW, setViewportW] = useState(() => (typeof window === 'undefined' ? 1280 : window.innerWidth))
   const panelRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
 
@@ -28,16 +34,29 @@ export function Mascot() {
   useEscapeKey(open, close)
   useFocusTrap(panelRef, open)
 
+  useEffect(() => {
+    const onResize = () => setViewportW(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   // occasional short walk along the bottom edge -- most of the time it just
   // idles in place (see the CSS kl-float bob on the inner wrapper below)
   useEffect(() => {
     if (prefersReducedMotion) return
     const id = setInterval(
-      () => setSpotIndex((i) => (i + 1 + Math.floor(Math.random() * (WALK_SPOTS.length - 1))) % WALK_SPOTS.length),
+      () => setSpotIndex((i) => (i + 1 + Math.floor(Math.random() * (BASE_WALK_SPOTS.length - 1))) % BASE_WALK_SPOTS.length),
       25000,
     )
     return () => clearInterval(id)
   }, [prefersReducedMotion])
+
+  // below 640px the open panel (up to 100vw-32px wide) anchored off the
+  // mascot's own position would overflow the left edge the moment the
+  // mascot wanders anywhere left of the corner -- so on phones it just
+  // parks in the corner and only bobs in place, no horizontal wandering
+  const maxRight = Math.max(24, viewportW - MASCOT_FOOTPRINT)
+  const walkSpots = viewportW < 640 ? [24] : BASE_WALK_SPOTS.map((s) => Math.min(s, maxRight))
 
   const category = mascotMenu.find((c) => c.id === categoryId) ?? null
   const item = category?.items.find((i) => i.id === itemId) ?? null
@@ -50,8 +69,8 @@ export function Mascot() {
   return createPortal(
     <motion.div
       className="fixed bottom-4 z-60"
-      initial={{ right: WALK_SPOTS[0] }}
-      animate={{ right: WALK_SPOTS[spotIndex] }}
+      initial={false}
+      animate={{ right: walkSpots[spotIndex % walkSpots.length] }}
       transition={{ duration: 3.5, ease: [0.4, 0, 0.2, 1] }}
     >
       <AnimatePresence>
@@ -64,7 +83,7 @@ export function Mascot() {
             initial={{ opacity: 0, scale: 0.94, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 6 }}
-            transition={{ duration: 0.22 }}
+            transition={{ type: 'spring', bounce: 0, duration: 0.32 }}
           >
             <div className="flex items-start justify-between gap-3 border-b-2 border-ink bg-brand-yellow p-3.5">
               <p className="text-[13px] leading-[1.4] font-semibold">

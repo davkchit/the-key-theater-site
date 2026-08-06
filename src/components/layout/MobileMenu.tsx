@@ -22,7 +22,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           initial={{ opacity: 0, scale: 0.98, y: -18 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.98, y: -18 }}
-          transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
         >
           <div className="flex items-center justify-between">
             <img src={logoWordmark} alt="Театр Ключ" className="h-[46px] w-auto object-contain" />

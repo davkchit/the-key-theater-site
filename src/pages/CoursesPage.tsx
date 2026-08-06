@@ -1,29 +1,36 @@
 import { useCallback, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { CourseCard } from '../components/courses/CourseCard'
+import { NavLink, useSearchParams } from 'react-router-dom'
+import { CourseGroupCard } from '../components/courses/CourseGroupCard'
 import { SignupForm } from '../components/courses/SignupForm'
 import { Modal } from '../components/ui/Modal'
 import { Reveal } from '../components/ui/Reveal'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { courses } from '../data/courses'
+import { courseGroups } from '../data/courseGroups'
 import logoKeymark from '../../assets/logo-keymark.png'
 import elKey from '../../assets/el-key-hanging.svg'
 
 export default function CoursesPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [sent, setSent] = useState(false)
+  const [sentName, setSentName] = useState('')
   const [shakeKey, setShakeKey] = useState(0)
 
   const courseKey = searchParams.get('course')
   const course = courses.find((c) => c.key === courseKey) ?? null
 
-  const openCourse = useCallback(
-    (key: string) => {
-      setSent(false)
-      setSearchParams({ course: key })
-    },
-    [setSearchParams],
-  )
+  // group cards / group detail pages link straight to `/kursy?course=...`
+  // instead of going through a click handler on this page, so a course
+  // switch shows up here purely as a searchParams change -- adjust the
+  // just-submitted state during render (React's recommended pattern for
+  // this, rather than an effect) so a new course opens the form again
+  // instead of the previous course's thank-you message.
+  const [prevCourseKey, setPrevCourseKey] = useState(courseKey)
+  if (courseKey !== prevCourseKey) {
+    setPrevCourseKey(courseKey)
+    setSent(false)
+  }
+
   const close = useCallback(() => {
     setSearchParams({}, { replace: true })
     setSent(false)
@@ -43,9 +50,9 @@ export default function CoursesPage() {
         может каждый.
       </p>
 
-      <div className="mt-7.5 grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-        {courses.map((c, i) => (
-          <CourseCard key={c.key} course={c} index={i} onOpen={() => openCourse(c.key)} />
+      <div className="mt-7.5 grid grid-cols-1 gap-3.5 lg:grid-cols-3">
+        {courseGroups.map((g, i) => (
+          <CourseGroupCard key={g.key} group={g} index={i} />
         ))}
       </div>
 
@@ -98,10 +105,22 @@ export default function CoursesPage() {
         {course &&
           (sent ? (
             <div className="rounded-[10px] bg-brand-blue/8 p-4.5 text-[14px] leading-[1.5] font-semibold text-brand-blue">
-              ✳ Спасибо! Заявка на поток «{course.name}» отправлена — мы свяжемся с вами.
+              ✳ Здравствуйте, {sentName}! Заявка на поток «{course.name}» принята — мы свяжемся с вами в ближайшее время.{' '}
+              А пока приглашаем на{' '}
+              <NavLink to="/afisha" className="underline">
+                наши спектакли
+              </NavLink>
+              .
             </div>
           ) : (
-            <SignupForm course={course} onSuccess={() => setSent(true)} onInvalid={() => setShakeKey((k) => k + 1)} />
+            <SignupForm
+              course={course}
+              onSuccess={(name) => {
+                setSentName(name)
+                setSent(true)
+              }}
+              onInvalid={() => setShakeKey((k) => k + 1)}
+            />
           ))}
       </Modal>
     </main>
