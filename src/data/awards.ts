@@ -1,7 +1,5 @@
-export const awards: string[] = [
-  'Софья Дивногорская — член Союза театральных деятелей РФ',
-  'Софья Дивногорская — лауреат премии СТД РФ «Признание» за развитие театра в России',
-  'Софья Дивногорская — более 50 режиссёрских работ, опыт преподавания больше 30 лет',
-  'С 2003 года поставили больше 30 спектаклей',
-  'Организатор всероссийского театрального фестиваля «Действующие лица» с 2004 года',
-]
+import awardsContent from '../content/awards.json'
+
+// Content lives in src/content/awards.json (Decap CMS-managed) -- see
+// public/admin/config.yml for the collection definition.
+export const awards: string[] = awardsContent.items

@@ -4,7 +4,7 @@ import { navItems } from '../../data/nav'
 import { useScrolled } from '../../hooks/useScrolled'
 import { Burger } from './Burger'
 import { MobileMenu } from './MobileMenu'
-import logoBadge from '../../../assets/logo-badge.png'
+import logoBadge from '../../../assets/logo-badge.svg'
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)

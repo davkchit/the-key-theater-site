@@ -1,0 +1,12 @@
+{
+  "images": [
+    { "src": "/uploads/gallery/spektakl-1.jpg", "span": "wide" },
+    { "src": "/uploads/gallery/spektakl-2.jpg", "span": "normal" },
+    { "src": "/uploads/gallery/spektakl-3.jpg", "span": "normal" },
+    { "src": "/uploads/gallery/lager-1.jpg", "span": "normal" },
+    { "src": "/uploads/gallery/lager-2.jpg", "span": "normal" },
+    { "src": "/uploads/gallery/lager-3.jpg", "span": "wide" },
+    { "src": "/uploads/gallery/nagrazhdenie-1.jpg", "span": "normal" },
+    { "src": "/uploads/gallery/nagrazhdenie-2.jpg", "span": "normal" }
+  ]
+}

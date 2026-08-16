@@ -4,7 +4,10 @@
 // own -- deliberate for a small non-profit's traffic and budget.
 const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwZCo7Na2ZaR8ZFeEqghhzU5RcmcdiD1SFuLlkEyqxNaCO691EGv5EPTD7NiLbPY3hH/exec'
 
-export type SheetFormType = 'courses' | 'audience' | 'festival'
+// 'mascot' is a new formType -- the Apps Script's SHEETS map needs a matching
+// sheet/column entry added on the theatre's side before these rows have
+// anywhere to land (fire-and-forget + no-cors means a missing route fails silently).
+export type SheetFormType = 'courses' | 'audience' | 'festival' | 'mascot'
 
 /**
  * Fire-and-forget submit to the Sheet. `mode: 'no-cors'` plus a `text/plain`

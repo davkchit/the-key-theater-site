@@ -5,6 +5,7 @@ import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { Modal } from '../components/ui/Modal'
 import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { awards } from '../data/awards'
+import { festivalApplicationsOpen } from '../data/festival'
 import photo2 from '../../assets/photo-2.jpg'
 import elFace from '../../assets/el-face.svg'
 
@@ -92,12 +93,18 @@ export default function AboutPage() {
             Проводим с 2004 года — к нам приезжают театральные коллективы со всей России. В программе — показы и
             мастерские для участников.
           </p>
-          <button
-            onClick={openFestival}
-            className="relative mt-5 inline-block rounded-md bg-ink px-6.5 py-3.25 font-heading text-[13px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95"
-          >
-            Стать участником
-          </button>
+          {festivalApplicationsOpen ? (
+            <button
+              onClick={openFestival}
+              className="relative mt-5 inline-block rounded-md bg-ink px-6.5 py-3.25 font-heading text-[13px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95"
+            >
+              Стать участником
+            </button>
+          ) : (
+            <div className="relative mt-5 inline-block rounded-md border-2 border-ink px-6.5 py-3.25 font-heading text-[13px] font-semibold tracking-[.08em] uppercase">
+              Приём заявок закрыт — следите за новостями
+            </div>
+          )}
         </Reveal>
       </div>
 

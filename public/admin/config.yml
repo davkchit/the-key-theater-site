@@ -1,0 +1,181 @@
+# Decap CMS config. Docs: https://decapcms.org/docs/configuration-options/
+#
+# backend.base_url must point at an OAuth proxy that can exchange a GitHub
+# auth code for a token (Decap's GitHub backend needs this because the
+# exchange requires a client secret, which can't live in the browser).
+# We are NOT hosting the site on Netlify, but you can still use Netlify purely
+# as a free OAuth proxy for this one step -- create an empty Netlify site,
+# enable Identity + the "GitHub" auth provider in its dashboard, and put that
+# site's URL below. Only the person editing content ever touches this URL;
+# site visitors never do.
+backend:
+  name: github
+  repo: davkchit/the-key-theater-site
+  branch: master
+  base_url: https://REPLACE-ME.netlify.app
+
+# Lets /admin run against a local proxy (`npx decap-server`) instead of real
+# GitHub -- for trying out the CMS UI before the OAuth proxy above is wired
+# up. Decap only uses this when it detects it's running on localhost; remove
+# once the real backend is confirmed working.
+local_backend: true
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: shows
+    label: Репертуар
+    files:
+      - name: shows
+        label: Спектакли
+        file: src/content/shows.json
+        fields:
+          - label: Спектакли
+            name: shows
+            widget: list
+            summary: '{{title}} ({{age}})'
+            fields:
+              - { label: Название, name: title, widget: string }
+              - { label: Возраст, name: age, widget: string, hint: 'Например 16+' }
+              - { label: По мотивам, name: based, widget: string }
+              - { label: Режиссёр, name: dir, widget: string }
+              - { label: Длительность, name: dur, widget: string, hint: 'Например 1 ч 40 мин' }
+              - { label: Афиша/фото, name: photo, widget: image }
+              - { label: Это постер (а не фото со сцены), name: poster, widget: boolean, default: true }
+              - label: Цвет карточки
+                name: bg
+                widget: select
+                options: [red, yellow, blue, ink]
+
+  - name: afisha
+    label: Афиша (расписание)
+    files:
+      - name: afisha
+        label: Показы
+        file: src/content/afisha.json
+        fields:
+          - label: Показы
+            name: items
+            widget: list
+            summary: '{{day}} {{mon}} — {{title}}'
+            fields:
+              - { label: День (число), name: day, widget: string, hint: 'Например 05' }
+              - { label: Месяц, name: mon, widget: string, hint: 'Например сентября' }
+              - { label: День недели, name: wd, widget: string, hint: 'Например суббота' }
+              - { label: Название спектакля, name: title, widget: string }
+              - { label: Возраст, name: age, widget: string }
+              - { label: Зал, name: hall, widget: string }
+              - { label: Время, name: time, widget: string, hint: 'Например 18:00' }
+              - label: Цвет строки
+                name: band
+                widget: select
+                options: [paper, red, blue]
+              - { label: Миниатюра, name: thumb, widget: image }
+
+  - name: courses
+    label: Курсы
+    files:
+      - name: courses
+        label: Список курсов
+        file: src/content/courses.json
+        fields:
+          - label: Курсы
+            name: items
+            widget: list
+            summary: '{{name}} ({{ageRange}})'
+            fields:
+              - { label: Ключ (латиницей, без пробелов), name: key, widget: string, hint: 'Не менять для существующих курсов -- на него ссылаются группы' }
+              - { label: Название, name: name, widget: string }
+              - { label: Возраст, name: ageRange, widget: string }
+              - label: Цвет карточки
+                name: bg
+                widget: select
+                options: [red, yellow, blue, ink]
+              - { label: Описание, name: desc, widget: text }
+              - { label: Цена, name: price, widget: string }
+              - { label: Старт группы, name: start, widget: string }
+              - { label: Детский курс, name: isChild, widget: boolean }
+
+  - name: courseGroups
+    label: Группы курсов (карточки на странице «Курсы»)
+    files:
+      - name: courseGroups
+        label: Группы
+        file: src/content/courseGroups.json
+        fields:
+          - label: Группы
+            name: items
+            widget: list
+            summary: '{{title}}'
+            fields:
+              - { label: Ключ (латиницей, без пробелов), name: key, widget: string }
+              - { label: Заголовок, name: title, widget: string }
+              - { label: Возраст, name: ageRange, widget: string }
+              - { label: Краткое описание, name: shortDesc, widget: text }
+              - label: Цвет карточки
+                name: bg
+                widget: select
+                options: [red, yellow, blue, ink]
+              - { label: Ключи курсов из раздела «Курсы» (через запятую), name: courseKeys, widget: list }
+
+  - name: team
+    label: Команда
+    files:
+      - name: team
+        label: Состав
+        file: src/content/team.json
+        fields:
+          - label: Люди
+            name: members
+            widget: list
+            summary: '{{name}} — {{role}}'
+            fields:
+              - { label: Имя, name: name, widget: string }
+              - { label: Роль, name: role, widget: string }
+              - { label: Фото, name: photo, widget: image, required: false }
+              - label: Цвет карточки
+                name: bg
+                widget: select
+                options: [red, yellow, blue, ink]
+              - { label: Художественный руководитель (выделяется на странице), name: lead, widget: boolean, required: false, default: false }
+
+  - name: gallery
+    label: Галерея
+    files:
+      - name: gallery
+        label: Фото
+        file: src/content/gallery.json
+        fields:
+          - label: Фотографии
+            name: images
+            widget: list
+            summary: '{{src}}'
+            fields:
+              - { label: Фото, name: src, widget: image }
+              - label: Размер плитки
+                name: span
+                widget: select
+                options: [normal, wide]
+                default: normal
+
+  - name: awards
+    label: Награды
+    files:
+      - name: awards
+        label: Список наград
+        file: src/content/awards.json
+        fields:
+          - label: Награды
+            name: items
+            widget: list
+            field: { label: Награда, name: award, widget: string }
+
+  - name: settings
+    label: Настройки сайта
+    files:
+      - name: settings
+        label: Общие настройки
+        file: src/content/settings.json
+        fields:
+          - { label: Приём заявок на фестиваль «Действующие лица» открыт, name: festivalApplicationsOpen, widget: boolean }
