@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && node bot/scripts/publish-knowledge.mjs && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "cms:server": "decap-server"
+    "cms:server": "decap-server",
+    "knowledge": "node bot/scripts/publish-knowledge.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

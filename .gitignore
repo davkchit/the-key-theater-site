@@ -22,3 +22,24 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets -- bot tokens and API keys, never committed
+.env
+.env.*
+!.env.example
+
+# собирается при `npm run build` из src/content и bot/core/faq.md
+public/knowledge.json
+
+# выгрузка для векторного хранилища, собирается скриптом
+bot/export/
+
+# рабочие данные бота: заявки, диалоги, логи (персональные данные!)
+bot/data/
+
+# внутренние документы театра (планы, люди): репозиторий публичный
+bot/docs/
+
+# локальные прогоны проверки бота и случайные базы
+bot/eval/runs/
+database.sqlite
