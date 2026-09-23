@@ -30,12 +30,13 @@ export default function ContactsPage() {
             <SwallowIcon className="pointer-events-none absolute -right-6 -bottom-2.5 h-37.5 -rotate-10 text-paper opacity-12" />
             <div className="font-heading text-xs font-medium tracking-[.14em] uppercase opacity-90">Адрес</div>
             <div className="mt-2.5 font-heading text-2xl leading-[1.15] font-semibold uppercase">
-              ул. Академика
+              Новый город,
               <br />
-              Рубаненко, 2
+              1/02
             </div>
             <WavyUnderline className="mt-3 h-3 w-30" />
-            <div className="mt-2.5 text-sm opacity-92">Набережные Челны, Республика Татарстан</div>
+            <div className="mt-2.5 text-sm opacity-92">Здание МЦ «НУР», второй вход</div>
+            <div className="mt-1 text-sm opacity-92">Набережные Челны, Республика Татарстан</div>
           </Reveal>
 
           <Reveal index={2} className="rounded-3.5 border-2 border-ink p-6.5">

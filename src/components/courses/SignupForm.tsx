@@ -34,7 +34,7 @@ type ChildValues = z.infer<typeof childSchema>
 type AdultValues = z.infer<typeof adultSchema>
 
 const inputClass =
-  'rounded-[10px] border-2 border-[#D3CCBB] bg-paper px-4 py-3.75 font-body text-[15px] outline-none transition-colors focus:border-brand-red'
+  'rounded-[10px] border-2 border-[#D3CCBB] bg-paper px-4 py-3.75 font-body text-[15px] text-ink outline-none transition-colors placeholder:text-[#8b8474] focus:border-brand-red'
 const errorClass = 'text-[12.5px] font-semibold text-brand-red'
 
 const courseBgVar: Record<Course['bg'], string> = {

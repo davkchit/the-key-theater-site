@@ -12,7 +12,7 @@ export function Burger({ open, onClick }: BurgerProps) {
       onClick={onClick}
       aria-label={open ? 'Закрыть меню' : 'Открыть меню'}
       aria-expanded={open}
-      className="ml-auto flex h-[46px] w-[46px] flex-shrink-0 flex-col items-center justify-center gap-[3px] border-none bg-transparent p-0 transition-transform duration-150 active:scale-90 md:hidden"
+      className="ml-auto flex h-[46px] w-[46px] flex-shrink-0 flex-col items-center justify-center gap-[3px] border-none bg-transparent p-0 transition-transform duration-150 active:scale-90 lg:hidden"
     >
       {[0, 1, 2].map((i) => (
         <svg

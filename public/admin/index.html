@@ -93,13 +93,14 @@
                 h(
                   'div',
                   { style: { padding: 16 } },
+                  s.get('genre') ? h('div', { style: { fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: BRAND_BG.red, marginBottom: 4 } }, s.get('genre')) : null,
                   h('div', { style: { fontWeight: 800, textTransform: 'uppercase', fontSize: 20 } }, s.get('title')),
                   h('div', { style: { marginTop: 8, fontSize: 13, color: '#33302a' } }, s.get('based')),
                   h(
                     'div',
                     { style: { marginTop: 10, display: 'flex', justifyContent: 'space-between', fontSize: 11, textTransform: 'uppercase', color: '#6B655A' } },
-                    h('span', {}, 'реж. ' + s.get('dir')),
-                    h('span', {}, s.get('dur')),
+                    h('span', {}, s.get('dir') ? 'реж. ' + s.get('dir') : ''),
+                    h('span', {}, s.get('dur') || ''),
                   ),
                 ),
               )

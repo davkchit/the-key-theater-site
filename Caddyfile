@@ -1,0 +1,9 @@
+# Railway injects $PORT; 8080 is just a local-run fallback.
+:{$PORT:8080} {
+	root * /srv
+	encode gzip
+	# SPA fallback: harmless for the current hash router, and already correct
+	# if the router is later switched to real paths.
+	try_files {path} /index.html
+	file_server
+}

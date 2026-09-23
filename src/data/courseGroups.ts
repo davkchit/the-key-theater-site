@@ -9,6 +9,9 @@ export interface CourseGroup {
   bg: Course['bg']
   /** keys into courses.ts, in display order -- first is the one opened by the top-level "Записаться" shortcut */
   courseKeys: string[]
+  /** optional gallery; the section is hidden entirely when empty, rather than
+   *  rendering placeholder tiles the theatre never got round to filling */
+  photos?: string[]
 }
 
 // Content lives in src/content/courseGroups.json (Decap CMS-managed) -- see

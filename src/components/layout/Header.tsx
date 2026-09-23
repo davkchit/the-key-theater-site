@@ -23,7 +23,7 @@ export function Header() {
             <img src={logoBadge} alt="Театр Ключ" className="h-13 w-13 object-contain" />
           </NavLink>
 
-          <nav className="ml-auto hidden items-center gap-7 md:flex">
+          <nav className="ml-auto hidden items-center gap-7 lg:flex">
             {navItems.map((item) => (
               <NavLink
                 key={item.key}
@@ -42,7 +42,7 @@ export function Header() {
 
           <NavLink
             to="/afisha"
-            className="hidden flex-shrink-0 rounded bg-brand-yellow px-5 py-3 font-heading text-[13px] font-semibold tracking-[.1em] text-ink uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95 md:block"
+            className="hidden flex-shrink-0 rounded bg-brand-yellow px-5 py-3 font-heading text-[13px] font-semibold tracking-[.1em] text-ink uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95 lg:block"
           >
             Купить билет
           </NavLink>

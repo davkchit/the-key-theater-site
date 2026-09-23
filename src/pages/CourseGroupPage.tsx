@@ -5,6 +5,7 @@ import { TeamCard } from '../components/team/TeamCard'
 import { courseGroups } from '../data/courseGroups'
 import { courses } from '../data/courses'
 import { team } from '../data/team'
+import { mediaUrl } from '../lib/mediaUrl'
 
 export default function CourseGroupPage() {
   const { groupKey } = useParams()
@@ -25,19 +26,18 @@ export default function CourseGroupPage() {
       <h1 className="mt-2.5 font-heading text-[clamp(38px,6.4vw,80px)] leading-[.92] font-bold uppercase">{group.title}</h1>
       <p className="mt-3.5 max-w-155 text-[17px] leading-[1.55] text-[#33302a]">{group.shortDesc}</p>
 
-      <Reveal className="mt-9">
-        <h2 className="mb-3.5 font-heading text-2xl font-bold uppercase">Галерея</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="flex aspect-square items-center justify-center rounded-[10px] border-2 border-dashed border-[#D3CCBB] p-3 text-center text-[12px] leading-[1.4] text-[#9B9484]"
-            >
-              Фото скоро появится
-            </div>
-          ))}
-        </div>
-      </Reveal>
+      {group.photos && group.photos.length > 0 && (
+        <Reveal className="mt-9">
+          <h2 className="mb-3.5 font-heading text-2xl font-bold uppercase">Галерея</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {group.photos.map((src) => (
+              <div key={src} className="aspect-square overflow-hidden rounded-[10px] border-2 border-ink">
+                <img src={mediaUrl(src)} alt="" className="h-full w-full object-cover" />
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      )}
 
       {teachers.length > 0 && (
         <Reveal index={1} className="mt-9">

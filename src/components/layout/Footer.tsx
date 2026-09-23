@@ -61,10 +61,11 @@ export function Footer() {
             <a href="tel:+79625739219" className="font-bold text-paper">
               +7 962 573-92-19
             </a>
-            <span className="text-[#8F887A]">ул. Академика Рубаненко, 2</span>
+            <span className="text-[#8F887A]">Новый город, 1/02 — МЦ «НУР», второй вход</span>
             <span className="text-[#8F887A]">Набережные Челны</span>
-            {/* demo content, not a real domain -- plain text, not a link (jsx-a11y/anchor-is-valid) */}
-            <span className="font-semibold text-brand-yellow">kluchtheatre.ru</span>
+            <a href="mailto:kluchtheatre@mail.ru" className="font-semibold text-brand-yellow">
+              kluchtheatre@mail.ru
+            </a>
           </div>
         </div>
       </div>

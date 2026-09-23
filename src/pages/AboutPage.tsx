@@ -5,6 +5,7 @@ import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { Modal } from '../components/ui/Modal'
 import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { awards } from '../data/awards'
+import { productions } from '../data/productions'
 import { festivalApplicationsOpen } from '../data/festival'
 import photo2 from '../../assets/photo-2.jpg'
 import elFace from '../../assets/el-face.svg'
@@ -29,6 +30,10 @@ export default function AboutPage() {
           <p className="mb-4.5 font-script text-[30px] leading-[1.1] text-brand-blue">
             Нам нравится жить по правилам, которые мы сами придумываем.
           </p>
+          <blockquote className="mb-4.5 border-l-3 border-brand-red pl-4 text-[clamp(15px,1.6vw,18px)] leading-[1.55] text-[#57503f] italic">
+            «Необходимо создавать места, где можно остановить время и там ждать отставшую душу»
+            <span className="mt-1 block text-[13px] not-italic opacity-70">Тонино Гуэрра — это о нашем театре</span>
+          </blockquote>
           <p className="mb-4.5">
             Мы родились в 2003 году — компания молодых неформалов начала делать свою театральную студию при Центре
             детского творчества «Огниво». Уже в 2004-м провели первый Всероссийский театральный фестиваль
@@ -41,7 +46,7 @@ export default function AboutPage() {
             и подростков и курсы для взрослых, а в 2022-м — летний театральный лагерь «Солнечная пыль».
           </p>
           <p className="mb-4.5">
-            За эти годы мы поставили больше 30 спектаклей и съездили на гастроли в Сербию, Литву, Латвию, Беларусь и
+            За эти годы мы поставили {productions.length} спектаклей и съездили на гастроли в Сербию, Литву, Латвию, Беларусь и
             Армению.
           </p>
           <p className="mb-4.5">
@@ -124,6 +129,24 @@ export default function AboutPage() {
           <FestivalSignupForm onSuccess={() => setFestivalSent(true)} onInvalid={() => setShakeKey((k) => k + 1)} />
         )}
       </Modal>
+
+      <Reveal className="relative mt-4 overflow-hidden rounded-3.5 border-2 border-ink p-7.5">
+        <SwallowIcon className="pointer-events-none absolute -top-6 -right-8 h-45 rotate-6 opacity-8" />
+        <div className="relative font-heading text-xs font-medium tracking-[.14em] text-[#6B655A] uppercase">С 2003 года</div>
+        <h2 className="relative mt-2 mb-5 font-heading text-[clamp(28px,3.4vw,44px)] leading-[.94] font-bold uppercase">
+          Все наши постановки
+        </h2>
+        {/* plain columns, not a grid of cards -- 32 titles as cards would
+            dominate the page; as a typographic list it reads like a playbill */}
+        <ul className="relative columns-1 gap-x-10 sm:columns-2 lg:columns-3">
+          {productions.map((p) => (
+            <li key={p.year + p.title} className="mb-2.5 flex break-inside-avoid items-baseline gap-3 text-[15px] leading-[1.4]">
+              <span className="w-11 flex-shrink-0 font-heading text-[13px] font-semibold text-brand-red">{p.year}</span>
+              <span>«{p.title}»</span>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
       <Reveal className="relative mt-4 grid grid-cols-1 gap-6 overflow-hidden rounded-3.5 bg-brand-blue p-7.5 text-paper md:grid-cols-2">
         <div>

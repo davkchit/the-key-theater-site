@@ -22,17 +22,22 @@ export interface MascotCategory {
 // own since they read whatever's currently in those files
 
 function afishaThisMonth(): string {
-  const list = afishaFull.map((it) => `${it.day} ${it.mon} — «${it.title}» (${it.time}, ${it.hall})`).join('; ')
-  return `Мяу, вот что у нас идёт: ${list}. Полное расписание и билеты — на странице «Афиша».`
+  // only the next handful -- the full season plan runs to 40 showings and
+  // dumping all of them into one chat bubble is unreadable
+  const list = afishaFull
+    .slice(0, 6)
+    .map((it) => `${it.day} ${it.mon} — «${it.title}» (${it.time}${it.hall ? ', ' + it.hall : ''})`)
+    .join('; ')
+  return `Мяу, вот что у нас ближайшее: ${list}. Полное расписание и билеты — на странице «Афиша».`
 }
 
 function showDurations(): string {
-  const list = shows.map((s) => `«${s.title}» — ${s.dur}`).join('; ')
+  const list = shows.filter((s) => s.dur).map((s) => `«${s.title}» — ${s.dur}`).join('; ')
   return `Тут я решил не спать и всё измерил хвостом: ${list}.`
 }
 
 function forKids(): string {
-  const kids = shows.filter((s) => parseInt(s.age, 10) <= 12)
+  const kids = shows.filter((s) => s.age && parseInt(s.age, 10) <= 12)
   const list = kids.map((s) => `«${s.title}» (${s.age})`).join(', ')
   return `Для юных зрителей у нас есть: ${list}. Смотри точные даты на странице «Афиша».`
 }
@@ -72,7 +77,8 @@ export const mascotMenu: MascotCategory[] = [
       {
         id: 'tickets',
         label: 'Как купить билет?',
-        answer: 'Прямо на странице «Афиша» — жми «Купить билет» под нужным спектаклем. Или звони: +7 906 120-22-62.',
+        answer:
+          'Билеты продаются на Билетоне и на Яндекс Афише, а ещё их можно купить в кассе театра. Расписание — на странице «Афиша», по вопросам звони: +7 906 120-22-62.',
       },
       { id: 'durations', label: 'Сколько идёт спектакль?', answer: showDurations },
       { id: 'kids', label: 'Что-то для детей есть?', answer: forKids },
@@ -143,7 +149,7 @@ export const mascotMenu: MascotCategory[] = [
     id: 'contacts',
     label: '📍 Как нас найти',
     items: [
-      { id: 'address', label: 'Адрес?', answer: 'Набережные Челны, ул. Академика Рубаненко, 2.' },
+      { id: 'address', label: 'Адрес?', answer: 'Набережные Челны, Новый город, 1/02 — здание молодёжного центра «НУР», второй вход.' },
       { id: 'phone', label: 'Телефон?', answer: '+7 906 120-22-62 и +7 962 573-92-19, почта kluchtheatre@mail.ru.' },
       { id: 'social', label: 'Соцсети?', answer: 'Мы во ВКонтакте: vk.com/teatr_kluch и в Telegram: t.me/teatr_kluch.' },
     ],

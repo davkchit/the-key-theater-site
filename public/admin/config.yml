@@ -34,15 +34,17 @@ collections:
           - label: Спектакли
             name: shows
             widget: list
-            summary: '{{title}} ({{age}})'
+            summary: '{{title}}'
             fields:
               - { label: Название, name: title, widget: string }
-              - { label: Возраст, name: age, widget: string, hint: 'Например 16+' }
-              - { label: По мотивам, name: based, widget: string }
-              - { label: Режиссёр, name: dir, widget: string }
-              - { label: Длительность, name: dur, widget: string, hint: 'Например 1 ч 40 мин' }
-              - { label: Афиша/фото, name: photo, widget: image }
-              - { label: Это постер (а не фото со сцены), name: poster, widget: boolean, default: true }
+              - { label: Возрастная маркировка, name: age, widget: string, required: false, hint: 'Например 16+. Если пусто — на сайте не показывается' }
+              - { label: Жанр, name: genre, widget: string, required: false, hint: 'Например: мистическая комедия' }
+              - { label: По мотивам / подзаголовок, name: based, widget: string }
+              - { label: Описание, name: synopsis, widget: text, required: false }
+              - { label: Режиссёр, name: dir, widget: string, required: false }
+              - { label: Длительность, name: dur, widget: string, required: false, hint: 'Например 1 ч 40 мин' }
+              - { label: Фото со спектакля, name: photo, widget: image, required: false, hint: 'Если пусто — покажем фирменную заглушку' }
+              - { label: Ссылка на билеты, name: ticketUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Начните со https://'], hint: 'Страница этого спектакля на Билетоне или Яндекс Афише. Если пусто — бот просто скажет, где продаются билеты' }
               - label: Цвет карточки
                 name: bg
                 widget: select
@@ -58,20 +60,17 @@ collections:
           - label: Показы
             name: items
             widget: list
-            summary: '{{day}} {{mon}} — {{title}}'
+            summary: '{{date}} — {{title}}'
             fields:
-              - { label: День (число), name: day, widget: string, hint: 'Например 05' }
-              - { label: Месяц, name: mon, widget: string, hint: 'Например сентября' }
-              - { label: День недели, name: wd, widget: string, hint: 'Например суббота' }
+              - { label: Дата, name: date, widget: date, format: 'YYYY-MM-DD', hint: 'День недели сайт определит сам по этой дате' }
               - { label: Название спектакля, name: title, widget: string }
-              - { label: Возраст, name: age, widget: string }
-              - { label: Зал, name: hall, widget: string }
+              - { label: Возрастная маркировка, name: age, widget: string, required: false, hint: 'Например 16+' }
+              - { label: Зал, name: hall, widget: string, required: false }
               - { label: Время, name: time, widget: string, hint: 'Например 18:00' }
               - label: Цвет строки
                 name: band
                 widget: select
                 options: [paper, red, blue]
-              - { label: Миниатюра, name: thumb, widget: image }
 
   - name: courses
     label: Курсы
@@ -118,6 +117,11 @@ collections:
                 widget: select
                 options: [red, yellow, blue, ink]
               - { label: Ключи курсов из раздела «Курсы» (через запятую), name: courseKeys, widget: list }
+              - label: Фото группы (если пусто — блок галереи на странице не показывается)
+                name: photos
+                widget: list
+                required: false
+                field: { label: Фото, name: photo, widget: image }
 
   - name: team
     label: Команда
@@ -170,6 +174,21 @@ collections:
             name: items
             widget: list
             field: { label: Награда, name: award, widget: string }
+
+  - name: productions
+    label: Все постановки (страница «О театре»)
+    files:
+      - name: productions
+        label: Список постановок
+        file: src/content/productions.json
+        fields:
+          - label: Постановки
+            name: items
+            widget: list
+            summary: '{{year}} — {{title}}'
+            fields:
+              - { label: Год, name: year, widget: string }
+              - { label: Название, name: title, widget: string, hint: 'Без кавычек — они добавятся сами' }
 
   - name: settings
     label: Настройки сайта

@@ -13,15 +13,21 @@ const items = [
 export function GalleryStrip() {
   return (
     <section className="mx-auto mt-15.5 max-w-320 px-6.5">
-      <div className="flex flex-wrap items-baseline justify-between gap-4">
-        <h2 className="font-heading text-[clamp(34px,5vw,62px)] font-bold uppercase">Атмосфера</h2>
-        <NavLink to="/galereya" className="border-b-3 border-brand-yellow pb-0.5 font-heading text-[15px] font-medium text-ink uppercase">
-          Вся галерея
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="font-heading text-[clamp(30px,4.2vw,58px)] leading-[.9] font-bold uppercase">
+            Так выглядит
+            <br />
+            «Ключ»
+          </h2>
+        </div>
+        <NavLink to="/galereya" className="inline-flex items-center gap-2.5 font-script text-[26px] text-ink">
+          атмосфера <span aria-hidden="true">→</span>
         </NavLink>
       </div>
       <div className="mt-5.5 grid grid-cols-1 gap-3 md:grid-cols-[2fr_1fr_1fr]">
         {items.map((item, i) => (
-          <Reveal key={i} index={i} className={['min-h-70 overflow-hidden rounded-xl', item.bg].join(' ')}>
+          <Reveal key={i} index={i} className={['min-h-70 overflow-hidden rounded-[5px]', item.bg].join(' ')}>
             <img src={item.src} alt="" className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.06]" />
           </Reveal>
         ))}
