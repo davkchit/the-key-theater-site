@@ -27,6 +27,16 @@ export function openStore(dataDir) {
       id INTEGER PRIMARY KEY AUTOINCREMENT, asked_at TEXT, chat_id TEXT, question TEXT
     );
     CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT);
+    -- letters waiting to go out: written in the same transaction as the lead
+    CREATE TABLE IF NOT EXISTS outbox (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, to_whom TEXT,
+      subject TEXT, text TEXT, html TEXT, tries INTEGER DEFAULT 0,
+      next_at INTEGER, sent_at TEXT, last_error TEXT
+    );
+    -- what visitors open in the site's cat: questions only, no personal data
+    CREATE TABLE IF NOT EXISTS events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT, kind TEXT, data TEXT
+    );
   `)
 
   // a database made before directions existed has no such columns
@@ -42,6 +52,11 @@ export function openStore(dataDir) {
     putKv: db.prepare('INSERT INTO kv (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v'),
     status: db.prepare('UPDATE leads SET status = ?, status_by = ?, updated_at = ? WHERE lead_id = ?'),
     unanswered: db.prepare('INSERT INTO unanswered (asked_at, chat_id, question) VALUES (?, ?, ?)'),
+    mail: db.prepare('INSERT INTO outbox (created_at, to_whom, subject, text, html, next_at) VALUES (?, ?, ?, ?, ?, 0)'),
+    due: db.prepare('SELECT * FROM outbox WHERE sent_at IS NULL AND next_at IS NOT NULL AND next_at <= ? ORDER BY id LIMIT 20'),
+    sent: db.prepare('UPDATE outbox SET sent_at = ?, last_error = NULL WHERE id = ?'),
+    failed: db.prepare('UPDATE outbox SET tries = ?, next_at = ?, last_error = ? WHERE id = ?'),
+    event: db.prepare('INSERT INTO events (at, kind, data) VALUES (?, ?, ?)'),
   }
 
   // A saved lead row carries only the columns the turn touched: a re-save of an
@@ -78,12 +93,20 @@ export function openStore(dataDir) {
         for (const l of plan.leads) saveLead(l)
         for (const s of plan.statuses) q.status.run(s.status, s.status_by, s.updated_at, s.lead_id)
         for (const u of plan.unanswered) q.unanswered.run(u.asked_at, u.chat_id, u.question)
+        for (const m of plan.mail || []) q.mail.run(m.at, m.to, m.subject, m.text, m.html || '')
         db.exec('COMMIT')
       } catch (e) {
         db.exec('ROLLBACK')
         throw e
       }
     },
+    dueMail(nowMs) {
+      return q.due.all(nowMs).map((r) => ({ id: r.id, to: r.to_whom, subject: r.subject, text: r.text, html: r.html, tries: r.tries }))
+    },
+    mailSent(id, nowMs) { q.sent.run(new Date(nowMs).toISOString(), id) },
+    // next = null: given up, stays in the table for the record
+    mailFailed(id, tries, next, error) { q.failed.run(tries, next, error, id) },
+    addEvent(kind, data) { q.event.run(new Date().toISOString(), kind, JSON.stringify(data)) },
     close() { db.close() },
   }
 }

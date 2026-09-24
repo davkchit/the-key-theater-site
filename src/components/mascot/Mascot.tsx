@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { mascotMenu, type MascotItem } from '../../data/mascotMenu'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
-import { submitToSheet } from '../../data/sheetsForms'
+import { trackEvent } from '../../data/leads'
 import { SketchyFrame } from '../ui/SketchyFrame'
 import { StarIcon } from '../ui/StarIcon'
 import { TicketIcon } from '../ui/TicketIcon'
@@ -16,7 +16,7 @@ import mascotImg from '../../../assets/mascot.png'
 // no personal data in these events, so no consent checkbox needed -- just
 // which question got opened (or typed) to see what visitors actually look for
 function trackMascot(fields: Record<string, string>) {
-  void submitToSheet('mascot', fields).catch(() => {})
+  trackEvent(fields)
 }
 
 // bottom-edge positions (px from the right edge) the mascot occasionally

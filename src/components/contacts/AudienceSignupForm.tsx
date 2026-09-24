@@ -3,13 +3,14 @@ import { NavLink } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { submitToSheet } from '../../data/sheetsForms'
+import { submitLead } from '../../data/leads'
 
 const schema = z.object({
   name: z.string().trim().min(1, 'Укажите ваше имя'),
   phone: z.string().trim().min(1, 'Укажите телефон'),
   email: z.string().trim().min(1, 'Укажите email').email('Некорректный email'),
   consent: z.boolean().refine((v) => v, { message: 'Подтвердите согласие' }),
+  website: z.string().optional(),
 })
 
 type Values = z.infer<typeof schema>
@@ -23,11 +24,17 @@ export function AudienceSignupForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { consent: false } })
 
   const submit = async (values: Values) => {
-    await submitToSheet('audience', { Имя: values.name, Телефон: values.phone, Email: values.email, Согласие: 'да' })
+    try {
+      await submitLead('audience', { Имя: values.name, Телефон: values.phone, Email: values.email, website: values.website ?? '' })
+    } catch (e) {
+      setError('root', { message: (e as Error).message })
+      return
+    }
     setSent(true)
   }
 
@@ -59,6 +66,7 @@ export function AudienceSignupForm() {
         </span>
       </label>
       {errors.consent && <span className={errorClass}>{errors.consent.message}</span>}
+      <input {...register('website')} type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 opacity-0" />
 
       <button
         type="submit"
@@ -67,6 +75,7 @@ export function AudienceSignupForm() {
       >
         {isSubmitting ? 'Отправляем…' : 'Держите в курсе'}
       </button>
+      {errors.root && <span className={errorClass}>{errors.root.message}</span>}
     </form>
   )
 }

@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { submitToSheet } from '../../data/sheetsForms'
+import { submitLead } from '../../data/leads'
 
 const schema = z.object({
   collective: z.string().trim().min(1, 'Укажите название коллектива'),
@@ -11,6 +11,7 @@ const schema = z.object({
   phone: z.string().trim().min(1, 'Укажите телефон'),
   email: z.string().trim().min(1, 'Укажите email').email('Некорректный email'),
   consent: z.boolean().refine((v) => v, { message: 'Подтвердите согласие' }),
+  website: z.string().optional(),
 })
 
 type Values = z.infer<typeof schema>
@@ -28,18 +29,24 @@ export function FestivalSignupForm({ onSuccess, onInvalid }: FestivalSignupFormP
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { consent: false } })
 
   const submit = async (values: Values) => {
-    await submitToSheet('festival', {
-      Коллектив: values.collective,
-      'Контактное лицо': values.contact,
-      Телефон: values.phone,
-      Email: values.email,
-      Город: values.city,
-      Согласие: 'да',
-    })
+    try {
+      await submitLead('festival', {
+        Коллектив: values.collective,
+        'Контактное лицо': values.contact,
+        Телефон: values.phone,
+        Email: values.email,
+        Город: values.city,
+        website: values.website ?? '',
+      })
+    } catch (e) {
+      setError('root', { message: (e as Error).message })
+      return
+    }
     onSuccess()
   }
 
@@ -74,6 +81,7 @@ export function FestivalSignupForm({ onSuccess, onInvalid }: FestivalSignupFormP
           </span>
         </label>
         {errors.consent && <span className={errorClass}>{errors.consent.message}</span>}
+        <input {...register('website')} type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 opacity-0" />
 
         <button
           type="submit"
@@ -82,6 +90,7 @@ export function FestivalSignupForm({ onSuccess, onInvalid }: FestivalSignupFormP
         >
           {isSubmitting ? 'Отправляем…' : 'Отправить заявку'}
         </button>
+        {errors.root && <span className={errorClass}>{errors.root.message}</span>}
       </form>
     </>
   )

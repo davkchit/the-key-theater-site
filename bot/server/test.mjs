@@ -13,6 +13,9 @@ import { buildKnowledge } from '../core/knowledge.mjs'
 import { loadBotLib } from './lib.mjs'
 import { openStore } from './store.mjs'
 import { createTurn } from './turn.mjs'
+import { createSiteApi } from './site.mjs'
+import { createMailer } from './mail.mjs'
+import { leadsCsv } from './csv.mjs'
 
 const lib = loadBotLib()
 const knowledge = buildKnowledge(repoRoot)
@@ -192,6 +195,129 @@ test('курс записывается по-старому, как до нап�
   await t.tap(24, 'consent:yes')
   await t.say(24, 'Марина')
   assert.ok(/сколько лет/i.test(t.texts().at(-1)), 'курс должен спросить возраст: ' + t.texts().at(-1))
+  t.close()
+})
+
+// ---- stage 3: leads from the site, mail, CSV
+
+function siteRig(know = knowledge) {
+  const t = rig()
+  const api = createSiteApi({ env: { ADMIN_CHAT_ID: ADMIN }, lib, store: t.store, getKnowledge: () => know, send: async (item) => { t.sent.push(item) }, log: () => {} })
+  return { ...t, api }
+}
+const courseLead = (over = {}) => ({ form: 'course', consent: true, fields: { Курс: 'Детский', Имя: 'Ольга', 'Имя ребёнка': 'Маша', 'Возраст ребёнка': '8', Телефон: '8 906 111-22-33', Email: 'olga@mail.ru', Согласие: 'да' }, ...over })
+
+test('заявка с сайта: в той же базе, письмо в очереди, карточка админу', async () => {
+  const t = siteRig()
+  const r = await t.api.lead(courseLead(), '1.1.1.1')
+  assert.equal(r.status, 200, JSON.stringify(r.body))
+  const lead = t.store.db.prepare('SELECT * FROM leads').get()
+  assert.equal(lead.source, 'сайт')
+  assert.equal(lead.phone, '+7 906 111-22-33')
+  assert.match(lead.direction, /Курсы \(детский\)/)
+  assert.match(lead.answers, /Имя ребёнка: Маша/)
+  assert.doesNotMatch(lead.answers, /Согласие/)
+  const mail = t.store.db.prepare('SELECT * FROM outbox').all()
+  assert.equal(mail.length, 1)
+  assert.match(mail[0].subject, /^Заявка: Курсы \(детский\), Ольга$/)
+  assert.match(mail[0].text, /с сайта/)
+  const card = t.sent.find((s) => s.payload.chat_id === ADMIN)
+  assert.ok(card && /Заявка с сайта/.test(card.payload.text) && card.payload.reply_markup, 'нет карточки с кнопками')
+  t.close()
+})
+
+test('с сайта не принимается: без согласия, чужая форма, без телефона, мусор в полях', async () => {
+  const t = siteRig()
+  assert.equal((await t.api.lead(courseLead({ consent: false }), 'a')).status, 400)
+  assert.equal((await t.api.lead(courseLead({ form: 'hack' }), 'a')).status, 400)
+  assert.equal((await t.api.lead(courseLead({ fields: { Имя: 'Ольга' } }), 'a')).status, 400)
+  assert.equal((await t.api.lead(courseLead({ fields: { Имя: 'О', Телефон: '89061112233', x: { y: 1 } } }), 'a')).status, 400)
+  assert.equal((await t.api.lead(courseLead({ fields: { Имя: 'О', Телефон: '89061112233', x: 'я'.repeat(600) } }), 'a')).status, 400)
+  assert.equal(t.store.db.prepare('SELECT count(*) n FROM leads').get().n, 0)
+  t.close()
+})
+
+test('робот, заполнивший скрытое поле, получает «ок», но заявка не сохраняется', async () => {
+  const t = siteRig()
+  const r = await t.api.lead(courseLead({ fields: { ...courseLead().fields, website: 'http://spam' } }), 'b')
+  assert.equal(r.status, 200)
+  assert.equal(t.store.db.prepare('SELECT count(*) n FROM leads').get().n, 0)
+  t.close()
+})
+
+test('с одного адреса не больше 6 заявок в час', async () => {
+  const t = siteRig()
+  for (let i = 0; i < 6; i++) assert.equal((await t.api.lead(courseLead(), 'c')).status, 200)
+  assert.equal((await t.api.lead(courseLead(), 'c')).status, 429)
+  assert.equal((await t.api.lead(courseLead(), 'd')).status, 200, 'другой адрес должен проходить')
+  t.close()
+})
+
+test('фестиваль с закрытым приёмом: сайт получает отказ', async () => {
+  const closed = { ...knowledge, directions: knowledge.directions.map((d) => (d.type === 'festival' ? { ...d, open: false } : d)) }
+  const t = siteRig(closed)
+  const r = await t.api.lead({ form: 'festival', consent: true, fields: { Коллектив: 'Огонёк', 'Контактное лицо': 'Анна', Город: 'Казань', Телефон: '89061112233', Email: 'a@a.ru' } }, 'e')
+  assert.equal(r.status, 409)
+  t.close()
+})
+
+test('заявка из бота тоже ставит письмо в очередь', async () => {
+  const t = rig()
+  await t.say(40, 'запишите дочку, ей 7')
+  await t.tap(40, 'consent:yes')
+  await t.say(40, 'Марина')
+  await t.say(40, '7')
+  await t.say(40, '89061234567')
+  await t.tap(40, 'confirm:yes')
+  const mail = t.store.db.prepare('SELECT * FROM outbox').all()
+  assert.equal(mail.length, 1, 'письма нет')
+  assert.match(mail[0].subject, /^Заявка: Курсы, Марина$/)
+  assert.match(mail[0].text, /из Telegram-бота/)
+  t.close()
+})
+
+test('почта: письмо уходит, при сбое повторяется позже и не теряется', async () => {
+  const t = rig()
+  let clock = 1_000_000
+  let fail = true
+  const sentMail = []
+  const mailer = createMailer({
+    env: { SMTP_HOST: 'smtp.test', SMTP_USER: 'box@mail.ru', SMTP_PASS: 'x', LEADS_EMAIL_TO: 'admin@mail.ru' },
+    store: t.store,
+    log: () => {},
+    now: () => clock,
+    transportFor: () => ({ sendMail: async (m) => { if (fail) throw new Error('сервер недоступен'); sentMail.push(m) } }),
+  })
+  t.store.commit({ chats: [], leads: [], statuses: [], unanswered: [], mail: [{ at: 'x', to: 'leads', subject: 'Заявка: тест', text: 'т', html: '' }] })
+  await mailer.flush()
+  let row = t.store.db.prepare('SELECT * FROM outbox').get()
+  assert.equal(row.tries, 1)
+  assert.equal(row.sent_at, null)
+  assert.ok(row.next_at > clock, 'повтор не назначен')
+  await mailer.flush()
+  assert.equal(t.store.db.prepare('SELECT tries FROM outbox').get().tries, 1, 'повторил раньше времени')
+  fail = false
+  clock = row.next_at + 1
+  await mailer.flush()
+  row = t.store.db.prepare('SELECT * FROM outbox').get()
+  assert.ok(row.sent_at, 'не отмечено отправленным')
+  assert.equal(sentMail.length, 1)
+  assert.equal(sentMail[0].to, 'admin@mail.ru')
+  await mailer.flush()
+  assert.equal(sentMail.length, 1, 'отправил второй раз')
+  t.close()
+})
+
+test('выгрузка для Excel: BOM, точка с запятой, формулы обезврежены', async () => {
+  const t = rig()
+  t.store.commit({ chats: [], statuses: [], unanswered: [], leads: [{ lead_id: 'S1', created_at: '2026-09-20T10:00:00.000Z', updated_at: 'x', status: 'новая', status_by: '', chat_id: '', source: 'сайт', name: '=HACK()', phone: '+7 906 111-22-33', children: '', questions: 'а; б', nudges: '0', direction: 'Курсы', answers: 'Город: Казань' }] })
+  const csv = leadsCsv(t.store.db)
+  assert.ok(csv.text.startsWith('﻿'), 'нет BOM')
+  const lines = csv.text.slice(1).trim().split('\r\n')
+  assert.equal(lines.length, 2)
+  assert.match(lines[0], /^Когда \(МСК\);Откуда;На что;Имя/)
+  assert.match(lines[1], /^20\.09\.2026 13:00;сайт;Курсы;'=HACK\(\);/)
+  assert.match(lines[1], /"а; б"/)
   t.close()
 })
 

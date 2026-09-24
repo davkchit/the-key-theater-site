@@ -4,12 +4,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { Course } from '../../types/content'
-import { submitToSheet } from '../../data/sheetsForms'
+import { submitLead } from '../../data/leads'
 
 const contactFields = {
   phone: z.string().trim().min(1, 'Укажите телефон'),
   email: z.string().trim().min(1, 'Укажите email').email('Некорректный email'),
   consent: z.boolean().refine((v) => v, { message: 'Подтвердите согласие' }),
+  website: z.string().optional(),
 }
 
 // plain z.number() (not z.coerce) so the schema's input/output types match --
@@ -78,20 +79,26 @@ function ChildForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<ChildValues>({ resolver: zodResolver(childSchema), defaultValues: { consent: false } })
 
   const submit = async (values: ChildValues) => {
-    await submitToSheet('courses', {
-      Курс: course.isChild ? 'Детский' : 'Взрослый',
-      Имя: values.parentName,
-      'Имя ребёнка': values.childName,
-      'Возраст ребёнка': String(values.childAge),
-      Телефон: values.phone,
-      Email: values.email,
-      'Свободное время': values.freeTime ?? '',
-      Согласие: 'да',
-    })
+    try {
+      await submitLead('course', {
+        Курс: course.isChild ? 'Детский' : 'Взрослый',
+        Имя: values.parentName,
+        'Имя ребёнка': values.childName,
+        'Возраст ребёнка': String(values.childAge),
+        Телефон: values.phone,
+        Email: values.email,
+        'Свободное время': values.freeTime ?? '',
+        website: values.website ?? '',
+      })
+    } catch (e) {
+      setError('root', { message: (e as Error).message })
+      return
+    }
     onSuccess(values.parentName)
   }
 
@@ -109,7 +116,9 @@ function ChildForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess
       <FieldError message={errors.email?.message} />
       <input {...register('freeTime')} placeholder="Свободное время для посещения (необязательно)" className={inputClass} />
       <ConsentField register={register('consent')} message={errors.consent?.message} />
+      <input {...register('website')} type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 opacity-0" />
       <SubmitButton pending={isSubmitting} />
+      <FieldError message={errors.root?.message} />
     </form>
   )
 }
@@ -118,19 +127,25 @@ function AdultForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<AdultValues>({ resolver: zodResolver(adultSchema), defaultValues: { consent: false } })
 
   const submit = async (values: AdultValues) => {
-    await submitToSheet('courses', {
-      Курс: course.isChild ? 'Детский' : 'Взрослый',
-      Имя: values.name,
-      Возраст: String(values.age),
-      Телефон: values.phone,
-      Email: values.email,
-      'Свободное время': values.freeTime ?? '',
-      Согласие: 'да',
-    })
+    try {
+      await submitLead('course', {
+        Курс: course.isChild ? 'Детский' : 'Взрослый',
+        Имя: values.name,
+        Возраст: String(values.age),
+        Телефон: values.phone,
+        Email: values.email,
+        'Свободное время': values.freeTime ?? '',
+        website: values.website ?? '',
+      })
+    } catch (e) {
+      setError('root', { message: (e as Error).message })
+      return
+    }
     onSuccess(values.name)
   }
 
@@ -146,7 +161,9 @@ function AdultForm({ course, onSuccess, onInvalid }: { course: Course; onSuccess
       <FieldError message={errors.email?.message} />
       <input {...register('freeTime')} placeholder="Свободное время для посещения (необязательно)" className={inputClass} />
       <ConsentField register={register('consent')} message={errors.consent?.message} />
+      <input {...register('website')} type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 opacity-0" />
       <SubmitButton pending={isSubmitting} />
+      <FieldError message={errors.root?.message} />
     </form>
   )
 }

@@ -11,6 +11,8 @@
 // `deps` are injected so the whole turn can be run in a test with a fake model
 // and a fake Telegram (bot/server/test.mjs).
 
+import { leadLetter } from './mail.mjs'
+
 const MODEL_DOWN_TEXT =
   'Я сейчас перегружен и не успеваю ответить, простите. Спросите, пожалуйста, через пару минут. Или позвоните: +7 906 120-22-62 (пн–пт, 15:00–21:00).'
 
@@ -32,7 +34,8 @@ export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now 
   // What this turn writes and sends, in one place (the "Итог хода" node).
   function plan(res) {
     const at = new Date(now()).toISOString()
-    const p = { chats: [], leads: [], statuses: [], unanswered: [], tg: [] }
+    const p = { chats: [], leads: [], statuses: [], unanswered: [], mail: [], tg: [] }
+    const letter = (lead, kind) => p.mail.push({ at, ...leadLetter({ ...lead, source: lead.source || 'бот' }, kind, at) })
     if (res.answerCallback) p.tg.push({ method: 'answerCallbackQuery', payload: res.answerCallback })
     for (const m of res.out) p.tg.push({ method: 'sendMessage', payload: m })
     if (res.state) p.chats.push({ chat_id: String(res.state.chatId), state: JSON.stringify(res.state), updated_at: at })
@@ -58,9 +61,11 @@ export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now 
           row.status_by = ''
         }
         p.leads.push(row)
+        letter(l, e.isNew ? 'new' : /Напоминает/.test(e.notice || '') ? 'nudge' : 'more')
         if (ADMIN) p.tg.push({ method: 'sendMessage', payload: lib.msg(ADMIN, (e.notice ? e.notice + '\n\n' : '') + lib.adminLeadText(l), lib.adminLeadKeyboard(l.id)) })
       } else if (e.type === 'leadCancel') {
         p.statuses.push({ lead_id: e.lead.id, status: 'отменена клиентом', status_by: 'клиент', updated_at: at })
+        letter(e.lead, 'cancel')
         if (ADMIN) p.tg.push({ method: 'sendMessage', payload: lib.msg(ADMIN, '❌ Клиент отменил заявку, звонить не нужно\n\n' + lib.adminLeadText(e.lead)) })
       } else if (e.type === 'leadStatus') {
         p.statuses.push({ lead_id: e.leadId, status: e.status, status_by: e.by || '', updated_at: at })

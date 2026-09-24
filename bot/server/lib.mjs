@@ -14,7 +14,7 @@ export function loadBotLib() {
   const ctx = vm.createContext({ Intl, Date, console, setTimeout, clearTimeout })
   vm.runInContext(
     code +
-      '\n;globalThis.__lib = { normalizeUpdate, decide, afterModel, parseTurnReply, adminLeadText, adminLeadKeyboard, msg, esc, callLlm, CFG };',
+      '\n;globalThis.__lib = { normalizeUpdate, decide, afterModel, parseTurnReply, adminLeadText, adminLeadKeyboard, msg, esc, normPhone, callLlm, CFG };',
     ctx,
   )
   return ctx.__lib

@@ -13,6 +13,9 @@
 //   SITE_URL          fetch knowledge.json from the deployed site (optional)
 //   BOT_DATA_DIR      where kluch.sqlite and bot.log live (default bot/data)
 //   BOT_PORT, BOT_HOST
+//   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, LEADS_EMAIL_TO, DEV_EMAIL_TO   (see mail.mjs)
+//   ALLOWED_ORIGINS   sites allowed to post leads from a browser, comma-separated
+//   TRUST_PROXY=1     behind nginx/caddy: take the visitor's address from X-Forwarded-For
 
 import fs from 'node:fs'
 import http from 'node:http'
@@ -23,8 +26,11 @@ import { openStore } from './store.mjs'
 import { createTelegram } from './telegram.mjs'
 import { createKnowledge } from './knowledge.mjs'
 import { createTurn } from './turn.mjs'
+import { createMailer, devLetter } from './mail.mjs'
+import { createSiteApi } from './site.mjs'
+import { leadsCsv } from './csv.mjs'
 
-const env = { ...loadEnv(), ...Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(TELEGRAM|ADMIN|LLM|YANDEX|SITE_URL|BOT_|KNOWLEDGE|SMTP|LEADS)/.test(k))) }
+const env = { ...loadEnv(), ...Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(TELEGRAM|ADMIN|LLM|YANDEX|SITE_URL|BOT_|KNOWLEDGE|SMTP|LEADS|MAIL_|DEV_EMAIL|ALLOWED_ORIGINS|TRUST_PROXY)/.test(k))) }
 if (!env.TELEGRAM_BOT_TOKEN) { console.error('нет TELEGRAM_BOT_TOKEN: впишите его в .env.bot'); process.exit(1) }
 
 const redact = redactor(env)
@@ -49,6 +55,7 @@ const tg = createTelegram(env.TELEGRAM_BOT_TOKEN, redact, log)
 // a problem the developer must hear about: into the admin chat when there is one
 async function alarm(text) {
   log('ВНИМАНИЕ:', text)
+  if (env.DEV_EMAIL_TO) { store.commit({ chats: [], leads: [], statuses: [], unanswered: [], mail: [{ at: new Date().toISOString(), ...devLetter(text) }] }); mailer.flush() }
   if (env.ADMIN_CHAT_ID) await tg.send({ method: 'sendMessage', payload: lib.msg(env.ADMIN_CHAT_ID, '⚠️ Бот «Ключ»: ' + lib.esc(text)) })
 }
 
@@ -60,7 +67,10 @@ const llm = async (body, budgetMs) => {
   return r
 }
 
+// a turn only queues its letters (outbox); they go out after the turn, see handleUpdate
+const mailer = createMailer({ env, store, log })
 const turn = createTurn({ env, lib, store, getKnowledge: knowledge.get, llm, send: tg.send, log })
+const site = createSiteApi({ env, lib, store, getKnowledge: knowledge.get, send: tg.send, log })
 
 // ---- one line per chat: two quick messages from one person are answered in the
 // order they were sent (in n8n they ran side by side and could swap places)
@@ -83,21 +93,66 @@ async function handleUpdate(u) {
   if (seenUpdates.size > 500) seenUpdates.delete(seenUpdates.values().next().value)
   try {
     await inLane(chatOf(u), () => turn.handle(u))
+    mailer.flush()
   } catch (e) {
     log('ход не удался:', e.stack || e.message)
     await alarm('ход не удался: ' + String(e.message).slice(0, 200))
   }
 }
 
-// ---- health
-const server = http.createServer((req, res) => {
-  if (req.url === '/health') {
-    res.writeHead(200, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ ok: true, knowledge: knowledge.info(), lanes: lanes.size }))
-    return
+// ---- http: health, leads from the site, the cat's events
+const origins = new Set(
+  String(env.ALLOWED_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173')
+    .split(',').map((o) => o.trim()).filter(Boolean),
+)
+
+function reply(req, res, status, body) {
+  const origin = req.headers.origin
+  const headers = { 'Content-Type': 'application/json; charset=utf-8' }
+  if (origin && origins.has(origin)) Object.assign(headers, { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' })
+  res.writeHead(status, headers)
+  res.end(body == null ? '' : JSON.stringify(body))
+}
+
+function readJson(req, limit = 16 * 1024) {
+  return new Promise((resolve) => {
+    let size = 0
+    const chunks = []
+    req.on('data', (c) => {
+      size += c.length
+      if (size > limit) { resolve(undefined); req.destroy() } else chunks.push(c)
+    })
+    req.on('end', () => { try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf8'))) } catch { resolve(null) } })
+    req.on('error', () => resolve(null))
+  })
+}
+
+const ipOf = (req) => (env.TRUST_PROXY === '1' && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || req.socket.remoteAddress || '?'
+
+const server = http.createServer(async (req, res) => {
+  const url = (req.url || '').split('?')[0]
+  try {
+    if (url === '/health') return reply(req, res, 200, { ok: true, knowledge: knowledge.info(), lanes: lanes.size, mail: mailer.enabled })
+    if (req.method === 'OPTIONS' && url.startsWith('/api/')) {
+      const origin = req.headers.origin
+      if (!origin || !origins.has(origin)) { res.writeHead(403); return res.end() }
+      res.writeHead(204, { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '600', Vary: 'Origin' })
+      return res.end()
+    }
+    if (req.method === 'POST' && (url === '/api/lead' || url === '/api/event')) {
+      // a browser from a foreign site is refused; no Origin (a server, curl) is allowed
+      if (req.headers.origin && !origins.has(req.headers.origin)) return reply(req, res, 403, { ok: false, error: 'чужой сайт' })
+      const body = await readJson(req)
+      if (body === undefined) return reply(req, res, 413, { ok: false, error: 'слишком большая заявка' })
+      const r = url === '/api/lead' ? await site.lead(body, ipOf(req)) : site.event(body, ipOf(req))
+      if (url === '/api/lead' && r.status === 200) mailer.flush()
+      return reply(req, res, r.status, r.body)
+    }
+    reply(req, res, 404, { ok: false })
+  } catch (e) {
+    log('ошибка запроса', url, e.stack || e.message)
+    reply(req, res, 500, { ok: false, error: 'ошибка на сервере, позвоните нам' })
   }
-  res.writeHead(404)
-  res.end()
 })
 server.on('error', (e) => {
   // a second copy of the bot would also fight the first for Telegram's updates
@@ -106,6 +161,28 @@ server.on('error', (e) => {
 })
 server.listen(Number(env.BOT_PORT || 8787), env.BOT_HOST || '127.0.0.1')
 
+// ---- once a week the whole week's leads go to the mailbox as a file for Excel
+function weekKey(nowMs) {
+  const d = new Date(nowMs + 3 * 3600e3) // Moscow
+  const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7)))
+  return { key: monday.toISOString().slice(0, 10), isMondayMorning: d.getUTCDay() === 1 && d.getUTCHours() >= 9 }
+}
+async function weeklyReport() {
+  if (!mailer.enabled || env.LEADS_WEEKLY_CSV === '0') return
+  const w = weekKey(Date.now())
+  if (!w.isMondayMorning || store.getKv('weeklySent') === w.key) return
+  const from = new Date(Date.parse(w.key + 'T00:00:00+03:00') - 7 * 86400e3).toISOString()
+  const csv = leadsCsv(store.db, from)
+  try {
+    await mailer.sendNow({ to: 'leads', subject: 'Заявки за неделю: ' + csv.count, text: 'Заявки за прошлую неделю во вложении. Файл открывается в Excel.', attachments: [{ filename: 'заявки-' + w.key + '.csv', content: csv.text, contentType: 'text/csv; charset=utf-8' }] })
+    store.putKv('weeklySent', w.key)
+    log('недельная выгрузка отправлена:', csv.count, 'заявок')
+  } catch (e) {
+    log('недельная выгрузка не ушла, повторю через час:', e.message)
+  }
+}
+setInterval(weeklyReport, 3600e3).unref()
+
 // ---- polling
 let stopping = false
 async function poll() {
@@ -113,6 +190,8 @@ async function poll() {
   if (!me.ok) throw new Error('Telegram: ' + me.description)
   // polling and a webhook cannot coexist: drop one left over from n8n
   await tg.call('deleteWebhook', { drop_pending_updates: false })
+  mailer.start()
+  weeklyReport()
   log(`бот запущен: @${me.result.username} · знание ${knowledge.get().builtAt} · показов ${knowledge.get().afisha.length}`)
 
   const saved = store.getKv('offset')
