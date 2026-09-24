@@ -1,7 +1,5 @@
-# Temporary Railway preview host -- lets the theatre look at the real site from
-# a phone while Beget isn't wired up yet. The permanent home is still Beget
-# (see PROJECT_CONTEXT.md); delete this file and Caddyfile when the preview is
-# no longer needed. Nothing else in the project depends on them.
+# The site: built once, served by Caddy, which also forwards /api to the bot.
+# Used by docker-compose.yml together with bot/Dockerfile.
 
 FROM node:22-alpine AS build
 WORKDIR /app
@@ -10,7 +8,7 @@ COPY package*.json ./
 # eslint-plugin-jsx-a11y's peer range caps at eslint 9 while the project is on 10.
 RUN npm ci --legacy-peer-deps
 COPY . .
-# Railway serves from the domain root, unlike GitHub Pages -- see vite.config.ts
+# served from the domain root, unlike GitHub Pages -- see vite.config.ts
 ENV VITE_BASE=/
 RUN npm run build
 

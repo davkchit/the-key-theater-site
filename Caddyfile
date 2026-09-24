@@ -1,9 +1,19 @@
-# Railway injects $PORT; 8080 is just a local-run fallback.
-:{$PORT:8080} {
-	root * /srv
+# Inside the site container. HTTPS is not done here: on the VPS the existing
+# proxy (nginx/Caddy that already serves the other projects) terminates TLS
+# and forwards the domain to this container's port.
+# $PORT: Railway sets it; 80 everywhere else.
+:{$PORT:80} {
 	encode gzip
-	# SPA fallback: harmless for the current hash router, and already correct
-	# if the router is later switched to real paths.
-	try_files {path} /index.html
-	file_server
+
+	# the bot's service: site forms (/api/lead), the cat (/api/event), admin login
+	handle /api/* {
+		reverse_proxy {$BOT_UPSTREAM:bot:8787}
+	}
+
+	handle {
+		root * /srv
+		# SPA fallback: any path serves index.html, the router takes it from there
+		try_files {path} /index.html
+		file_server
+	}
 }

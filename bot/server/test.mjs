@@ -16,6 +16,7 @@ import { createTurn } from './turn.mjs'
 import { createSiteApi } from './site.mjs'
 import { createMailer } from './mail.mjs'
 import { leadsCsv } from './csv.mjs'
+import { createOauth } from './oauth.mjs'
 
 const lib = loadBotLib()
 const knowledge = buildKnowledge(repoRoot)
@@ -319,6 +320,52 @@ test('выгрузка для Excel: BOM, точка с запятой, форм
   assert.match(lines[1], /^20\.09\.2026 13:00;сайт;Курсы;'=HACK\(\);/)
   assert.match(lines[1], /"а; б"/)
   t.close()
+})
+
+// ---- admin login (Decap) through our own server
+function fakeRes() {
+  const r = { status: 0, headers: {}, body: '' }
+  r.writeHead = (st, h) => { r.status = st; r.headers = h || {} }
+  r.end = (b) => { r.body = b || '' }
+  return r
+}
+
+test('вход в админку: GitHub, проверка state, токен передаётся окну админки', async () => {
+  const none = createOauth({ env: {}, log: () => {} })
+  let res = fakeRes()
+  await none.handle({ url: '/api/oauth/auth' }, res, '/api/oauth/auth')
+  assert.equal(res.status, 503, 'без настроек должен честно сказать, что не настроено')
+
+  let exchanged = null
+  const oauth = createOauth({
+    env: { GITHUB_OAUTH_ID: 'cid', GITHUB_OAUTH_SECRET: 'sec' },
+    log: () => {},
+    fetchImpl: async (url, o) => { exchanged = JSON.parse(o.body); return { json: async () => ({ access_token: 'tok123' }) } },
+  })
+  res = fakeRes()
+  await oauth.handle({ url: '/api/oauth/auth' }, res, '/api/oauth/auth')
+  assert.equal(res.status, 302)
+  const loc = new URL(res.headers.Location)
+  assert.equal(loc.host, 'github.com')
+  assert.equal(loc.searchParams.get('client_id'), 'cid')
+  const state = loc.searchParams.get('state')
+  assert.ok(state && state.length >= 16)
+
+  res = fakeRes()
+  await oauth.handle({ url: '/api/oauth/callback?code=c1&state=wrong' }, res, '/api/oauth/callback')
+  assert.equal(res.status, 400, 'чужой state должен отклоняться')
+
+  res = fakeRes()
+  await oauth.handle({ url: '/api/oauth/callback?code=c1&state=' + state }, res, '/api/oauth/callback')
+  assert.equal(res.status, 200)
+  assert.equal(exchanged.client_secret, 'sec')
+  assert.equal(exchanged.code, 'c1')
+  assert.match(res.body, /authorization:github:success:/)
+  assert.match(res.body, /tok123/)
+
+  res = fakeRes()
+  await oauth.handle({ url: '/api/oauth/callback?code=c1&state=' + state }, res, '/api/oauth/callback')
+  assert.equal(res.status, 400, 'один и тот же state нельзя использовать дважды')
 })
 
 test('повторное сохранение заявки не сбрасывает её статус', async () => {

@@ -16,6 +16,8 @@
 //   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, LEADS_EMAIL_TO, DEV_EMAIL_TO   (see mail.mjs)
 //   ALLOWED_ORIGINS   sites allowed to post leads from a browser, comma-separated
 //   TRUST_PROXY=1     behind nginx/caddy: take the visitor's address from X-Forwarded-For
+//   BOT_POLL=0        do not read Telegram (HTTP only: tests, a second copy)
+//   GITHUB_OAUTH_ID, GITHUB_OAUTH_SECRET   admin login for Decap (see oauth.mjs)
 
 import fs from 'node:fs'
 import http from 'node:http'
@@ -29,8 +31,9 @@ import { createTurn } from './turn.mjs'
 import { createMailer, devLetter } from './mail.mjs'
 import { createSiteApi } from './site.mjs'
 import { leadsCsv } from './csv.mjs'
+import { createOauth } from './oauth.mjs'
 
-const env = { ...loadEnv(), ...Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(TELEGRAM|ADMIN|LLM|YANDEX|SITE_URL|BOT_|KNOWLEDGE|SMTP|LEADS|MAIL_|DEV_EMAIL|ALLOWED_ORIGINS|TRUST_PROXY)/.test(k))) }
+const env = { ...loadEnv(), ...Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(TELEGRAM|ADMIN|LLM|YANDEX|SITE_URL|BOT_|KNOWLEDGE|SMTP|LEADS|MAIL_|DEV_EMAIL|ALLOWED_ORIGINS|TRUST_PROXY|GITHUB_OAUTH)/.test(k))) }
 if (!env.TELEGRAM_BOT_TOKEN) { console.error('нет TELEGRAM_BOT_TOKEN: впишите его в .env.bot'); process.exit(1) }
 
 const redact = redactor(env)
@@ -106,10 +109,20 @@ const origins = new Set(
     .split(',').map((o) => o.trim()).filter(Boolean),
 )
 
+// A form on the site itself posts to the same address through the proxy;
+// browsers still send Origin with a POST, so that case is recognised by host
+// instead of having to be listed.
+function allowedOrigin(req) {
+  const origin = req.headers.origin
+  if (!origin) return false
+  if (origins.has(origin)) return true
+  try { return new URL(origin).host === (req.headers['x-forwarded-host'] || req.headers.host) } catch { return false }
+}
+
 function reply(req, res, status, body) {
   const origin = req.headers.origin
   const headers = { 'Content-Type': 'application/json; charset=utf-8' }
-  if (origin && origins.has(origin)) Object.assign(headers, { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' })
+  if (origin && allowedOrigin(req)) Object.assign(headers, { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' })
   res.writeHead(status, headers)
   res.end(body == null ? '' : JSON.stringify(body))
 }
@@ -127,6 +140,8 @@ function readJson(req, limit = 16 * 1024) {
   })
 }
 
+const oauth = createOauth({ env, log })
+
 const ipOf = (req) => (env.TRUST_PROXY === '1' && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || req.socket.remoteAddress || '?'
 
 const server = http.createServer(async (req, res) => {
@@ -135,19 +150,20 @@ const server = http.createServer(async (req, res) => {
     if (url === '/health') return reply(req, res, 200, { ok: true, knowledge: knowledge.info(), lanes: lanes.size, mail: mailer.enabled })
     if (req.method === 'OPTIONS' && url.startsWith('/api/')) {
       const origin = req.headers.origin
-      if (!origin || !origins.has(origin)) { res.writeHead(403); return res.end() }
+      if (!allowedOrigin(req)) { res.writeHead(403); return res.end() }
       res.writeHead(204, { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '600', Vary: 'Origin' })
       return res.end()
     }
     if (req.method === 'POST' && (url === '/api/lead' || url === '/api/event')) {
       // a browser from a foreign site is refused; no Origin (a server, curl) is allowed
-      if (req.headers.origin && !origins.has(req.headers.origin)) return reply(req, res, 403, { ok: false, error: 'чужой сайт' })
+      if (req.headers.origin && !allowedOrigin(req)) return reply(req, res, 403, { ok: false, error: 'чужой сайт' })
       const body = await readJson(req)
       if (body === undefined) return reply(req, res, 413, { ok: false, error: 'слишком большая заявка' })
       const r = url === '/api/lead' ? await site.lead(body, ipOf(req)) : site.event(body, ipOf(req))
       if (url === '/api/lead' && r.status === 200) mailer.flush()
       return reply(req, res, r.status, r.body)
     }
+    if (url.startsWith('/api/oauth/')) return oauth.handle(req, res, url)
     reply(req, res, 404, { ok: false })
   } catch (e) {
     log('ошибка запроса', url, e.stack || e.message)
@@ -233,4 +249,9 @@ process.on('SIGINT', stop)
 process.on('SIGTERM', stop)
 process.on('unhandledRejection', (e) => log('необработанная ошибка:', e && e.stack ? e.stack : e))
 
-poll().catch((e) => { log('остановка из-за ошибки:', e.message); process.exit(1) })
+if (env.BOT_POLL === '0') {
+  mailer.start()
+  log(`сервис запущен без Telegram (BOT_POLL=0): только сайт и почта · знание ${knowledge.get().builtAt}`)
+} else {
+  poll().catch((e) => { log('остановка из-за ошибки:', e.message); process.exit(1) })
+}
