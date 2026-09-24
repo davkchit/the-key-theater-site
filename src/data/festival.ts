@@ -1,8 +1,8 @@
-import settings from '../content/settings.json'
+import { directionByType } from './directions'
 
-// Toggle for the "Действующие лица" festival application window -- the
-// theatre doesn't accept applications year-round, so this flips the signup
-// button on AboutPage between "Стать участником" and a closed-notice.
-// Content lives in src/content/settings.json (Decap CMS-managed) so the
-// theatre can flip it themselves -- see public/admin/config.yml.
-export const festivalApplicationsOpen: boolean = settings.festivalApplicationsOpen
+// Whether the "Действующие лица" festival takes applications right now. The
+// switch is the festival's entry in the admin's "Направления" ("Заявки
+// открыты"), the same one the bot and the server read -- one switch, so the
+// site, the chat and the lead endpoint can never disagree. No festival entry
+// at all means nothing was closed: the form stays open.
+export const festivalApplicationsOpen: boolean = directionByType('festival')?.open ?? true

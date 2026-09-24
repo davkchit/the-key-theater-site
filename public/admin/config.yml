@@ -256,5 +256,4 @@ collections:
         label: Общие настройки
         file: src/content/settings.json
         fields:
-          - { label: Приём заявок на фестиваль «Действующие лица» открыт, name: festivalApplicationsOpen, widget: boolean }
           - { label: Ссылка на страницу театра на Билетоне, name: ticketsWidgetUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Ссылка должна начинаться с https://'], hint: 'Витрина со всеми показами и местами. Бот даёт её на вопросы про билеты' }

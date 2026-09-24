@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { NavLink, useSearchParams } from 'react-router-dom'
 import { CourseGroupCard } from '../components/courses/CourseGroupCard'
 import { SignupForm } from '../components/courses/SignupForm'
+import { DirectionsSection } from '../components/directions/DirectionsSection'
 import { Modal } from '../components/ui/Modal'
 import { Reveal } from '../components/ui/Reveal'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
@@ -59,6 +60,8 @@ export default function CoursesPage() {
       <p className="mt-3.5 text-[13px] text-[#6B655A]">
         Цены и даты старта — ориентировочные, точную стоимость и расписание уточним при записи.
       </p>
+
+      <DirectionsSection />
 
       <div className="mt-10 grid grid-cols-1 gap-5.5 md:grid-cols-2">
         <Reveal className="overflow-hidden rounded-[16px] border-2 border-ink p-7.5">

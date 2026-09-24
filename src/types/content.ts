@@ -77,3 +77,31 @@ export interface GalleryImage {
 }
 
 export type Social = 'VK' | 'TG' | 'YT'
+
+/** One question of a direction's signup form, set in the admin. */
+export interface DirectionField {
+  label: string
+  kind: 'text' | 'number' | 'email' | 'choice'
+  ask?: string
+  options?: string[]
+}
+
+/** Anything people can sign up for besides the courses: a preparatory group,
+ *  the festival, a quest, a carnival night, the newsletter. Lives in
+ *  src/content/directions.json (Decap CMS); the bot reads the same file, so a
+ *  direction added in the admin can be booked on the site and in the chat. */
+export interface Direction {
+  id: string
+  type: 'prep' | 'festival' | 'quest' | 'carnival' | 'newsletter' | 'other'
+  title: string
+  desc?: string
+  age?: string
+  schedule?: string
+  prices?: { name: string; price: string }[]
+  /** YYYY-MM-DD; outside these dates the direction is not shown at all */
+  showFrom?: string
+  showTo?: string
+  open: boolean
+  askPhone: boolean
+  fields: DirectionField[]
+}

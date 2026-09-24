@@ -15,7 +15,7 @@ import { leadLetter } from './mail.mjs'
 const FORMS = {
   course: { what: (f) => 'Курсы' + (f['Курс'] ? ' (' + f['Курс'].toLowerCase() + ')' : ''), phone: true },
   festival: { what: () => 'Фестиваль «Действующие лица»', phone: true, direction: 'festival' },
-  audience: { what: () => 'Новости театра', phone: false },
+  audience: { what: () => 'Новости театра', phone: false, direction: 'newsletter' },
   direction: { what: null, phone: false },
 }
 const NAME_KEYS = ['Имя', 'Контактное лицо', 'Ваше имя']
@@ -87,7 +87,7 @@ export function createSiteApi({ env, lib, store, getKnowledge, send, log, now = 
     } else {
       const d = FORMS[form].direction && (getKnowledge().directions || []).find((x) => x.type === FORMS[form].direction)
       if (d && d.open === false) return bad(409, 'приём заявок закрыт')
-      what = FORMS[form].what(fields)
+      what = d ? d.title : FORMS[form].what(fields)
     }
 
     if (!allow('ip:' + ip, LIMITS.perIpHour, 3600e3, t)) return bad(429, 'слишком много заявок подряд, попробуйте позже или позвоните')
