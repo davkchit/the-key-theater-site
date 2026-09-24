@@ -1,0 +1,6 @@
+# Run on the Linux server: must keep Unix line endings whatever the
+# checkout machine is (a CRLF shebang fails with "not found").
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+Caddyfile   text eol=lf
+*.yml       text eol=lf
