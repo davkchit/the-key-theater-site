@@ -9,7 +9,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "cms:server": "decap-server",
-    "knowledge": "node bot/scripts/publish-knowledge.mjs"
+    "knowledge": "node bot/scripts/publish-knowledge.mjs",
+    "bot": "node --no-warnings bot/server/index.mjs",
+    "bot:test": "node --no-warnings bot/server/test.mjs",
+    "bot:eval": "node bot/scripts/eval.mjs --parser"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

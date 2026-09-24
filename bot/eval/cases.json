@@ -30,7 +30,8 @@
     "longDash": "\\s[—–]\\s",
     "linkElsewhere": "ссылк\\S* (в описании|на сайте)",
     "unmarkedAsAllAges": "(без возрастн\\S* (ограничен|маркировк[^и])|для любого возраста|для всех возрастов)",
-    "inventedLabCampSignup": "(принима\\S*|оформля\\S*) заявк\\S*[^.!?]{0,60}(лаборатори|лагер)"
+    "inventedLabCampSignup": "(принима\\S*|оформля\\S*) заявк\\S*[^.!?]{0,60}(лаборатори|лагер)",
+    "formPromiseNoButton": "я открою форму|форма откроется|форму открою"
   },
   "cases": [
     {
@@ -1520,6 +1521,108 @@
         "never": [
           "оформляю заявку",
           "форма откроется сразу"
+        ]
+      }
+    },
+    {
+      "id": "dir-festival-form",
+      "tags": [
+        "signup",
+        "directions"
+      ],
+      "turns": [
+        "запишите на фестиваль",
+        {
+          "tap": "consent:yes"
+        },
+        "Анна"
+      ],
+      "expect": {
+        "model": false,
+        "say": [
+          "коллектив"
+        ]
+      }
+    },
+    {
+      "id": "dir-quest-closed",
+      "tags": [
+        "directions",
+        "facts"
+      ],
+      "turns": [
+        "хочу записаться на квест"
+      ],
+      "expect": {
+        "model": true,
+        "say": [
+          "закрыт|пока нет|не опубликован|зимой"
+        ],
+        "never": [
+          "Согласен",
+          "Оформить заявку"
+        ],
+        "noEffects": [
+          "leadSave"
+        ]
+      }
+    },
+    {
+      "id": "dir-quest-info",
+      "tags": [
+        "directions",
+        "facts"
+      ],
+      "turns": [
+        "а квесты у вас есть?"
+      ],
+      "expect": {
+        "model": true,
+        "say": [
+          "квест"
+        ],
+        "never": [
+          "уточнит администратор"
+        ]
+      }
+    },
+    {
+      "id": "dir-newsletter-form",
+      "tags": [
+        "signup",
+        "directions"
+      ],
+      "turns": [
+        "хочу записаться на рассылку",
+        {
+          "tap": "consent:yes"
+        },
+        "Олег"
+      ],
+      "expect": {
+        "model": false,
+        "say": [
+          "почт"
+        ]
+      }
+    },
+    {
+      "id": "dir-course-still-course",
+      "tags": [
+        "signup",
+        "directions"
+      ],
+      "turns": [
+        "запишите дочку, ей 7",
+        {
+          "tap": "consent:yes"
+        },
+        "Марина"
+      ],
+      "expect": {
+        "model": false,
+        "say": [
+          "сколько лет"
         ]
       }
     }

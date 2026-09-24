@@ -40,11 +40,40 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
 
   const faq = parseFaq(fs.readFileSync(path.join(repoRoot, 'bot/core/faq.md'), 'utf8'))
 
-  const base = { builtAt: new Date().toISOString(), afisha, shows, courses, faq, source: 'site' }
-  // Temporary: while the theatre decides between keeping the CMS up to date and
-  // sending Word files, the files in bot/docs win. KNOWLEDGE_SOURCE=site brings
-  // the site back without deleting anything.
-  if (process.env.KNOWLEDGE_SOURCE !== 'site' && docsPresent(repoRoot)) {
+  // Everything the theatre lets people sign up for besides the courses. Optional
+  // file: a site without it simply has no directions.
+  const dirFile = path.join(repoRoot, 'src/content/directions.json')
+  const directions = fs.existsSync(dirFile)
+    ? read('src/content/directions.json').items.map((d) => ({
+        id: d.id,
+        type: d.type,
+        title: d.title,
+        ...(d.desc ? { desc: d.desc } : {}),
+        ...(d.age ? { age: d.age } : {}),
+        ...(d.schedule ? { schedule: d.schedule } : {}),
+        ...(Array.isArray(d.prices) && d.prices.length ? { prices: d.prices.map((p) => ({ name: p.name, price: p.price })) } : {}),
+        ...(d.showFrom ? { showFrom: d.showFrom } : {}),
+        ...(d.showTo ? { showTo: d.showTo } : {}),
+        open: d.open !== false,
+        askPhone: d.askPhone !== false,
+        fields: (d.fields || []).map((f) => ({
+          label: f.label,
+          kind: f.kind || 'text',
+          ...(f.ask ? { ask: f.ask } : {}),
+          ...(Array.isArray(f.options) && f.options.length ? { options: f.options } : {}),
+        })),
+      }))
+    : []
+
+  // the theatre's shop window on Bileton: every show and its seats in one place
+  const settings = read('src/content/settings.json')
+  const ticketsUrl = /^https?:\/\//.test(settings.ticketsWidgetUrl || '') ? settings.ticketsWidgetUrl : ''
+
+  const base = { builtAt: new Date().toISOString(), afisha, shows, courses, faq, directions, ...(ticketsUrl ? { ticketsUrl } : {}), source: 'site' }
+  // The site is the source of truth: the theatre edits it in the admin and the
+  // bot follows. The Word-document mode (bot/docs, the theatre's season plan)
+  // stays for the day someone wants it: KNOWLEDGE_SOURCE=docs.
+  if (process.env.KNOWLEDGE_SOURCE === 'docs' && docsPresent(repoRoot)) {
     const { knowledge, report } = knowledgeFromDocs(repoRoot, base, nowMs)
     return { ...knowledge, docsReport: report }
   }

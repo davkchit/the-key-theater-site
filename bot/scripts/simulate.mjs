@@ -33,7 +33,7 @@ export async function callYandex(env, model, messages, opts = {}) {
   const r = await callModel(env, body, {
     ...opts,
     provider: opts.provider || env.LLM_PROVIDER,
-    maxTokens: 1000,
+    maxTokens: 2000,
     temperature: Number(process.env.BOT_TEMP || 0.2),
   })
   return { text: r.text, tokens: r.tokens, price: r.price, model: r.model }

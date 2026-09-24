@@ -20,8 +20,6 @@ const CFG = {
   consentTtlMs: 10 * 60 * 1000,
   secondChildWindowMs: 60 * 60 * 1000,
   afishaShown: 6,
-  // months of afisha the model sees line by line; beyond that, per-show dates
-  afishaMonths: 4,
   // how long "давай" still means "yes to the signup the bot just offered"
   offerTtlMs: 15 * 60 * 1000,
   // narrow the prompt to the topic the parser named? Off: the handbook is four
@@ -250,7 +248,8 @@ function contactsText() {
 }
 
 function ticketsText(knowledge, nowMs) {
-  return 'Билеты продаются на <b>Билетоне</b> и на <b>Яндекс Афише</b>, а также в кассе театра.\n\n' + afishaText(knowledge, nowMs)
+  const shop = knowledge.ticketsUrl ? '\n🎟 <a href="' + esc(knowledge.ticketsUrl) + '">Купить билет на Билетоне</a>' : ''
+  return 'Билеты продаются на <b>Билетоне</b> и на <b>Яндекс Афише</b>, а также в кассе театра.' + shop + '\n\n' + afishaText(knowledge, nowMs)
 }
 
 // Every block the model may be told about, keyed by topic id. The ids of the
@@ -260,37 +259,126 @@ function ticketsText(knowledge, nowMs) {
 // ноябре?" lost the 28th). A heading per month with its count lets it see where
 // the month ends and check that it named them all.
 const MONTHS_NOM = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
-function afishaByMonth(knowledge, nowMs) {
-  const groups = []
-  for (const a of upcomingAfisha(knowledge, nowMs)) {
-    const key = a.date.slice(0, 7)
-    if (!groups.length || groups[groups.length - 1].key !== key) groups.push({ key, items: [] })
-    groups[groups.length - 1].items.push(a)
+// ---- which afisha dates the model sees
+//
+// A whole season is 40 to 75 lines, and the prompt is paid for on every message.
+// So the model always gets the next four weeks, plus exactly the period the
+// person asked about. Working out that period is plain code, not the model's
+// job: "эти выходные" and "в субботу" are calendar arithmetic, and the model
+// got them wrong when it had to do them itself.
+
+const MONTH_RES = [
+  /(^|[^а-яё])январ/i, /(^|[^а-яё])феврал/i, /(^|[^а-яё])март/i, /(^|[^а-яё])апрел/i,
+  /(^|[^а-яё])ма[йяе]([^а-яё]|$)/i, /(^|[^а-яё])июн/i, /(^|[^а-яё])июл/i, /(^|[^а-яё])август/i,
+  /(^|[^а-яё])сентябр/i, /(^|[^а-яё])октябр/i, /(^|[^а-яё])ноябр/i, /(^|[^а-яё])декабр/i,
+]
+// index = Date#getUTCDay (0 is Sunday)
+const WEEKDAY_RES = [
+  /воскресень/i, /понедельник/i, /вторник/i, /(^|[^а-яё])сред[ауы]([^а-яё]|$)/i, /четверг/i, /пятниц/i, /суббот/i,
+]
+
+function isoAdd(iso, days) {
+  const d = new Date(iso + 'T12:00:00Z')
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+const isoDow = (iso) => new Date(iso + 'T12:00:00Z').getUTCDay()
+const pad2 = (n) => String(n).padStart(2, '0')
+
+function weekendRange(today) {
+  const dow = isoDow(today)
+  if (dow === 6) return [today, isoAdd(today, 1)]
+  if (dow === 0) return [today, today]
+  return [isoAdd(today, 6 - dow), isoAdd(today, 7 - dow)]
+}
+
+function shortDate(iso) {
+  const d = ruDate(iso)
+  return d.day + ' ' + d.mon
+}
+
+// The periods a question (and the two before it) is about, as calendar ranges.
+function askedRanges(question, today) {
+  const q = String(question || '')
+  const out = []
+  const add = (from, to, label) => { if (to >= today) out.push({ from: from < today ? today : from, to, label }) }
+  const year = Number(today.slice(0, 4))
+
+  // "27 сентября" names a day, not the whole of September
+  const named = q.match(new RegExp('(\\d{1,2})\\s+(' + MONTHS_GEN.join('|') + ')', 'i'))
+  const namedMonth = named ? MONTHS_GEN.indexOf(named[2].toLowerCase()) : -1
+
+  MONTH_RES.forEach((re, m) => {
+    if (!re.test(q) || m === namedMonth) return
+    let y = year
+    if (y + '-' + pad2(m + 1) + '-' + pad2(new Date(Date.UTC(y, m + 1, 0)).getUTCDate()) < today) y++
+    const last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate()
+    add(y + '-' + pad2(m + 1) + '-01', y + '-' + pad2(m + 1) + '-' + pad2(last), MONTHS_NOM[m] + ' ' + y)
+  })
+
+  const dm = q.match(new RegExp('(\\d{1,2})\\s+(' + MONTHS_GEN.join('|') + ')', 'i'))
+  if (dm) {
+    const m = MONTHS_GEN.indexOf(dm[2].toLowerCase())
+    let iso = year + '-' + pad2(m + 1) + '-' + pad2(Number(dm[1]))
+    if (iso < today) iso = year + 1 + '-' + pad2(m + 1) + '-' + pad2(Number(dm[1]))
+    add(iso, iso, shortDate(iso))
   }
-  // A whole season from the theatre's plan (75 shows) pushed the prompt past
-  // Groq's 8000 tokens a minute on its own. The next few months are listed in
-  // full; later months keep only their count and what is not in the
-  // repertoire, because every repertoire show already carries all its dates.
-  const repertoire = new Set((knowledge.shows || []).map((s) => String(s.title).toLowerCase().trim()))
-  return groups.map((g, gi) => {
-    // The year stays even though the model then copies it into dates: without
-    // it the model skipped September as if it were over (2 runs of 3). The
-    // current year is taken back out of the reply in afterModel instead.
-    const head = '### ' + MONTHS_NOM[Number(g.key.slice(5, 7)) - 1] + ' ' + g.key.slice(0, 4) + ', показов: ' + g.items.length
-    const far = gi >= CFG.afishaMonths
-    const items = far ? g.items.filter((a) => !repertoire.has(String(a.title).toLowerCase().trim())) : g.items
-    const pointer = far ? '\n- даты спектаклей репертуара на этот месяц указаны у каждого спектакля в разделе «Спектакли в репертуаре»' : ''
-    // short month and weekday: with a whole season from the theatre's plan the
-    // full words alone cost a thousand tokens per message
-    const lines = items.map((a) => { const d = ruDate(a.date); return '- ' + d.day + ' ' + d.mon.slice(0, 3) + ' (' + WD_SHORT_RU[new Date(a.date + 'T12:00:00Z').getUTCDay()] + '), ' + showTime(a) + ', «' + a.title + '»' + (a.age ? ', ' + a.age : '') + (a.note ? ', ' + a.note : '') })
-    // days the theatre is away: "есть спектакль 10 октября?" needs the reason
-    const today = todayIso(nowMs)
-    const away = (knowledge.tours || [])
-      .filter((t) => t.to >= today && t.from.slice(0, 7) <= g.key && t.to.slice(0, 7) >= g.key)
-      .map((t) => { const a = ruDate(t.from); const b = ruDate(t.to); return '- ' + a.day + (a.mon === b.mon ? '' : ' ' + a.mon.slice(0, 3)) + '–' + b.day + ' ' + b.mon.slice(0, 3) + ': театр на гастролях (' + t.place + '), спектаклей в Челнах нет' })
-    lines.unshift(...away)
-    return head + (lines.length ? '\n' + lines.join('\n') : '') + pointer
-  }).join('\n')
+
+  if (/послезавтра/i.test(q)) add(isoAdd(today, 2), isoAdd(today, 2), 'Послезавтра, ' + shortDate(isoAdd(today, 2)))
+  else if (/завтра/i.test(q)) add(isoAdd(today, 1), isoAdd(today, 1), 'Завтра, ' + shortDate(isoAdd(today, 1)))
+  if (/сегодня/i.test(q)) add(today, today, 'Сегодня, ' + shortDate(today))
+
+  if (/выходн/i.test(q)) {
+    const w = weekendRange(today)
+    add(w[0], w[1], 'Выходные ' + (w[0] === w[1] ? shortDate(w[0]) : shortDate(w[0]) + ' и ' + shortDate(w[1])))
+  }
+  if (/недел/i.test(q)) {
+    const dow = isoDow(today)
+    if (/следующ|будущ|той недел/i.test(q)) {
+      const monday = isoAdd(today, dow === 0 ? 1 : 8 - dow)
+      add(monday, isoAdd(monday, 6), 'Следующая неделя, ' + shortDate(monday) + ' по ' + shortDate(isoAdd(monday, 6)))
+    } else {
+      const sunday = isoAdd(today, (7 - dow) % 7)
+      add(today, sunday, 'Эта неделя, до ' + shortDate(sunday))
+    }
+  }
+  WEEKDAY_RES.forEach((re, wd) => {
+    if (!re.test(q)) return
+    const day = isoAdd(today, (wd - isoDow(today) + 7) % 7)
+    add(day, day, WD_SHORT_RU[wd] + ' ' + shortDate(day))
+  })
+
+  // several ways of naming one period must not print it twice
+  const seen = new Set()
+  return out.filter((r) => { const k = r.from + '|' + r.to; if (seen.has(k)) return false; seen.add(k); return true }).slice(0, 4)
+}
+
+function afishaLine(a) {
+  const d = ruDate(a.date)
+  return '- ' + d.day + ' ' + d.mon.slice(0, 3) + ' (' + WD_SHORT_RU[isoDow(a.date)] + '), ' + showTime(a) + ', «' + a.title + '»' + (a.age ? ', ' + a.age : '') + (a.note ? ', ' + a.note : '')
+}
+
+function afishaByMonth(knowledge, nowMs, question) {
+  const today = todayIso(nowMs)
+  const all = upcomingAfisha(knowledge, nowMs)
+  const tours = (knowledge.tours || []).filter((t) => t.to >= today)
+
+  // "есть спектакль 10 октября?" needs the reason there is none
+  const tourLines = (r) => tours
+    .filter((t) => t.from <= r.to && t.to >= r.from)
+    .map((t) => { const a = ruDate(t.from); const b = ruDate(t.to); return '- ' + a.day + (a.mon === b.mon ? '' : ' ' + a.mon.slice(0, 3)) + '–' + b.day + ' ' + b.mon.slice(0, 3) + ': театр на гастролях (' + t.place + '), спектаклей в Челнах нет' })
+
+  const section = (r, title) => {
+    const rows = all.filter((a) => a.date >= r.from && a.date <= r.to)
+    const lines = tourLines(r).concat(rows.length ? rows.map(afishaLine) : ['- показов в афише на эти даты нет'])
+    return '### ' + title + ', показов: ' + rows.length + '\n' + lines.join('\n')
+  }
+
+  const base = { from: today, to: isoAdd(today, 27) }
+  const parts = [section(base, 'Ближайшие 4 недели (по ' + shortDate(base.to) + ')')]
+  for (const r of askedRanges(question, today)) parts.push(section(r, 'По вашему вопросу: ' + r.label))
+  parts.push('Другие даты: у каждого спектакля в разделе «Спектакли в репертуаре» перечислены все его ближайшие показы.')
+  return parts.join('\n')
 }
 
 // "Когда будет Симон?" made the model pick one title's lines out of forty, and
@@ -306,24 +394,31 @@ function showDates(knowledge, nowMs, title) {
   return 'Все ближайшие показы (' + items.length + '): ' + items.map((a) => a.date.slice(8) + '.' + a.date.slice(5, 7) + (a.date.slice(0, 4) === thisYear ? '' : '.' + a.date.slice(0, 4)) + (a.time ? ' ' + a.time : ' время уточняется') + (a.note ? ' (' + a.note + ')' : '')).join(', ')
 }
 
-function knowledgeBlocks(knowledge, nowMs) {
+function all_or_none(text) {
+  return text && /показов: [1-9]/.test(text) ? text : (text || '') + '\n- ближайших спектаклей в афише нет'
+}
+
+function knowledgeBlocks(knowledge, nowMs, question) {
   const blocks = {
     // The model gets the whole season, not the six lines the button shows: a
     // screen limit is not a knowledge limit, and "что в ноябре?" needs November.
     // December's New Year block is not published yet, so the list is "what is
     // out so far", never "all there will be".
-    afisha: '## Афиша (все опубликованные показы. Театр может добавить новые, поэтому не говори, что других не будет)\n' + (afishaByMonth(knowledge, nowMs) || '- ближайших спектаклей нет'),
+    afisha: '## Афиша (все опубликованные показы. Театр может добавить новые, поэтому не говори, что других не будет)\n' + (all_or_none(afishaByMonth(knowledge, nowMs, question))),
     shows: '## Спектакли в репертуаре\n' + knowledge.shows
       .map((s) => '- «' + s.title + '»: ' + [s.age ? 'возраст ' + s.age : 'возраст уточняется у администратора', s.genre, s.based, s.dir && 'режиссёр ' + s.dir, s.dur && 'длительность ' + s.dur].filter(Boolean).join('; ') + (s.synopsis ? '. Сюжет: ' + s.synopsis : '') + (s.ticketUrl ? '. Страница билетов: ' + s.ticketUrl : '') + '. ' + showDates(knowledge, nowMs, s.title))
       .join('\n'),
     courses: '## Курсы (группы по возрасту)\n' + knowledge.courses.map((c) => '- «' + c.name + '», ' + c.ageRange + ': ' + c.desc + (c.price ? '. Стоимость: ' + c.price : '')).join('\n'),
   }
   for (const s of knowledge.faq) blocks[s.id] = '## ' + s.title + '\n' + s.body
+  const dirs = directionsBlock(knowledge, nowMs)
+  if (dirs) blocks.directions = dirs
   // A ticket question is answered out of the tickets block, so the links have to
   // live there too: routing can only carry what the chosen topic contains, and
   // the first run through the parser lost them because they sat under shows.
   const links = (knowledge.shows || []).filter((sh) => sh.ticketUrl).map((sh) => '- «' + sh.title + '»: ' + sh.ticketUrl)
-  if (links.length && blocks.tickets) blocks.tickets += '\nСтраницы покупки билетов:\n' + links.join('\n')
+  if (knowledge.ticketsUrl && blocks.tickets) blocks.tickets += '\nСтраница театра на Билетоне, там все показы и места, билет можно купить сразу: ' + knowledge.ticketsUrl
+  if (links.length && blocks.tickets) blocks.tickets += '\nСтраницы покупки билетов на отдельные спектакли:\n' + links.join('\n')
   return blocks
 }
 
@@ -339,14 +434,16 @@ function alwaysTopics(knowledge) {
 // the afisha is cut to the upcoming few, and `topics` selects which blocks are
 // relevant to this turn. `topics = null` means "send everything", which is the
 // behaviour until the turn parser is in place and can name the topic itself.
-function knowledgeForPrompt(knowledge, nowMs, topics) {
+function knowledgeForPrompt(knowledge, nowMs, topics, question) {
   const today = todayIso(nowMs)
   const td = ruDate(today)
-  const blocks = knowledgeBlocks(knowledge, nowMs)
+  const blocks = knowledgeBlocks(knowledge, nowMs, question)
   const wanted = topics
     ? [...new Set(topics.concat(alwaysTopics(knowledge)))].filter((id) => blocks[id])
     : Object.keys(blocks)
-  return ['Сегодня: ' + td.day + ' ' + td.mon + ' ' + today.slice(0, 4) + ', ' + td.wd + '.']
+  const wk = weekendRange(today)
+  const weekend = wk[0] === wk[1] ? shortDate(wk[0]) : shortDate(wk[0]) + ' и ' + shortDate(wk[1])
+  return ['Сегодня: ' + td.day + ' ' + td.mon + ' ' + today.slice(0, 4) + ', ' + td.wd + '. Ближайшие выходные: ' + weekend + '.']
     .concat(wanted.map((id) => blocks[id]))
     .join('\n\n')
 }
@@ -563,7 +660,7 @@ const SYSTEM_PROMPT = [
   '7в. На общий вопрос о театре отвечай фактами из данных (с какого года, что ставит, курсы, фестиваль), без общих красивых фраз.',
   '8. Группы курсов: 5–7 лет, 8–12 лет, 13–17 лет, 18+. Если ребёнку скоро исполнится возраст следующей группы (например, сейчас 7, скоро 8), НЕ называй группу, скажи, что подойдёт администратор с педагогом.',
   '9. На посторонние темы вежливо верни разговор к театру.',
-  '10. Заявку на курс ты принимаешь: под твоим ответом появится кнопка «Оформить заявку», по ней открывается короткая форма. Сам ты заявку не оформляешь, поэтому не пиши «оформляю заявку» или «форма уже открылась», а предлагай нажать кнопку. В чате заявки принимаются только на курсы. На фестиваль заявку подают так, как написано в данных о фестивале, а про заявки в лабораторию и лагерь в данных ничего нет. Никогда не говори, что не можешь записать или не принимаешь заявки. Но имя и телефон спрашивает форма, а не ты: не проси и не повторяй телефоны, фамилии и другие личные данные в переписке.',
+  '10. Заявку на курс ты принимаешь: под твоим ответом появится кнопка «Оформить заявку», по ней открывается короткая форма. Сам ты заявку не оформляешь, поэтому не пиши «оформляю заявку» или «форма уже открылась», а предлагай нажать кнопку. В чате заявки принимаются на курсы и на направления из раздела «Направления», если заявки на них открыты. Если заявки закрыты, так и скажи. На всё, чего нет в данных (например, лаборатория и лагерь), заявок в чате нет. Никогда не говори, что не можешь записать или не принимаешь заявки. Но имя и телефон спрашивает форма, а не ты: не проси и не повторяй телефоны, фамилии и другие личные данные в переписке.',
   '11. Отвечай только на последнее сообщение человека. Никогда не пиши реплики за человека и не продолжай диалог сам.',
   '12. Стоимость занятий называй только ту, что есть в данных, и всегда со словом «от». Про скидки, рассрочку и способы оплаты ты не знаешь, это уточнит администратор.',
   '13. Никогда не обещай, что вам перезвонят или с вами свяжутся. Звонок бывает только по оформленной заявке с телефоном. Если человек просит администратора, дай телефон и часы работы или предложи оставить заявку, но не обещай звонок сам.',
@@ -596,7 +693,11 @@ const TONE_EXAMPLES = [
 ]
 
 function buildModelRequest(knowledge, nowMs, history, userText, topics) {
-  const messages = [{ role: 'system', text: SYSTEM_PROMPT + knowledgeForPrompt(knowledge, nowMs, topics) }].concat(TONE_EXAMPLES)
+  // the two earlier things the person said count too: "а ещё что-то есть?" is
+  // about the month asked one message ago
+  const earlier = (history || []).filter((h) => h.role === 'user').slice(-2).map((h) => h.text)
+  const question = earlier.concat([String(userText)]).join(' ')
+  const messages = [{ role: 'system', text: SYSTEM_PROMPT + knowledgeForPrompt(knowledge, nowMs, topics, question) }].concat(TONE_EXAMPLES)
   for (const h of (history || []).slice(-CFG.historyTurns)) messages.push({ role: h.role, text: h.text })
   messages.push({ role: 'user', text: String(userText).slice(0, CFG.maxInputChars) })
   return messages
@@ -610,11 +711,11 @@ function buildModelRequest(knowledge, nowMs, history, userText, topics) {
 // for in words.
 const NEVER_SAY = [
   [/(форм\w*|заявк\w*)[^.!?]{0,30}(на сайте|на нашем сайте|через сайт)/i,
-   'Заявку оформляем прямо здесь: я открою форму, это полминуты.'],
-  [/(не\s+принима\w*|не\s+оформля\w*|не\s+могу\s+(принят\w*|запис\w*|оформ\w*))[^.!?]{0,40}(заявк|запис)/i,
-   'Заявку я принимаю, это быстро. Администратор потом перезвонит и всё расскажет.'],
-  [/(я\s+не\s+могу|не\s+умею)[^.!?]{0,30}(запис|оформ)/i,
-   'Записать могу, сейчас открою форму.'],
+   'Заявку оформляем прямо здесь, в чате: нажмите кнопку «Оформить заявку» ниже, это полминуты.'],
+  [/(не\s+принима\w*|не\s+оформля\w*|не\s+могу\s+(принима\w*|принят\w*|запис\w*|оформ\w*))[^.!?]{0,40}(заявк|запис)/i,
+   'Заявку я принимаю, это быстро. Нажмите кнопку «Оформить заявку» ниже, администратор потом перезвонит и всё расскажет.'],
+  [/(я\s+не\s+могу|не\s+умею)[^.!?]{0,30}(запис|оформ)|(запис|оформ)[а-яё]*\s+([а-яё]*заявк[а-яё]*\s+)?не\s+(умею|могу)/i,
+   'Записать могу: нажмите кнопку «Оформить заявку» ниже.'],
 ]
 
 function stripForbidden(text) {
@@ -843,6 +944,202 @@ function offerStillOpen(s, nowMs) {
   return Boolean(s.signupOfferedAt) && nowMs - s.signupOfferedAt < CFG.offerTtlMs && !s.step
 }
 
+// ---------------------------------------------------------------- directions
+//
+// Courses have their own scenario above (age, group, second child). Everything
+// else the theatre offers -- a preparatory group, the festival, a quest, a
+// carnival night, the newsletter -- is a "direction": data in the site's admin
+// with its own list of questions. One generic scenario asks them, so a new kind
+// of event is a new row in the admin, not new code.
+
+const DIR_TYPE_LABEL = { prep: 'подготовительная группа', festival: 'фестиваль', quest: 'квест', carnival: 'карнавальная ночь', newsletter: 'рассылка', other: 'событие' }
+const DIR_TYPE_RE = { prep: /подготовит/i, festival: /фестивал/i, quest: /квест/i, carnival: /карнавал/i, newsletter: /рассылк|подписа/i }
+
+// Seasonal ones (quests and carnival nights only run in winter) show up and go
+// away by their dates, with nobody touching the admin.
+function visibleDirections(knowledge, nowMs) {
+  const today = todayIso(nowMs)
+  return (knowledge.directions || []).filter((d) => (!d.showFrom || d.showFrom <= today) && (!d.showTo || d.showTo >= today))
+}
+
+function directionById(knowledge, id, nowMs) {
+  return visibleDirections(knowledge, nowMs).find((d) => d.id === id) || null
+}
+
+// Which direction a message is about: its title first, then its kind of event.
+function directionFor(knowledge, text, nowMs) {
+  const t = String(text || '').toLowerCase().replace(/ё/g, 'е')
+  const list = visibleDirections(knowledge, nowMs)
+  for (const d of list) {
+    const words = String(d.title).toLowerCase().replace(/ё/g, 'е').split(/[^а-яa-z0-9]+/).filter((w) => w.length >= 5)
+    if (words.some((w) => t.indexOf(w.slice(0, Math.max(5, w.length - 2))) !== -1)) return d
+  }
+  for (const d of list) if (DIR_TYPE_RE[d.type] && DIR_TYPE_RE[d.type].test(t)) return d
+  return null
+}
+
+function directionsBlock(knowledge, nowMs) {
+  const list = visibleDirections(knowledge, nowMs)
+  if (!list.length) return ''
+  return '## Направления, на которые можно записаться через бота (кроме курсов)\n' + list.map((d) =>
+    '- «' + d.title + '» (' + (DIR_TYPE_LABEL[d.type] || 'событие') + ')' +
+    (d.age ? ', возраст ' + d.age : '') +
+    (d.schedule ? ', ' + d.schedule : '') +
+    ((d.prices || []).length ? '. Цена: ' + d.prices.map((x) => x.name + ' ' + x.price).join('; ') : '') +
+    '. ' + (d.open === false ? 'Заявки сейчас закрыты, записаться нельзя' : 'Заявки открыты, под ответом будет кнопка записи') +
+    (d.desc ? '. ' + d.desc : '')
+  ).join('\n')
+}
+
+function startDirSignup(state, dir, nowMs) {
+  state.pendingExtra = null
+  state.pendingAge = null
+  state.step = 'consent'
+  state.stepAt = nowMs
+  state.draft = {
+    questions: state.pendingQuestions || [],
+    dir: { id: dir.id, title: dir.title, type: dir.type, askPhone: dir.askPhone !== false, fields: (dir.fields || []).slice(0, 8) },
+  }
+  state.pendingQuestions = null
+  return {
+    msgs: [msg(state.chatId, 'Оформлю заявку: <b>' + esc(dir.title) + '</b>. Это займёт пару минут.\n\nНажимая «Согласен», вы соглашаетесь на обработку персональных данных для связи с вами по заявке.', inline([[['✅ Согласен', 'consent:yes'], ['Отмена', 'signup:cancel']]]))],
+    effects: [],
+  }
+}
+
+// What a "запишите" means: the direction the message names, else (for a bare
+// "давай" after an offer) the one that was offered, else a course. False means
+// the direction is closed, and the caller lets the model explain that.
+function beginSignup(res, s, nowMs, knowledge, text, useOffered) {
+  let dir = directionFor(knowledge, text, nowMs)
+  if (!dir && useOffered && s.offeredDir) dir = directionById(knowledge, s.offeredDir, nowMs)
+  s.offeredDir = null
+  if (dir && dir.open === false) return false
+  if (dir) {
+    const r = startDirSignup(s, dir, nowMs)
+    res.out.push(...r.msgs)
+    return true
+  }
+  runSignupStart(res, s, nowMs, null, knowledge)
+  return true
+}
+
+function dirQuestion(state) {
+  const q = state.draft.qs[state.draft.i]
+  if (q.kind === 'choice') return msg(state.chatId, esc(q.ask), inline((q.options || []).map((o, i) => [[o, 'dirc:' + i]])))
+  if (q.kind === 'phone') return msg(state.chatId, esc(q.ask), contactKeyboard())
+  return msg(state.chatId, esc(q.ask), { remove_keyboard: true })
+}
+
+// After the consent: name first, then the direction's own questions, then the
+// phone (unless the direction does not need one, like the newsletter).
+function dirBegin(state, nowMs) {
+  const d = state.draft
+  const qs = [{ kind: 'name', ask: 'Как вас зовут?', label: 'Имя' }]
+  for (const f of d.dir.fields || []) qs.push({ kind: f.kind || 'text', ask: f.ask || f.label + '?', label: f.label, options: f.options || [] })
+  if (d.dir.askPhone) qs.push({ kind: 'phone', ask: 'Оставьте телефон: нажмите кнопку ниже или напишите номер сообщением.', label: 'Телефон' })
+  d.qs = qs
+  d.i = 0
+  d.answers = []
+  state.step = 'dir_field'
+  state.stepAt = nowMs
+  return { out: [dirQuestion(state)], effects: [] }
+}
+
+function dirSummary(state) {
+  const d = state.draft
+  return msg(state.chatId, 'Проверьте, всё верно?\n\n<b>' + esc(d.dir.title) + '</b>\n' + d.answers.map((a) => '• ' + esc(a.label) + ': ' + esc(a.value)).join('\n'), inline([[['✅ Да, всё верно', 'confirm:yes'], ['✏️ Исправить', 'confirm:edit']]]))
+}
+
+function dirStep(state, ev, nowMs) {
+  const out = []
+  const effects = []
+  const d = state.draft
+  const text = ev.kind === 'text' ? ev.text : ''
+
+  if (state.step === 'dir_confirm') {
+    if (ev.kind === 'callback' && ev.data === 'confirm:yes') {
+      const get = (label) => (d.answers.find((a) => a.label === label) || {}).value || ''
+      const lead = {
+        id: 'L' + nowMs.toString(36).toUpperCase(),
+        createdAt: new Date(nowMs).toISOString(),
+        chatId: state.chatId,
+        source: 'бот',
+        name: get('Имя'),
+        children: [],
+        phone: get('Телефон'),
+        questions: d.questions || [],
+        status: 'новая',
+        direction: d.dir.title,
+        answers: d.answers.filter((a) => a.label !== 'Имя' && a.label !== 'Телефон').map((a) => a.label + ': ' + a.value),
+      }
+      effects.push({ type: 'leadSave', lead, isNew: true, notice: '🆕 Новая заявка' })
+      state.step = null
+      state.draft = null
+      out.push(msg(state.chatId, 'Готово, ' + esc(lead.name) + '! Заявка «' + esc(lead.direction) + '» принята.' + (lead.phone ? ' Администратор перезвонит на ' + esc(lead.phone) + ' в рабочее время (пн–пт, 15:00–21:00).' : ' Мы свяжемся с вами.'), mainKeyboard()))
+      return { out, effects }
+    }
+    if (ev.kind === 'callback' && ev.data === 'confirm:edit') {
+      d.i = 0
+      d.answers = []
+      state.step = 'dir_field'
+      state.stepAt = nowMs
+      out.push(msg(state.chatId, 'Давайте заново.'), dirQuestion(state))
+      return { out, effects }
+    }
+    if (text) return { out, effects, needsModel: text, keepQuestion: true, reprompt: 'Проверьте данные выше и нажмите «Да, всё верно» или «Исправить».' }
+    return { out, effects }
+  }
+
+  const q = d.qs[d.i]
+  const again = () => ({ out, effects, needsModel: text, keepQuestion: true, reprompt: esc(q.ask), repromptMarkup: dirQuestion(state).reply_markup })
+  let value = null
+
+  if (q.kind === 'choice') {
+    if (ev.kind === 'callback' && /^dirc:\d+$/.test(ev.data)) value = (q.options || [])[Number(ev.data.slice(5))] || null
+    else if (text) {
+      value = (q.options || []).find((o) => o.toLowerCase() === text.trim().toLowerCase()) || null
+      if (!value && looksLikeQuestion(text)) return again()
+    }
+    if (!value) { out.push(msg(state.chatId, 'Выберите вариант кнопкой ниже.', dirQuestion(state).reply_markup)); return { out, effects } }
+  } else if (q.kind === 'phone') {
+    if (ev.kind === 'contact') value = normPhone(ev.phone)
+    else if (text) {
+      value = normPhone(text)
+      if (!value && looksLikeQuestion(text)) return again()
+    }
+    if (!value) { out.push(msg(state.chatId, 'Не получилось разобрать номер. Нажмите «Поделиться контактом» или напишите номер вида 8 900 123-45-67.', contactKeyboard())); return { out, effects } }
+  } else {
+    if (!text) { out.push(msg(state.chatId, 'Напишите ответ текстом.')); return { out, effects } }
+    if (looksLikeQuestion(text)) return again()
+    if (q.kind === 'name') {
+      if (text.length > 40 || /\d/.test(text)) return again()
+      if (smallTalkReply(text, nowMs) || NOT_A_NAME.test(text)) { out.push(msg(state.chatId, 'Мяу, привет! 🐾 А как вас зовут? Напишите, пожалуйста, имя.')); return { out, effects } }
+      value = text.replace(/[.!,]+$/, '')
+    } else if (q.kind === 'number') {
+      if (!/^\d{1,4}$/.test(text.trim())) { out.push(msg(state.chatId, 'Напишите число цифрами.')); return { out, effects } }
+      value = text.trim()
+    } else if (q.kind === 'email') {
+      if (!/^\S+@\S+\.\S+$/.test(text.trim())) { out.push(msg(state.chatId, 'Похоже на ошибку в адресе почты. Напишите ещё раз, например name@mail.ru.')); return { out, effects } }
+      value = text.trim()
+    } else {
+      if (text.length > 200) { out.push(msg(state.chatId, 'Слишком длинно, напишите покороче.')); return { out, effects } }
+      value = text.trim()
+    }
+  }
+
+  d.answers.push({ label: q.label, value })
+  d.i += 1
+  state.stepAt = nowMs
+  if (d.i < d.qs.length) {
+    out.push(dirQuestion(state))
+    return { out, effects }
+  }
+  state.step = 'dir_confirm'
+  out.push(dirSummary(state))
+  return { out, effects }
+}
+
 function runSignupStart(res, s, nowMs, mode, knowledge) {
   const r = startSignup(s, nowMs, mode, knowledge)
   res.out.push(...r.msgs)
@@ -876,13 +1173,17 @@ function signupStep(state, ev, nowMs, knowledge, parsedIntent) {
   // parser is off or failed.
   if (text && (parsedIntent === 'cancel' || parsedIntent === 'decline' || CANCEL_RE.test(text))) return { out: cancelSignup(state), effects }
   if (ev.kind === 'callback' && ev.data === 'signup:cancel') return { out: cancelSignup(state), effects }
+  if (state.step === 'dir_field' || state.step === 'dir_confirm') return dirStep(state, ev, nowMs)
 
   if (state.step === 'consent') {
     // The tap is the same decision whichever way it arrives, and a second tap
     // on an already-consumed button must do nothing at all.
     const agreed = (ev.kind === 'callback' && ev.data === 'consent:yes') || parsedIntent === 'confirm'
     if (agreed) {
-      state.step = 'name'; state.stepAt = nowMs; state.stepMiss = 0; state.reminded = 0
+      state.stepMiss = 0; state.reminded = 0
+      // a direction asks its own questions; a course keeps the age-and-group scenario
+      if (state.draft && state.draft.dir) return dirBegin(state, nowMs)
+      state.step = 'name'; state.stepAt = nowMs
       out.push(msg(state.chatId, 'Как вас зовут?', { remove_keyboard: true }))
       return { out, effects }
     }
@@ -1035,6 +1336,11 @@ function signupStep(state, ev, nowMs, knowledge, parsedIntent) {
 // ---------------------------------------------------------------- admin side
 
 function adminLeadText(lead) {
+  if (lead.direction) {
+    const a = (lead.answers || []).map((x) => '• ' + esc(x)).join('\n')
+    const dq = (lead.questions || []).length ? '\n❓ ' + lead.questions.map(esc).join('\n❓ ') : ''
+    return '<b>Заявка: ' + esc(lead.direction) + '</b> · ' + esc(lead.source) + '\n👤 ' + esc(lead.name) + (lead.phone ? '\n📞 ' + esc(lead.phone) : '') + (a ? '\n' + a : '') + dq + (lead.status ? '\n\nСтатус: <b>' + esc(lead.status) + '</b>' : '')
+  }
   const many = (lead.children || []).length > 1
   const kids = (lead.children || []).map((c, i) => personIcon(null, c) + ' ' + (many ? (i + 1) + ') ' : '') + esc(c)).join('\n')
   const q = (lead.questions || []).length ? '\n❓ ' + lead.questions.map(esc).join('\n❓ ') : ''
@@ -1128,6 +1434,13 @@ function decide(ev, stateIn, globalIn, knowledge, cfg) {
   }
 
   if (ev.kind === 'callback') {
+    const dirTap = String(ev.data).match(/^signup:dir:(.+)$/)
+    if (dirTap) {
+      const dir = directionById(knowledge, dirTap[1], nowMs)
+      if (dir && dir.open !== false) { const r = startDirSignup(s, dir, nowMs); res.out.push(...r.msgs) }
+      else res.out.push(msg(s.chatId, 'Приём заявок на это сейчас закрыт.', mainKeyboard()))
+      return res
+    }
     if (ev.data === 'signup:start') { runSignupStart(res, s, nowMs, null, knowledge); return res }
     if (ev.data === 'signup:extra') { runSignupStart(res, s, nowMs, 'extra', knowledge); return res }
     if (ev.data === 'signup:new') { runSignupStart(res, s, nowMs, 'new', knowledge); return res }
@@ -1145,7 +1458,7 @@ function decide(ev, stateIn, globalIn, knowledge, cfg) {
     }
     // a button from an old message, pressed after the signup it belonged to
     // was finished, cancelled or expired
-    if (/^(consent|confirm):/.test(ev.data)) res.out.push(msg(s.chatId, 'Эта запись уже неактуальна. Чтобы оставить заявку, нажмите «Записаться на курс» внизу.', mainKeyboard()))
+    if (/^(consent|confirm|dirc):/.test(ev.data)) res.out.push(msg(s.chatId, 'Эта запись уже неактуальна. Чтобы оставить заявку, нажмите «Записаться на курс» внизу.', mainKeyboard()))
     return res
   }
 
@@ -1186,13 +1499,12 @@ function decide(ev, stateIn, globalIn, knowledge, cfg) {
     if (offerStillOpen(s, nowMs) && (parsed.intent === 'confirm' || parsed.intent === 'signup')) {
       s.signupOfferedAt = 0
       s.pendingExtra = false
-      runSignupStart(res, s, nowMs, null, knowledge)
-      return res
+      if (beginSignup(res, s, nowMs, knowledge, t, true)) return res
     }
     const act = parsed.wantsAction && intentAllowed(parsed.intent, s, nowMs)
     if (act && parsed.intent === 'cancel') { cancelLeadAsk(res.out, s); return res }
     if (act && parsed.intent === 'add_child') { s.pendingExtra = true; runSignupStart(res, s, nowMs, 'extra', knowledge); return res }
-    if (act && parsed.intent === 'signup') { s.pendingExtra = false; runSignupStart(res, s, nowMs, null, knowledge); return res }
+    if (act && parsed.intent === 'signup') { s.pendingExtra = false; if (beginSignup(res, s, nowMs, knowledge, t, false)) return res }
     if (parsed.intent === 'complaint' || (parsed.intent === 'human' && parsed.wantsAction)) { humanRequest(res.out, res.effects, s); return res }
     // everything else is answered, with the button that matches what was asked
     const offer = parsed.intent === 'signup' || parsed.intent === 'add_child' ? (hasOpenLead(s, nowMs) ? 'extra' : 'signup') : null
@@ -1209,8 +1521,7 @@ function decide(ev, stateIn, globalIn, knowledge, cfg) {
   if (offerStillOpen(s, nowMs) && words <= 3 && YES_TO_OFFER.test(t)) {
     s.signupOfferedAt = 0
     s.pendingExtra = false
-    runSignupStart(res, s, nowMs, null, knowledge)
-    return res
+    if (beginSignup(res, s, nowMs, knowledge, t, true)) return res
   }
   // checked before signup: "отмена заявки" contains "заявк" too
   if (CANCEL_RE.test(t)) { cancelLeadAsk(res.out, s); return res }
@@ -1219,8 +1530,8 @@ function decide(ev, stateIn, globalIn, knowledge, cfg) {
   if (SIGNUP_WORDS.test(t) && (words <= 5 || (!/\?/.test(t) && words <= 8))) {
     s.pendingAge = extractAge(t)
     s.pendingExtra = ANOTHER_CHILD.test(t)
-    runSignupStart(res, s, nowMs, null, knowledge)
-    return res
+    // a closed direction is answered by the model instead of opening a form
+    if (beginSignup(res, s, nowMs, knowledge, t, false)) return res
   }
   if (/(^|\s)(не|никто\s+не)\s+(по|пере)?звон/i.test(t) || /^(позовите|позвать|дайте)\s+(админ|человек|менеджер|оператор)/i.test(t)) {
     humanRequest(res.out, res.effects, s)
@@ -1272,7 +1583,8 @@ function requestModel(res, s, knowledge, nowMs, text, ctx, topics) {
 function noInventedAllAges(text) {
   return String(text)
     .replace(/без\s+возрастн[а-яё]*\s+ограничени[а-яё]*/gi, 'возраст уточнит администратор')
-    .replace(/для\s+(всех\s+возрастов|любого\s+возраста)/gi, 'возраст уточнит администратор')
+    // true of the courses (groups from 5 to adults), so only softened, not denied
+    .replace(/для\s+(всех\s+возрастов|любого\s+возраста)/gi, 'для разных возрастов')
 }
 
 // Model text -> Telegram HTML. Escaping comes first, so nothing the model
@@ -1329,14 +1641,24 @@ function afterModel(res, rawReply, nowMs, knowledge) {
   // A reply that talks about filing a signup must come with the way to do it.
   // The model decides what to say, the code decides what happens, and the two
   // parted ways live: "форма откроется сразу в чате", and nothing opened.
-  const promisesForm = /(оформ\S*|остав\S*|пода\S*)\s+(\S+\s+)?заявк|форм\S*\s+(\S+\s+)?(откро|появ)|запис\S*\s+можно\s+(прямо\s+)?(здесь|тут|в\s+чате)/i.test(text)
-  const offer = ctx.offer || (promisesForm && !ctx.inSignup ? (hasOpenLead(s, nowMs) ? 'extra' : 'signup') : null)
+  // A canned replacement (parsed.replaced) always points at the button, whatever
+  // its wording: the first version promised "я открою форму" with no button, and
+  // the detector below did not recognise its own bot's sentence.
+  const promisesForm = parsed.replaced || /(оформ\S*|остав\S*|пода\S*)\s+(\S+\s+)?заявк|заявк\S*\s+(\S+\s+)?(оформ|принима|приму)|форм\S*\s+(\S+\s+)?(откро|появ)|откро\S*\s+(\S+\s+)?форм|(могу|можем|готов\S*)\s+(\S+\s+)?(записать|оформить|принять)|запис\S*\s+можно\s+(прямо\s+)?(здесь|тут|в\s+чате)/i.test(text)
+  // which direction the talk is about decides what the button opens
+  const offerDir = ctx.offer !== 'extra' && (ctx.offer || promisesForm) && !ctx.inSignup ? directionFor(knowledge, (res.model.userText || '') + ' ' + text, nowMs) : null
+  // a closed direction gets no button at all: the reply already says it is closed
+  const dirClosed = Boolean(offerDir && offerDir.open === false)
+  const offer = dirClosed ? null : ctx.offer || (promisesForm && !ctx.inSignup ? (hasOpenLead(s, nowMs) ? 'extra' : 'signup') : null)
+  if (dirClosed) ctx.offer = null
   if (offer) s.signupOfferedAt = nowMs
+  s.offeredDir = offer && offerDir ? offerDir.id : null
   if (offer && !ctx.offer) ctx.offer = offer
   if (ctx.offer) {
+    const shortTitle = offerDir && offerDir.title.length > 26 ? offerDir.title.slice(0, 25) + '…' : offerDir && offerDir.title
     const btn = ctx.offer === 'extra'
       ? [['➕ Ещё одного к заявке', 'signup:extra'], ['📝 Новая заявка', 'signup:new']]
-      : [['✍️ Оформить заявку', 'signup:start']]
+      : offerDir ? [['✍️ Записаться: ' + shortTitle, 'signup:dir:' + offerDir.id]] : [['✍️ Оформить заявку', 'signup:start']]
     out.push(msg(s.chatId, html || 'Оформить заявку можно кнопкой:', inline([btn])))
     return { out, effects }
   }

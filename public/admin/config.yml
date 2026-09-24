@@ -190,6 +190,65 @@ collections:
               - { label: Год, name: year, widget: string }
               - { label: Название, name: title, widget: string, hint: 'Без кавычек — они добавятся сами' }
 
+  - name: directions
+    label: Направления (запись и заявки)
+    files:
+      - name: directions
+        label: Все направления
+        file: src/content/directions.json
+        fields:
+          - label: Направления
+            name: items
+            widget: list
+            summary: '{{title}}'
+            hint: 'Всё, на что можно оставить заявку, кроме курсов: подготовительные группы, фестиваль, квесты, карнавальные ночи, рассылка. Бот и сайт читают этот список.'
+            fields:
+              - { label: Код (латиницей, не менять), name: id, widget: string, hint: 'Например quest-2027. Нужен боту, чтобы отличать направления' }
+              - label: Вид
+                name: type
+                widget: select
+                options:
+                  - { label: Подготовительная группа, value: prep }
+                  - { label: Фестиваль, value: festival }
+                  - { label: Квест, value: quest }
+                  - { label: Карнавальная ночь, value: carnival }
+                  - { label: Рассылка, value: newsletter }
+                  - { label: Другое, value: other }
+              - { label: Название, name: title, widget: string }
+              - { label: Описание, name: desc, widget: text, required: false }
+              - { label: Возраст, name: age, widget: string, required: false, hint: 'Например 5–7 лет' }
+              - { label: Расписание или даты (словами), name: schedule, widget: string, required: false }
+              - label: Цены
+                name: prices
+                widget: list
+                required: false
+                summary: '{{name}}: {{price}}'
+                fields:
+                  - { label: Вариант, name: name, widget: string, hint: 'Например: один, командой' }
+                  - { label: Цена, name: price, widget: string, hint: 'Например: 1 500 ₽' }
+              - { label: Показывать с, name: showFrom, widget: date, format: 'YYYY-MM-DD', required: false, hint: 'Пусто, если показывать всегда. Квесты и карнавальные ночи сами появятся и пропадут по датам' }
+              - { label: Показывать по, name: showTo, widget: date, format: 'YYYY-MM-DD', required: false }
+              - { label: Заявки открыты, name: open, widget: boolean, default: true, hint: 'Выключите, когда приём закрыт: бот скажет об этом и не предложит записаться' }
+              - { label: Спрашивать телефон, name: askPhone, widget: boolean, default: true }
+              - label: Вопросы анкеты
+                name: fields
+                widget: list
+                required: false
+                summary: '{{label}}'
+                hint: 'Что бот спросит у человека после имени (телефон спросит сам, если включено выше)'
+                fields:
+                  - { label: Название поля (попадёт в заявку), name: label, widget: string }
+                  - label: Тип ответа
+                    name: kind
+                    widget: select
+                    options:
+                      - { label: Текст, value: text }
+                      - { label: Число, value: number }
+                      - { label: Электронная почта, value: email }
+                      - { label: Выбор из вариантов, value: choice }
+                  - { label: Варианты для выбора, name: options, widget: list, required: false, field: { label: Вариант, name: option, widget: string }, hint: 'Только для типа «Выбор из вариантов»' }
+                  - { label: Как спросить, name: ask, widget: string, required: false, hint: 'Например: Из какого вы города?' }
+
   - name: settings
     label: Настройки сайта
     files:
@@ -198,3 +257,4 @@ collections:
         file: src/content/settings.json
         fields:
           - { label: Приём заявок на фестиваль «Действующие лица» открыт, name: festivalApplicationsOpen, widget: boolean }
+          - { label: Ссылка на страницу театра на Билетоне, name: ticketsWidgetUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Ссылка должна начинаться с https://'], hint: 'Витрина со всеми показами и местами. Бот даёт её на вопросы про билеты' }
