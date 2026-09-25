@@ -55,7 +55,7 @@ export function leadLetter(lead, kind, at) {
   const head = { cancel: 'Клиент отменил заявку, звонить не нужно', nudge: 'Напоминает о себе, ждёт звонка', more: 'К заявке добавлен ещё один человек' }[kind] || 'Новая заявка'
   const subject = ({ cancel: 'Отмена: ', nudge: 'Ждёт звонка: ', more: 'Дополнение: ' }[kind] || 'Заявка: ') + what + ', ' + (lead.name || 'без имени')
   const rows = leadLines(lead)
-  const where = (lead.source === 'сайт' ? 'с сайта' : 'из Telegram-бота') + ', ' + msk(at)
+  const where = ({ сайт: 'с формы на сайте', 'чат на сайте': 'из чата на сайте' }[lead.source] || 'из Telegram-бота') + ', ' + msk(at)
   const text = [head, what, where, '', ...rows.map(([k, v]) => (k ? k + ': ' : '') + v), '', 'Номер заявки: ' + lead.id].join('\n')
   const html =
     `<p style="font:15px/1.5 Arial,sans-serif;margin:0 0 4px"><b>${esc(head)}</b></p>` +

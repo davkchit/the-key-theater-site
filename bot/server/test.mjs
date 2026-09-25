@@ -17,6 +17,7 @@ import { createSiteApi } from './site.mjs'
 import { createMailer } from './mail.mjs'
 import { leadsCsv } from './csv.mjs'
 import { createOauth } from './oauth.mjs'
+import { createWebChat } from './webchat.mjs'
 
 const lib = loadBotLib()
 const knowledge = buildKnowledge(repoRoot)
@@ -221,7 +222,7 @@ test('заявка с сайта: в той же базе, письмо в оч�
   const mail = t.store.db.prepare('SELECT * FROM outbox').all()
   assert.equal(mail.length, 1)
   assert.match(mail[0].subject, /^Заявка: Курсы \(детский\), Ольга$/)
-  assert.match(mail[0].text, /с сайта/)
+  assert.match(mail[0].text, /с формы на сайте/)
   const card = t.sent.find((s) => s.payload.chat_id === ADMIN)
   assert.ok(card && /Заявка с сайта/.test(card.payload.text) && card.payload.reply_markup, 'нет карточки с кнопками')
   t.close()
@@ -366,6 +367,82 @@ test('вход в админку: GitHub, проверка state, токен п�
   res = fakeRes()
   await oauth.handle({ url: '/api/oauth/callback?code=c1&state=' + state }, res, '/api/oauth/callback')
   assert.equal(res.status, 400, 'один и тот же state нельзя использовать дважды')
+})
+
+// ---- the chat window on the site
+
+function webRig({ llm } = {}) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kluch-web-'))
+  const store = openStore(dir)
+  const telegram = []
+  let webchat = null
+  const send = (item) => webchat.route(item, async (i) => { telegram.push(i); return true })
+  const env = { ADMIN_CHAT_ID: ADMIN, BOT_PARSER: '0', LLM_MODEL: 'm' }
+  const turn = createTurn({
+    env, lib, store,
+    getKnowledge: () => knowledge,
+    llm: llm || (async () => { throw new Error('модель не должна вызываться') }),
+    send,
+    log: () => {},
+    now: () => Date.UTC(2026, 8, 19, 10, 0) + (updateId += 1) * 1000,
+  })
+  webchat = createWebChat({ turn, lane: (k, job) => job(), log: () => {} })
+  const session = 'abcdefghijklmnop1234'
+  const post = (body) => webchat.handle({ session, ...body }, '9.9.9.9')
+  return { store, telegram, post, session, close: () => { store.close(); fs.rmSync(dir, { recursive: true, force: true }) } }
+}
+
+test('чат на сайте: приветствие без модели, кнопки меню как подсказки', async () => {
+  const w = webRig()
+  const r = await w.post({ start: true })
+  assert.equal(r.status, 200)
+  assert.ok(r.body.messages.length >= 1)
+  assert.match(r.body.messages[0].html, /кот/i)
+  assert.ok(r.body.messages.some((m) => (m.chips || []).length >= 4), 'нет подсказок меню')
+  w.close()
+})
+
+test('чат на сайте: вопрос уходит модели, ответ приходит в окно, не в Telegram', async () => {
+  const w = webRig({ llm: async () => ({ choices: [{ message: { content: '«Симон» - весёлые похороны, 18+.' } }] }) })
+  const r = await w.post({ text: 'расскажи про Симона' })
+  assert.equal(r.status, 200)
+  assert.match(r.body.messages.map((m) => m.html).join(' '), /<b>«Симон»<\/b>/)
+  assert.equal(w.telegram.filter((i) => i.method === 'sendMessage').length, 0, 'ответ посетителю ушёл в Telegram')
+  w.close()
+})
+
+test('чат на сайте: запись до конца кнопками, заявка «чат на сайте», карточка админу в Telegram', async () => {
+  const w = webRig()
+  let r = await w.post({ text: 'запишите дочку, ей 7' })
+  const consent = r.body.messages.flatMap((m) => m.buttons.flat()).find((b) => b.data === 'consent:yes')
+  assert.ok(consent, 'нет кнопки согласия')
+  await w.post({ tap: 'consent:yes' })
+  await w.post({ text: 'Марина' })
+  r = await w.post({ text: '7' })
+  const phoneAsk = r.body.messages.map((m) => m.html).join(' ')
+  assert.doesNotMatch(phoneAsk, /кнопк|Поделиться контактом/, 'в окне сайта нет кнопки «поделиться контактом»')
+  assert.ok(!r.body.messages.some((m) => (m.chips || []).some((c) => /контакт/i.test(c))), 'подсказка «поделиться контактом» в окне')
+  await w.post({ text: '89061234567' })
+  await w.post({ tap: 'confirm:yes' })
+  const lead = w.store.db.prepare('SELECT * FROM leads').get()
+  assert.ok(lead, 'заявка не сохранена')
+  assert.equal(lead.source, 'чат на сайте')
+  const card = w.telegram.find((i) => i.payload && i.payload.chat_id === ADMIN)
+  assert.ok(card && /чат на сайте/.test(card.payload.text), 'карточка админу не ушла в Telegram')
+  const mail = w.store.db.prepare('SELECT text FROM outbox').get()
+  assert.match(mail.text, /из чата на сайте/)
+  w.close()
+})
+
+test('чат на сайте: чужая сессия и кнопки админа не проходят', async () => {
+  const w = webRig()
+  assert.equal((await w.post({ session: 'bad', text: 'привет' })).status, 400)
+  assert.equal((await w.post({ text: '   ' })).status, 400)
+  // a visitor pressing an admin status button must not change anything
+  const r = await w.post({ tap: 'lead:L1:записан' })
+  assert.equal(r.status, 200)
+  assert.equal(w.telegram.filter((i) => i.method === 'editMessageText').length, 0)
+  w.close()
 })
 
 test('повторное сохранение заявки не сбрасывает её статус', async () => {

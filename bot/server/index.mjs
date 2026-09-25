@@ -32,6 +32,7 @@ import { createMailer, devLetter } from './mail.mjs'
 import { createSiteApi } from './site.mjs'
 import { leadsCsv } from './csv.mjs'
 import { createOauth } from './oauth.mjs'
+import { createWebChat } from './webchat.mjs'
 
 const env = { ...loadEnv(), ...Object.fromEntries(Object.entries(process.env).filter(([k]) => /^(TELEGRAM|ADMIN|LLM|YANDEX|SITE_URL|BOT_|KNOWLEDGE|SMTP|LEADS|MAIL_|DEV_EMAIL|ALLOWED_ORIGINS|TRUST_PROXY|GITHUB_OAUTH)/.test(k))) }
 if (!env.TELEGRAM_BOT_TOKEN) { console.error('нет TELEGRAM_BOT_TOKEN: впишите его в .env.bot'); process.exit(1) }
@@ -72,7 +73,11 @@ const llm = async (body, budgetMs) => {
 
 // a turn only queues its letters (outbox); they go out after the turn, see handleUpdate
 const mailer = createMailer({ env, store, log })
-const turn = createTurn({ env, lib, store, getKnowledge: knowledge.get, llm, send: tg.send, log })
+// the chat window on the site shares the turn: its own messages go back in the
+// HTTP reply, everything else (the admin chat) to Telegram, see webchat.mjs
+let webchat = null
+const send = (item) => (webchat ? webchat.route(item, tg.send) : tg.send(item))
+const turn = createTurn({ env, lib, store, getKnowledge: knowledge.get, llm, send, log })
 const site = createSiteApi({ env, lib, store, getKnowledge: knowledge.get, send: tg.send, log })
 
 // ---- one line per chat: two quick messages from one person are answered in the
@@ -85,6 +90,8 @@ function inLane(key, job) {
   next.finally(() => { if (lanes.get(key) === next) lanes.delete(key) })
   return next
 }
+
+webchat = createWebChat({ turn, lane: inLane, log })
 
 const chatOf = (u) => String(u.message?.chat?.id ?? u.callback_query?.message?.chat?.id ?? u.update_id)
 const seenUpdates = new Set()
@@ -163,6 +170,14 @@ const server = http.createServer(async (req, res) => {
       if (url === '/api/lead' && r.status === 200) mailer.flush()
       return reply(req, res, r.status, r.body)
     }
+    if (req.method === 'POST' && url === '/api/chat') {
+      if (req.headers.origin && !allowedOrigin(req)) return reply(req, res, 403, { ok: false, error: 'чужой сайт' })
+      const body = await readJson(req, 4 * 1024)
+      if (body === undefined) return reply(req, res, 413, { ok: false, error: 'слишком длинное сообщение' })
+      const r = await webchat.handle(body, ipOf(req))
+      if (r.status === 200) mailer.flush()
+      return reply(req, res, r.status, r.body)
+    }
     if (url.startsWith('/api/oauth/')) return oauth.handle(req, res, url)
     reply(req, res, 404, { ok: false })
   } catch (e) {
@@ -202,12 +217,23 @@ setInterval(weeklyReport, 3600e3).unref()
 // ---- polling
 let stopping = false
 async function poll() {
-  const me = await tg.call('getMe')
-  if (!me.ok) throw new Error('Telegram: ' + me.description)
+  // Telegram may be unreachable at start (network, VPN, a blocked server). The
+  // site's forms and chat do not need it, so the service keeps running and
+  // tries again instead of exiting.
+  let me = null
+  for (let attempt = 1; !stopping; attempt++) {
+    try {
+      me = await tg.call('getMe')
+      if (me.ok) break
+      throw new Error(me.description || 'нет ответа')
+    } catch (e) {
+      if (attempt === 1 || attempt % 20 === 0) log('Telegram недоступен, сайт и чат работают, пробую снова:', redact(e.cause?.code ?? e.message))
+      await new Promise((r) => setTimeout(r, Math.min(30000, 3000 * attempt)))
+    }
+  }
+  if (!me || !me.ok) return
   // polling and a webhook cannot coexist: drop one left over from n8n
-  await tg.call('deleteWebhook', { drop_pending_updates: false })
-  mailer.start()
-  weeklyReport()
+  try { await tg.call('deleteWebhook', { drop_pending_updates: false }) } catch {}
   log(`бот запущен: @${me.result.username} · знание ${knowledge.get().builtAt} · показов ${knowledge.get().afisha.length}`)
 
   const saved = store.getKv('offset')
@@ -249,8 +275,11 @@ process.on('SIGINT', stop)
 process.on('SIGTERM', stop)
 process.on('unhandledRejection', (e) => log('необработанная ошибка:', e && e.stack ? e.stack : e))
 
+// mail and the weekly report do not depend on Telegram
+mailer.start()
+weeklyReport()
+
 if (env.BOT_POLL === '0') {
-  mailer.start()
   log(`сервис запущен без Telegram (BOT_POLL=0): только сайт и почта · знание ${knowledge.get().builtAt}`)
 } else {
   poll().catch((e) => { log('остановка из-за ошибки:', e.message); process.exit(1) })

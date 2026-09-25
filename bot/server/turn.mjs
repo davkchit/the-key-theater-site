@@ -35,7 +35,10 @@ export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now 
   function plan(res) {
     const at = new Date(now()).toISOString()
     const p = { chats: [], leads: [], statuses: [], unanswered: [], mail: [], tg: [] }
-    const letter = (lead, kind) => p.mail.push({ at, ...leadLetter({ ...lead, source: lead.source || 'бот' }, kind, at) })
+    // a lead from the chat window on the site runs through the same bot logic,
+    // which labels every lead «бот»; the chat id tells where it really came from
+    const sourceOf = (lead) => (/^w[a-z0-9]+$/.test(String(lead.chatId)) ? 'чат на сайте' : lead.source || 'бот')
+    const letter = (lead, kind) => p.mail.push({ at, ...leadLetter({ ...lead, source: sourceOf(lead) }, kind, at) })
     if (res.answerCallback) p.tg.push({ method: 'answerCallbackQuery', payload: res.answerCallback })
     for (const m of res.out) p.tg.push({ method: 'sendMessage', payload: m })
     if (res.state) p.chats.push({ chat_id: String(res.state.chatId), state: JSON.stringify(res.state), updated_at: at })
@@ -46,7 +49,7 @@ export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now 
           lead_id: l.id,
           updated_at: at,
           chat_id: String(l.chatId),
-          source: l.source || 'бот',
+          source: sourceOf(l),
           name: l.name || '',
           phone: l.phone || '',
           children: (l.children || []).join('; '),
@@ -62,7 +65,7 @@ export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now 
         }
         p.leads.push(row)
         letter(l, e.isNew ? 'new' : /Напоминает/.test(e.notice || '') ? 'nudge' : 'more')
-        if (ADMIN) p.tg.push({ method: 'sendMessage', payload: lib.msg(ADMIN, (e.notice ? e.notice + '\n\n' : '') + lib.adminLeadText(l), lib.adminLeadKeyboard(l.id)) })
+        if (ADMIN) p.tg.push({ method: 'sendMessage', payload: lib.msg(ADMIN, (e.notice ? e.notice + '\n\n' : '') + lib.adminLeadText({ ...l, source: sourceOf(l) }), lib.adminLeadKeyboard(l.id)) })
       } else if (e.type === 'leadCancel') {
         p.statuses.push({ lead_id: e.lead.id, status: 'отменена клиентом', status_by: 'клиент', updated_at: at })
         letter(e.lead, 'cancel')
