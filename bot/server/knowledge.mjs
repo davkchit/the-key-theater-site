@@ -38,7 +38,9 @@ export function createKnowledge({ env, repoRoot, store, log, alarm }) {
         next = buildKnowledge(repoRoot)
       }
       if (!looksLikeKnowledge(next)) throw new Error('скачанное знание не похоже на знание')
-      if (next.builtAt !== current.builtAt) log('знание обновлено:', next.builtAt, `· показов ${next.afisha.length}`)
+      // builtAt changes on every local rebuild; only a change in content is news
+      const same = JSON.stringify({ ...next, builtAt: '' }) === JSON.stringify({ ...current, builtAt: '' })
+      if (!same) log('знание обновлено:', next.builtAt, `· показов ${next.afisha.length}`)
       current = next
       refreshedAt = Date.now()
     } catch (e) {
