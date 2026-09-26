@@ -45,6 +45,22 @@ collections:
               - { label: Длительность, name: dur, widget: string, required: false, hint: 'Например 1 ч 40 мин' }
               - { label: Фото со спектакля, name: photo, widget: image, required: false, hint: 'Если пусто — покажем фирменную заглушку' }
               - { label: Ссылка на билеты, name: ticketUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Начните со https://'], hint: 'Страница этого спектакля на Билетоне или Яндекс Афише. Если пусто — бот просто скажет, где продаются билеты' }
+              - label: Фото спектакля
+                name: photos
+                widget: list
+                required: false
+                hint: 'Несколько фото со сцены для страницы спектакля. Если пусто — блок не показывается'
+                field: { label: Фото, name: photo, widget: image }
+              - label: В ролях
+                name: cast
+                widget: list
+                required: false
+                summary: '{{fields.name}}'
+                hint: 'Кто играет. Если пусто — блок «В ролях» не показывается'
+                fields:
+                  - { label: Имя, name: name, widget: string }
+                  - { label: Роль, name: role, widget: string, required: false }
+                  - { label: Фото (лицо крупно), name: photo, widget: image, required: false }
               - label: Цвет карточки
                 name: bg
                 widget: select
@@ -257,3 +273,55 @@ collections:
         file: src/content/settings.json
         fields:
           - { label: Ссылка на страницу театра на Билетоне, name: ticketsWidgetUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Ссылка должна начинаться с https://'], hint: 'Витрина со всеми показами и местами. Бот даёт её на вопросы про билеты' }
+      - name: home
+        label: Главная страница
+        file: src/content/home.json
+        fields:
+          - label: Первый экран
+            name: hero
+            widget: list
+            summary: '{{fields.show}}'
+            hint: 'Спектакли для большого слайдера наверху главной. Показываются только те, у которых есть ближайший показ в афише, по порядку дат. Спектакль без хорошего фото сюда лучше не добавлять.'
+            fields:
+              - { label: Спектакль (название как в афише), name: show, widget: string }
+              - { label: Фото на весь экран, name: photo, widget: image, hint: 'Горизонтальное, крупное (от 2500 px по ширине), актёры на сцене. Слева на фото будет название, там лучше тёмный фон' }
+              - { label: Главное на фото (x% y%), name: focus, widget: string, required: false, default: '60% 40%', hint: 'Какую точку фото держать в кадре. 50% 50% — центр, 70% 30% — правее и выше' }
+      - name: festival
+        label: Фестиваль «Действующие лица»
+        file: src/content/festival.json
+        fields:
+          - label: О фестивале (абзацы)
+            name: intro
+            widget: list
+            field: { label: Абзац, name: text, widget: text }
+          - label: Цифры
+            name: stats
+            widget: list
+            summary: '{{fields.big}} — {{fields.note}}'
+            fields:
+              - { label: Число, name: big, widget: string, hint: 'Например: 2004, 20+, 45' }
+              - { label: Подпись, name: note, widget: string, hint: 'Например: первый фестиваль, городов России' }
+          - label: Программа по дням
+            name: program
+            widget: list
+            required: false
+            summary: '{{fields.day}}'
+            hint: 'Если пусто — блок «Программа» не показывается'
+            fields:
+              - { label: День, name: day, widget: string, hint: 'Например: 21 апреля' }
+              - { label: Пункты, name: items, widget: list, field: { label: Пункт, name: item, widget: string } }
+          - label: Вопросы и ответы
+            name: faq
+            widget: list
+            required: false
+            summary: '{{fields.q}}'
+            hint: 'Если пусто — блок «Вопросы» не показывается'
+            fields:
+              - { label: Вопрос, name: q, widget: string }
+              - { label: Ответ, name: a, widget: text }
+          - label: Фото прошлых лет
+            name: photos
+            widget: list
+            required: false
+            hint: 'Показываются, если фото хотя бы три'
+            field: { label: Фото, name: photo, widget: image }

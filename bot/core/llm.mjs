@@ -25,6 +25,19 @@ export const PROVIDERS = {
     price: 0,
     priceParser: 0,
   },
+  // Cloud.ru Evolution Foundation Models: gpt-oss-120b on Russian servers,
+  // pay-as-you-go from a prepaid balance (grant bonuses do not cover models)
+  cloudru: {
+    base: 'https://foundation-models.api.cloud.ru/v1',
+    auth: 'Bearer',
+    model: 'openai/gpt-oss-120b',
+    parserModel: 'openai/gpt-oss-120b',
+    // 15.86 ₽ per 1M input and 61 ₽ per 1M output tokens (catalog, Sept 2026);
+    // answers are mostly prompt, so ~0.02 ₽ per 1000 tokens overall
+    price: 0.02,
+    priceParser: 0.02,
+    keyName: 'LLM_CLOUDRU_KEY',
+  },
   yandex: {
     base: 'https://llm.api.cloud.yandex.net/v1',
     auth: 'Api-Key',
@@ -42,6 +55,7 @@ export const PROVIDERS = {
 // a fourth setting -- and getting it wrong silently mangles the model name.
 function guessProvider(env) {
   const base = String(env.LLM_BASE || '')
+  if (base.includes('cloud.ru')) return 'cloudru'
   for (const key of Object.keys(PROVIDERS)) if (base.includes(key)) return key
   return 'yandex'
 }
@@ -51,7 +65,7 @@ export function llmConfig(env, opts = {}) {
   const p = PROVIDERS[name] || PROVIDERS.yandex
   // Scripts (eval, parse, simulate) run on their own key when there is one, so
   // a test run cannot spend the daily limit of the bot someone is trying out.
-  const key = env.EVAL_LLM_KEY || env.LLM_KEY || (name === 'groq' ? env.GROQ_API_KEY : env.YANDEX_API_KEY)
+  const key = (p.keyName && env[p.keyName]) || env.EVAL_LLM_KEY || env.LLM_KEY || (name === 'groq' ? env.GROQ_API_KEY : env.YANDEX_API_KEY)
   const model = opts.parser ? (env.LLM_PARSER_MODEL || p.parserModel) : (env.LLM_MODEL || p.model)
   return {
     name,

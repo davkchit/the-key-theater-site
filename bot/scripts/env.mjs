@@ -14,6 +14,9 @@ export function loadEnv() {
     const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/)
     if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '')
   }
+  // one-off runs on another model without editing the file:
+  //   LLM_BASE=https://foundation-models.api.cloud.ru/v1 node bot/scripts/eval.mjs ...
+  for (const k of ['LLM_BASE', 'LLM_MODEL', 'LLM_PARSER_MODEL', 'LLM_PROVIDER', 'LLM_AUTH']) if (process.env[k]) env[k] = process.env[k]
   return env
 }
 

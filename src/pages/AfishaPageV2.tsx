@@ -1,0 +1,328 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import type { AfishaItem } from '../types/content'
+import { upcomingAfisha } from '../data/afisha'
+import { shows } from '../data/shows'
+import { PrintFilters, BTN, RoughFrame, WRAP } from '../components/home2/parts'
+import { GRAIN_URL, Torn } from '../components/home2/paper'
+import { TICKETS_URL, heroShows, longDate, showPath } from '../components/home2/homeData'
+import { SwallowIcon } from '../components/ui/SwallowIcon'
+import starSvg from '../../assets/el-star.svg'
+
+// «Афиша» from the approved mockup, in two versions the visitor can switch
+// between: «тёмный зал» (the schedule on a black band, like an auditorium
+// with the lights down) and «программка» (a printed playbill on paper).
+// Only dates still to come are listed; the choice is remembered.
+
+type Theme = 'dark' | 'light'
+const THEME_KEY = 'kluch-afisha-theme'
+
+const NOMINATIVE: Record<string, string> = {
+  января: 'Январь',
+  февраля: 'Февраль',
+  марта: 'Март',
+  апреля: 'Апрель',
+  мая: 'Май',
+  июня: 'Июнь',
+  июля: 'Июль',
+  августа: 'Август',
+  сентября: 'Сентябрь',
+  октября: 'Октябрь',
+  ноября: 'Ноябрь',
+  декабря: 'Декабрь',
+}
+const WD: Record<string, string> = {
+  воскресенье: 'вс',
+  понедельник: 'пн',
+  вторник: 'вт',
+  среда: 'ср',
+  четверг: 'чт',
+  пятница: 'пт',
+  суббота: 'сб',
+}
+
+const byTitle = (t: string) => shows.find((s) => s.title.toLowerCase() === t.toLowerCase())
+const months = [...new Set(upcomingAfisha.map((i) => i.mon))]
+// the nearest show that has a proper photo picked for the homepage
+const featured = heroShows[0]
+
+function readTheme(): Theme {
+  try {
+    return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'
+  } catch {
+    return 'dark'
+  }
+}
+
+function ThemeSwitch({ theme, onChange }: { theme: Theme; onChange: (t: Theme) => void }) {
+  const options: [Theme, string][] = [
+    ['dark', 'Тёмная'],
+    ['light', 'Светлая'],
+  ]
+  return (
+    <div className="border-ink inline-flex border-2 p-1" role="group" aria-label="Оформление афиши">
+      {options.map(([t, label]) => (
+        <button
+          key={t}
+          onClick={() => onChange(t)}
+          aria-pressed={theme === t}
+          className={`font-heading px-4 py-1.5 text-[14px] font-semibold tracking-[.04em] uppercase transition-colors active:scale-[.97] ${
+            theme === t ? 'bg-ink text-paper' : 'text-ink hover:bg-ink/10'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function AgeRing({ age, dark }: { age?: string; dark: boolean }) {
+  if (!age) return <span className="block w-11" />
+  return (
+    <span
+      className={`font-heading flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border-[1.5px] text-[13px] font-semibold ${
+        dark ? 'border-paper/80' : 'border-ink'
+      }`}
+    >
+      {age}
+    </span>
+  )
+}
+
+function Row({ item, dark }: { item: AfishaItem; dark: boolean }) {
+  const show = byTitle(item.title)
+  const ticket = show?.ticketUrl || TICKETS_URL
+  const to = show ? showPath(show.title) : null
+  return (
+    <li
+      className={`grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-2 py-5 sm:grid-cols-[88px_auto_1fr_auto_auto] sm:gap-x-6 md:gap-x-8 ${
+        dark ? 'border-paper/25 border-b' : 'border-ink/30 border-b'
+      }`}
+    >
+      <div className="w-16 sm:w-auto">
+        <div className="font-heading text-[48px] leading-none font-bold md:text-[56px]">
+          {Number(item.day)}
+        </div>
+        <div className="mt-1 text-[12px] tracking-[.06em] uppercase">
+          {item.mon.slice(0, 3)} · {WD[item.wd] ?? item.wd}
+        </div>
+      </div>
+      <div
+        className={`font-heading hidden text-[20px] font-semibold sm:block sm:pl-6 ${
+          dark ? 'border-paper/40 border-l' : 'border-brand-red border-l-4'
+        }`}
+      >
+        {item.time}
+      </div>
+      <div className="min-w-0">
+        <h3 className="font-heading text-[24px] leading-[1.05] font-bold uppercase md:text-[32px]">
+          {to ? (
+            <Link to={to} className="hover:underline">
+              {item.title}
+            </Link>
+          ) : (
+            item.title
+          )}
+        </h3>
+        <div
+          className={`mt-1 flex flex-wrap gap-x-3 text-[14px] ${dark ? 'text-paper/65' : 'text-ink/60'}`}
+        >
+          <span className="font-heading text-[16px] font-semibold sm:hidden">{item.time}</span>
+          {show?.genre && <span>{show.genre}</span>}
+          {item.hall && <span>{item.hall}</span>}
+        </div>
+      </div>
+      <div className="hidden sm:block">
+        <AgeRing age={item.age} dark={dark} />
+      </div>
+      {ticket ? (
+        <a
+          href={ticket}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`${BTN} px-6 py-3 text-[14px] ${
+            dark
+              ? 'border-paper text-paper hover:bg-paper hover:text-ink border-2'
+              : 'bg-ink text-paper'
+          }`}
+        >
+          Купить
+        </a>
+      ) : (
+        <span />
+      )}
+    </li>
+  )
+}
+
+function Featured({ dark }: { dark: boolean }) {
+  if (!featured) return null
+  return (
+    <div className="grid items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
+      <RoughFrame>
+        <img
+          src={featured.photo}
+          alt={`«${featured.item.title}»`}
+          className="aspect-[16/10] w-full object-cover"
+          style={{ objectPosition: featured.focus ?? '60% 40%' }}
+        />
+      </RoughFrame>
+      <div className="relative">
+        {dark && (
+          <img
+            src={starSvg}
+            alt=""
+            aria-hidden="true"
+            className="absolute -top-4 right-0 hidden h-20 w-20 invert md:block"
+          />
+        )}
+        <span className="bg-brand-red text-paper font-heading inline-block px-3 py-1 text-[13px] font-semibold tracking-[.06em] uppercase">
+          Ближайший спектакль
+        </span>
+        <h2 className="font-heading mt-4 text-[clamp(44px,6vw,84px)] leading-[.95] font-bold uppercase">
+          {featured.item.title}
+        </h2>
+        <p className="mt-3 text-[18px] md:text-[20px]">{longDate(featured.item)}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-3">
+          {featured.ticketUrl && (
+            <a
+              href={featured.ticketUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${BTN} bg-brand-red text-paper px-8 py-4 text-[16px]`}
+            >
+              Купить билет
+            </a>
+          )}
+          <Link
+            to={showPath(featured.item.title)}
+            className="group inline-flex items-center gap-2.5 text-[16px] font-medium"
+          >
+            <span className="border-b border-current pb-0.5">О спектакле</span>
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">
+              →
+            </span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Months({
+  month,
+  setMonth,
+  dark,
+}: {
+  month: string
+  setMonth: (m: string) => void
+  dark: boolean
+}) {
+  const active = dark ? 'bg-brand-yellow text-ink' : 'bg-ink text-paper'
+  const idle = dark ? 'text-paper/70 hover:text-paper' : 'text-ink/55 hover:text-ink'
+  return (
+    <div className="flex flex-wrap gap-2" role="tablist" aria-label="Месяцы">
+      {months.map((m) => (
+        <button
+          key={m}
+          role="tab"
+          aria-selected={m === month}
+          onClick={() => setMonth(m)}
+          className={`font-heading px-4 py-2 text-[16px] font-semibold tracking-[.04em] uppercase transition-colors active:scale-[.97] md:text-[18px] ${
+            m === month ? active : idle
+          }`}
+        >
+          {NOMINATIVE[m] ?? m}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+export default function AfishaPageV2() {
+  const [theme, setThemeState] = useState<Theme>(readTheme)
+  const [month, setMonth] = useState(months[0] ?? '')
+  const items = upcomingAfisha.filter((i) => i.mon === month)
+  const dark = theme === 'dark'
+
+  const setTheme = (t: Theme) => {
+    setThemeState(t)
+    try {
+      localStorage.setItem(THEME_KEY, t)
+    } catch {
+      /* private mode: the choice just is not remembered */
+    }
+  }
+
+  const schedule = months.length ? (
+    <>
+      <Months month={month} setMonth={setMonth} dark={dark} />
+      <div className="mt-10">
+        <Featured dark={dark} />
+      </div>
+      <ul className={`mt-12 border-t ${dark ? 'border-paper/25' : 'border-ink/30'}`}>
+        {items.map((item) => (
+          <Row key={item.day + item.mon + item.time + item.title} item={item} dark={dark} />
+        ))}
+      </ul>
+    </>
+  ) : (
+    <p className="text-[18px]">Новый сезон скоро появится в афише. Следите за новостями театра.</p>
+  )
+
+  return (
+    <div className="bg-paper relative overflow-x-clip">
+      <PrintFilters />
+
+      <section className={`${WRAP} relative pt-14 md:pt-20 ${dark ? 'pb-16' : 'pb-10'}`}>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <h1 className="font-heading text-[clamp(56px,10vw,140px)] leading-[.9] font-bold uppercase">
+              Афиша
+            </h1>
+            <p className="mt-4 text-[17px] md:text-[19px]">
+              Сезон 2026 / 2027 · Молодёжный центр «НУР», второй вход
+            </p>
+          </div>
+          <ThemeSwitch theme={theme} onChange={setTheme} />
+        </div>
+      </section>
+
+      {dark ? (
+        <section className="bg-ink text-paper relative">
+          <Torn color="text-ink" seed={301} />
+          <div className={`${WRAP} py-14 md:py-16`}>{schedule}</div>
+        </section>
+      ) : (
+        <section className={`${WRAP} pb-16`}>{schedule}</section>
+      )}
+
+      <section className="bg-brand-yellow relative">
+        <Torn color="text-brand-yellow" seed={291} />
+        <div
+          className={`${WRAP} flex flex-col gap-3 py-8 md:flex-row md:items-center md:justify-between md:py-10`}
+        >
+          <p className="text-[16px] md:text-[18px]">
+            Даты и составы могут меняться. Билеты — на Билетоне, Яндекс Афише и в кассе театра.
+          </p>
+          <div className="flex items-center gap-6">
+            <a
+              href="tel:+79061202262"
+              className="font-heading text-[26px] leading-tight font-bold whitespace-nowrap hover:underline"
+            >
+              +7 906 120-22-62
+            </a>
+            <SwallowIcon className="text-ink h-10 -rotate-6" />
+          </div>
+        </div>
+      </section>
+
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
+        style={{ backgroundImage: GRAIN_URL }}
+      />
+    </div>
+  )
+}

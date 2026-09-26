@@ -56,7 +56,7 @@ export function FestivalSignupForm({ onSuccess, onInvalid }: FestivalSignupFormP
         Заявка на фестиваль
       </h2>
       <p className="mb-5 text-[13px] leading-[1.5] text-[#6B655A]">
-        «Действующие лица» — оставьте контакты, мы запомним ваш коллектив и напишем, когда откроется приём заявок.
+        «Действующие лица» — оставьте контакты коллектива, мы свяжемся и пришлём положение фестиваля.
       </p>
 
       <form onSubmit={handleSubmit(submit, onInvalid)} className="relative flex flex-col gap-3">

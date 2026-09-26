@@ -1,0 +1,7 @@
+{
+  "hero": [
+    { "show": "Симон", "photo": "/uploads/gallery/simon-3.jpg", "focus": "60% 35%" },
+    { "show": "Никаких последствий", "photo": "/uploads/gallery/posledstviy-3.jpg", "focus": "55% 40%" },
+    { "show": "Эмиль из Леннеберги", "photo": "/uploads/shows/photo-3.jpg", "focus": "55% 40%" }
+  ]
+}

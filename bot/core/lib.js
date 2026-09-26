@@ -822,6 +822,15 @@ const NOT_A_NAME = /^(да|нет|ок|окей|ага|угу|хорошо|ла�
 // "отмена", "отменить заявку", "передумал", "не надо"
 const CANCEL_RE = /^(отмен|отказ|стоп\b|cancel|не надо|передумал)/i
 
+// A plain written "yes" on the consent screen. It is the one step where the
+// answer cannot be a question, so the words alone are enough: parsers read a
+// bare "согласен" differently depending on context (on Cloud.ru it came back
+// as "asking"), and without a parser it went to the model and the form stalled.
+const CONSENT_YES_RE = /^(да|согласен|согласна|согласны|хорошо|ок|окей|конечно|ага|угу|принимаю|разрешаю)[\s!.)]*$/i
+// ...and a plain "no" there; only on that screen, since elsewhere «не согласен»
+// can mean «не согласен с ценой»
+const CONSENT_NO_RE = /^(нет|не\s+соглас(ен|на|ны)|не\s+хочу|не\s+надо)[\s!.)]*$/i
+
 function cancelLeadAsk(out, s) {
   if (!s.lastLead || s.lastLead.cancelled) {
     out.push(msg(s.chatId, 'Отменять нечего, активных заявок от вас нет 🐾', mainKeyboard()))
@@ -1178,7 +1187,8 @@ function signupStep(state, ev, nowMs, knowledge, parsedIntent) {
   if (state.step === 'consent') {
     // The tap is the same decision whichever way it arrives, and a second tap
     // on an already-consumed button must do nothing at all.
-    const agreed = (ev.kind === 'callback' && ev.data === 'consent:yes') || parsedIntent === 'confirm'
+    const agreed =
+      (ev.kind === 'callback' && ev.data === 'consent:yes') || parsedIntent === 'confirm' || (text && CONSENT_YES_RE.test(text.trim()))
     if (agreed) {
       state.stepMiss = 0; state.reminded = 0
       // a direction asks its own questions; a course keeps the age-and-group scenario
@@ -1187,7 +1197,8 @@ function signupStep(state, ev, nowMs, knowledge, parsedIntent) {
       out.push(msg(state.chatId, 'Как вас зовут?', { remove_keyboard: true }))
       return { out, effects }
     }
-    if (parsedIntent === 'decline' || parsedIntent === 'cancel') return { out: cancelSignup(state), effects }
+    if (parsedIntent === 'decline' || parsedIntent === 'cancel' || (text && CONSENT_NO_RE.test(text.trim())))
+      return { out: cancelSignup(state), effects }
     if (text) {
       // Asking something is not failing to answer. The first version of this
       // counter cancelled a real person's form because his second message was

@@ -47,6 +47,10 @@ export interface Show {
    *  instead of linking to a guess. */
   ticketUrl?: string
   bg: BrandColorKey
+  /** stage photos for the show's own page; empty = the block is hidden */
+  photos?: string[]
+  /** who plays; empty = the block is hidden */
+  cast?: { name: string; role?: string; photo?: string }[]
 }
 
 export interface TeamMember {
