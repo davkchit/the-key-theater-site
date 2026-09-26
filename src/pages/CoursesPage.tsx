@@ -110,7 +110,7 @@ export default function CoursesPage() {
             <div className="rounded-[10px] bg-brand-blue/8 p-4.5 text-[14px] leading-[1.5] font-semibold text-brand-blue">
               ✳ Здравствуйте, {sentName}! Заявка на поток «{course.name}» принята — мы свяжемся с вами в ближайшее время.{' '}
               А пока приглашаем на{' '}
-              <NavLink to="/afisha" className="underline">
+              <NavLink to="/staryi/afisha" className="underline">
                 наши спектакли
               </NavLink>
               .

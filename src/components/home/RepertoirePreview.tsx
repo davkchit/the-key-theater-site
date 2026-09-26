@@ -39,7 +39,7 @@ export function RepertoirePreview() {
       <div className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(0,.28fr)_minmax(0,.72fr)] lg:gap-9">
         <div>
           <h2 className="font-heading text-[clamp(32px,3.6vw,50px)] leading-[.88] font-bold uppercase">Спектакли</h2>
-          <NavLink to="/repertuar" className="mt-3 inline-flex items-center gap-2.5 font-script text-[26px] text-ink">
+          <NavLink to="/staryi/repertuar" className="mt-3 inline-flex items-center gap-2.5 font-script text-[26px] text-ink">
             наш репертуар <span aria-hidden="true">→</span>
           </NavLink>
         </div>
@@ -49,7 +49,7 @@ export function RepertoirePreview() {
             const art = showArt[show.title] ?? elStar
             return (
               <Reveal key={show.title} index={i}>
-                <NavLink to="/repertuar" className="group block">
+                <NavLink to="/staryi/repertuar" className="group block">
                   <div className={['relative aspect-4/3 overflow-hidden rounded-[5px]', bgClass[show.bg]].join(' ')}>
                     {show.photo ? (
                       <img

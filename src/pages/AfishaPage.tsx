@@ -67,7 +67,7 @@ export default function AfishaPage() {
             </div>
           }
           footer={
-            <NavLink to="/repertuar" className="font-heading text-sm font-semibold tracking-[.12em] uppercase hover:underline">
+            <NavLink to="/staryi/repertuar" className="font-heading text-sm font-semibold tracking-[.12em] uppercase hover:underline">
               Весь репертуар
             </NavLink>
           }

@@ -16,7 +16,7 @@ export function LabBand() {
       <div className="grid grid-cols-1 gap-4.5 lg:grid-cols-[minmax(0,.42fr)_minmax(0,.58fr)]">
         <Reveal>
           <NavLink
-            to="/o-teatre"
+            to="/staryi/o-teatre"
             className="relative flex min-h-52 flex-col justify-center overflow-hidden rounded-[5px] bg-brand-red p-7 text-paper transition-transform duration-200 hover:-translate-y-1 md:p-9"
           >
             <img src={elChair} alt="" className="pointer-events-none absolute top-1/2 right-4 h-[72%] max-w-[38%] w-auto -translate-y-1/2 object-contain object-right" />
@@ -38,7 +38,7 @@ export function LabBand() {
               <span className="text-[13px] text-[#6B655A]">— художественный руководитель</span>
             </div>
             <NavLink
-              to="/o-teatre"
+              to="/staryi/o-teatre"
               className="relative mt-5 inline-flex w-fit items-center gap-2 border-b-3 border-brand-red pb-0.5 font-heading text-[14px] font-medium text-ink uppercase"
             >
               О театре <span aria-hidden="true">→</span>

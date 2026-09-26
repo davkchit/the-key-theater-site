@@ -11,14 +11,14 @@ export default function CourseGroupPage() {
   const { groupKey } = useParams()
   const navigate = useNavigate()
   const group = courseGroups.find((g) => g.key === groupKey)
-  if (!group) return <Navigate to="/kursy" replace />
+  if (!group) return <Navigate to="/staryi/kursy" replace />
 
   const groupCourses = courses.filter((c) => group.courseKeys.includes(c.key))
   const teachers = team.filter((m) => m.role.includes('едагог'))
 
   return (
     <main className="mx-auto max-w-320 px-6.5 pt-13">
-      <NavLink to="/kursy" className="text-[13px] font-semibold text-[#6B655A] underline">
+      <NavLink to="/staryi/kursy" className="text-[13px] font-semibold text-[#6B655A] underline">
         ← Все курсы
       </NavLink>
 
@@ -61,7 +61,7 @@ export default function CourseGroupPage() {
 
       <div className="mt-9 flex justify-center">
         <NavLink
-          to={`/kursy?course=${group.courseKeys[0]}`}
+          to={`/staryi/kursy?course=${group.courseKeys[0]}`}
           className="inline-flex items-center rounded-lg bg-brand-red px-8 py-4 font-heading text-[15px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-[.96]"
         >
           Записаться на курс

@@ -173,7 +173,7 @@ function QuickSignup() {
         />
         <span>
           Согласен на обработку{' '}
-          <Link to="/novaya/politika" className="underline underline-offset-2">
+          <Link to="/politika" className="underline underline-offset-2">
             персональных данных
           </Link>
           {errors.consent && (
@@ -405,7 +405,7 @@ export default function CoursesPageV2() {
 
       {/* teachers */}
       <section className={`${WRAP} pt-20 pb-24`}>
-        <SectionHead title="Педагоги" to="/novaya/komanda" link="Вся команда" />
+        <SectionHead title="Педагоги" to="/komanda" link="Вся команда" />
         <div className="grid gap-12 sm:grid-cols-3 sm:gap-8 lg:gap-10">
           {TEACHERS.map((t, i) => (
             <Reveal key={t.name} index={i}>

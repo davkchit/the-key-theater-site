@@ -170,19 +170,19 @@ export default function NotFoundPageV2() {
             Страница, которую вы ищете, не существует или переехала
           </p>
           <Link
-            to="/novaya"
+            to="/"
             className={`${BTN} bg-brand-yellow text-ink relative mt-8 w-full max-w-md py-5 text-[19px]`}
           >
             На главную
           </Link>
           <div className="relative mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[15px]">
-            <Link to="/novaya/afisha" className="underline underline-offset-4">
+            <Link to="/afisha" className="underline underline-offset-4">
               Афиша
             </Link>
-            <Link to="/novaya/repertuar" className="underline underline-offset-4">
+            <Link to="/repertuar" className="underline underline-offset-4">
               Спектакли
             </Link>
-            <Link to="/novaya/kursy" className="underline underline-offset-4">
+            <Link to="/kursy" className="underline underline-offset-4">
               Курсы
             </Link>
           </div>

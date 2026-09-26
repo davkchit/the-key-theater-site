@@ -356,7 +356,7 @@ export function GalleryCarousel() {
   return (
     <section className="bg-paper relative pt-10 pb-16 md:pt-14 md:pb-24">
       <div className={WRAP}>
-        <SectionHead title="Галерея" to="/novaya/galereya" link="Все фото" />
+        <SectionHead title="Галерея" to="/galereya" link="Все фото" />
       </div>
 
       <div

@@ -89,4 +89,4 @@ export function galleryPhoto(name: string, fallback = 0): string {
 export const teamPhoto = (file: string) => mediaUrl(`/uploads/team/${file}`)
 
 /** A show's own page in the new design. */
-export const showPath = (title: string) => `/novaya/spektakl/${showSlug(title)}`
+export const showPath = (title: string) => `/spektakl/${showSlug(title)}`

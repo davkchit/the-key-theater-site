@@ -43,7 +43,7 @@ export default function ShowPageV2() {
         <p className="mt-4 text-[17px]">
           Возможно, он уже не идёт. Посмотрите, что есть в репертуаре.
         </p>
-        <Link to="/novaya/repertuar" className={`${BTN} bg-ink text-paper mt-8`}>
+        <Link to="/repertuar" className={`${BTN} bg-ink text-paper mt-8`}>
           Все спектакли
         </Link>
       </div>
@@ -172,7 +172,7 @@ export default function ShowPageV2() {
       {dates.length > 0 && (
         <section className={`${WRAP} pb-16 md:pb-20`}>
           <div className="border-ink/15 border-t pt-12 md:pt-16">
-            <SectionHead title="Даты" to="/novaya/afisha" link="Вся афиша" />
+            <SectionHead title="Даты" to="/afisha" link="Вся афиша" />
             <ul className="divide-ink/20 border-ink/20 divide-y border-y">
               {dates.map((d) => (
                 <li
@@ -218,7 +218,7 @@ export default function ShowPageV2() {
       {/* stage photos, only when the admin has some */}
       {(show.photos ?? []).length > 0 && (
         <section className={`${WRAP} pb-16 md:pb-20`}>
-          <SectionHead title="Фото со спектакля" to="/novaya/galereya" link="Все фото" />
+          <SectionHead title="Фото со спектакля" to="/galereya" link="Все фото" />
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:items-center">
             {(show.photos ?? []).slice(0, 4).map((p, i) => (
               <RoughFrame key={p} className={i === 1 ? 'md:scale-[1.08]' : ''}>
@@ -260,7 +260,7 @@ export default function ShowPageV2() {
       {others.length > 0 && (
         <section className={`${WRAP} pb-24`}>
           <div className="border-ink/15 border-t pt-12 md:pt-16">
-            <SectionHead title="Ещё спектакли" to="/novaya/repertuar" link="Все спектакли" />
+            <SectionHead title="Ещё спектакли" to="/repertuar" link="Все спектакли" />
             <div className="grid gap-10 sm:grid-cols-3 sm:gap-6">
               {others.map((s) => {
                 const d = upcomingAfisha.find((a) => a.title === s.title)

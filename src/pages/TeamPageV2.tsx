@@ -192,7 +192,7 @@ export default function TeamPageV2() {
             </p>
           </div>
           <Link
-            to="/novaya/kursy"
+            to="/kursy"
             className={`${BTN} bg-ink text-paper self-start px-9 py-4.5 text-[17px] md:self-auto`}
           >
             Записаться на курс

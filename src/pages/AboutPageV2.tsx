@@ -43,7 +43,7 @@ const DIRECTIONS = [
     note: 'Всероссийский, с 2004 года. К нам приезжают театральные коллективы со всей России: показы, мастерские, обсуждения.',
     photo: 'nagrazhdenie-1',
     block: 'bg-brand-red',
-    to: '/novaya/festival',
+    to: '/festival',
   },
   {
     title: 'Лаборатория «ЛСД»',
@@ -231,10 +231,10 @@ export default function AboutPageV2() {
             ))}
           </ul>
           <div className="mt-12 flex flex-wrap gap-4">
-            <Link to="/novaya/repertuar" className={`${BTN} bg-ink text-paper`}>
+            <Link to="/repertuar" className={`${BTN} bg-ink text-paper`}>
               Что идёт сейчас
             </Link>
-            <Link to="/novaya/komanda" className={`${BTN} border-ink border-2`}>
+            <Link to="/komanda" className={`${BTN} border-ink border-2`}>
               Команда театра
             </Link>
           </div>

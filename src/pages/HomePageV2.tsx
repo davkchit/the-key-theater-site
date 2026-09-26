@@ -14,8 +14,7 @@ import {
 import { FindUs, NewsletterBand } from '../components/home2/Contact'
 import { GalleryCarousel } from '../components/home2/Gallery'
 
-// The homepage from the approved mockup (September 2026). Lives at /#/novaya
-// until the theatre says yes, then replaces HomePage.
+// The homepage from the approved mockup (September 2026).
 
 export default function HomePageV2() {
   // Safari on iPhone shows :active (the press feedback of buttons) only when

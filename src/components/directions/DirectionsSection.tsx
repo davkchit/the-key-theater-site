@@ -51,7 +51,7 @@ export function DirectionsSection() {
             <div className="mt-4.5">
               {d.open ? (
                 <NavLink
-                  to={`/kursy?direction=${encodeURIComponent(d.id)}`}
+                  to={`/staryi/kursy?direction=${encodeURIComponent(d.id)}`}
                   className="inline-flex items-center rounded-[7px] bg-brand-red px-4 py-2.25 font-heading text-xs font-semibold tracking-[.06em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95"
                 >
                   Записаться

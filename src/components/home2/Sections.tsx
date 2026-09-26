@@ -126,7 +126,7 @@ export function UpcomingShows() {
     <section className="bg-paper relative">
       <Torn color="text-paper" seed={23} />
       <div className={`${WRAP} pt-16 pb-20 md:pt-24 md:pb-28`}>
-        <SectionHead title="Ближайшие спектакли" to="/novaya/afisha" link="Вся афиша" />
+        <SectionHead title="Ближайшие спектакли" to="/afisha" link="Вся афиша" />
         <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-5 overflow-x-auto px-4 pb-2 sm:grid sm:grid-cols-2 sm:gap-x-0 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-4">
           {upcomingCards.map((h, n) => {
             const tone = CARD_TONES[n % 4] as Tone
@@ -189,7 +189,7 @@ export function UpcomingShows() {
           })}
         </div>
         <div className="mt-6 sm:hidden">
-          <MoreLink to="/novaya/afisha">Вся афиша</MoreLink>
+          <MoreLink to="/afisha">Вся афиша</MoreLink>
         </div>
       </div>
     </section>
@@ -230,7 +230,7 @@ export function CoursesBand() {
           <ul className="divide-ink/60 border-ink/60 mt-7 divide-y border-b">
             {courses.map((c) => (
               <li key={c.key}>
-                <Link to="/novaya/kursy" className="group block py-3.5">
+                <Link to="/kursy" className="group block py-3.5">
                   <span className="font-heading block text-[24px] leading-tight font-bold uppercase group-hover:underline">
                     {c.name}
                   </span>
@@ -241,10 +241,7 @@ export function CoursesBand() {
               </li>
             ))}
           </ul>
-          <Link
-            to="/novaya/kursy"
-            className={`${BTN} bg-ink text-paper mt-7 w-full py-4.5 text-[16px]`}
-          >
+          <Link to="/kursy" className={`${BTN} bg-ink text-paper mt-7 w-full py-4.5 text-[16px]`}>
             Записаться на курс
           </Link>
         </Reveal>
@@ -373,7 +370,7 @@ const PEOPLE = [
 ]
 
 export function PeopleSection() {
-  // /#/novaya?p=duo shows the yellow two-tone version, to compare with colour
+  // /#/?p=duo shows the yellow two-tone version, to compare with colour
   const [params] = useSearchParams()
   const duo = params.get('p') === 'duo'
   const [lead, ...rest] = PEOPLE
@@ -381,7 +378,7 @@ export function PeopleSection() {
     <section className="bg-paper relative">
       <Torn color="text-paper" seed={53} />
       <div className={`${WRAP} pt-16 pb-16 md:pt-24`}>
-        <SectionHead title="Люди театра" to="/novaya/komanda" link="Вся команда" />
+        <SectionHead title="Люди театра" to="/komanda" link="Вся команда" />
         <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-[1.45fr_1fr_1fr_1fr] md:gap-x-8">
           {lead && (
             <Reveal className="col-span-2 md:col-span-1">
@@ -423,7 +420,7 @@ export function PeopleSection() {
           ))}
         </div>
         <div className="mt-8 sm:hidden">
-          <MoreLink to="/novaya/komanda">Вся команда</MoreLink>
+          <MoreLink to="/komanda">Вся команда</MoreLink>
         </div>
       </div>
     </section>
@@ -439,21 +436,21 @@ const MORE = [
     note: 'всероссийский, с 2004 года',
     photo: 'nagrazhdenie-1',
     block: 'bg-brand-red',
-    to: '/novaya/festival',
+    to: '/festival',
   },
   {
     title: 'Лаборатория «ЛСД»',
     note: 'современная драматургия, с 2012 года',
     photo: 'spektakl-1',
     block: 'bg-brand-yellow',
-    to: '/novaya/o-teatre',
+    to: '/o-teatre',
   },
   {
     title: 'Лагерь «Солнечная пыль»',
     note: 'летний театральный лагерь',
     photo: 'lager-1',
     block: 'bg-brand-blue',
-    to: '/novaya/o-teatre',
+    to: '/o-teatre',
   },
 ]
 

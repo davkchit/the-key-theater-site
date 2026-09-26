@@ -44,7 +44,7 @@ export function AfishaPreview() {
             <br />
             показы
           </h2>
-          <NavLink to="/afisha" className="mt-4 inline-flex items-center gap-2.5 font-script text-[26px] text-paper">
+          <NavLink to="/staryi/afisha" className="mt-4 inline-flex items-center gap-2.5 font-script text-[26px] text-paper">
             вся афиша <span aria-hidden="true">→</span>
           </NavLink>
         </div>
@@ -79,7 +79,7 @@ export function AfishaPreview() {
                 )}
 
                 <NavLink
-                  to="/afisha"
+                  to="/staryi/afisha"
                   className="inline-flex items-center gap-1.5 rounded-[5px] bg-brand-yellow px-4.5 py-2.5 font-heading text-[12px] font-semibold tracking-[.06em] text-ink uppercase transition-transform duration-180 hover:-translate-y-0.5"
                 >
                   Купить билет <span aria-hidden="true">→</span>

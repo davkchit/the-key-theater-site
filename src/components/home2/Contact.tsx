@@ -91,7 +91,7 @@ export function NewsletterBand() {
               />
               <span>
                 Согласен на обработку{' '}
-                <Link to="/novaya/politika" className="underline underline-offset-2">
+                <Link to="/politika" className="underline underline-offset-2">
                   персональных данных
                 </Link>
                 {errors.consent && (

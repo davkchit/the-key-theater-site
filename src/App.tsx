@@ -8,9 +8,9 @@ import { FooterV2 } from './components/home2/FooterV2'
 import bgPattern from '../assets/bg-pattern.png'
 
 function App() {
-  // The new design lives under /novaya until the theatre approves it; there it
-  // brings its own menu, footer and plain paper background.
-  const redesign = useLocation().pathname.startsWith('/novaya')
+  // The new design is the site; the previous one is kept at /staryi with its
+  // own menu, footer and patterned background.
+  const redesign = !useLocation().pathname.startsWith('/staryi')
 
   return (
     <div

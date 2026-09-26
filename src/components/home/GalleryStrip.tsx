@@ -21,7 +21,7 @@ export function GalleryStrip() {
             «Ключ»
           </h2>
         </div>
-        <NavLink to="/galereya" className="inline-flex items-center gap-2.5 font-script text-[26px] text-ink">
+        <NavLink to="/staryi/galereya" className="inline-flex items-center gap-2.5 font-script text-[26px] text-ink">
           атмосфера <span aria-hidden="true">→</span>
         </NavLink>
       </div>

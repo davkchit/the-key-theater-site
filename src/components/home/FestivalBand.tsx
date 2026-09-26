@@ -53,7 +53,7 @@ export function FestivalBand() {
               спектакли, режиссёры и театры со всей страны в Набережных Челнах
             </p>
             <NavLink
-              to="/o-teatre"
+              to="/staryi/o-teatre"
               className="mt-5 inline-flex items-center gap-2 rounded-[4px] bg-ink px-6 py-3.25 font-heading text-[13px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.5"
             >
               О фестивале <span aria-hidden="true">→</span>

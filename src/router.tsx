@@ -3,7 +3,8 @@
 // deploy-target crutch, not a permanent choice: swap back to
 // createBrowserRouter (one line) the day the site moves to a host that can
 // rewrite unknown paths to index.html.
-import { createHashRouter } from 'react-router-dom'
+import { Navigate, createHashRouter } from 'react-router-dom'
+import { FromNovaya } from './pages/FromNovaya'
 import App from './App'
 import HomePage from './pages/HomePage'
 import HomePageV2 from './pages/HomePageV2'
@@ -34,29 +35,37 @@ export const router = createHashRouter([
     path: '/',
     element: <App />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'novaya', element: <HomePageV2 /> },
-      { path: 'novaya/repertuar', element: <RepertoirePageV2 /> },
-      { path: 'novaya/spektakl/:slug', element: <ShowPageV2 /> },
-      { path: 'novaya/kursy', element: <CoursesPageV2 /> },
-      { path: 'novaya/festival', element: <FestivalPageV2 /> },
-      { path: 'novaya/o-teatre', element: <AboutPageV2 /> },
-      { path: 'novaya/komanda', element: <TeamPageV2 /> },
-      { path: 'novaya/afisha', element: <AfishaPageV2 /> },
-      { path: 'novaya/galereya', element: <GalleryPageV2 /> },
-      { path: 'novaya/kontakty', element: <ContactsPageV2 /> },
-      { path: 'novaya/politika', element: <PrivacyPageV2 /> },
-      { path: 'novaya/*', element: <NotFoundPageV2 /> },
-      { path: 'afisha', element: <AfishaPage /> },
-      { path: 'repertuar', element: <RepertoirePage /> },
-      { path: 'o-teatre', element: <AboutPage /> },
-      { path: 'komanda', element: <TeamPage /> },
-      { path: 'galereya', element: <GalleryPage /> },
-      { path: 'kursy', element: <CoursesPage /> },
-      { path: 'kursy/:groupKey', element: <CourseGroupPage /> },
-      { path: 'kontakty', element: <ContactsPage /> },
-      { path: 'politika', element: <PrivacyPolicyPage /> },
-      { path: '*', element: <NotFoundPage /> },
+      // the site
+      { index: true, element: <HomePageV2 /> },
+      { path: 'afisha', element: <AfishaPageV2 /> },
+      { path: 'repertuar', element: <RepertoirePageV2 /> },
+      { path: 'spektakl/:slug', element: <ShowPageV2 /> },
+      { path: 'kursy', element: <CoursesPageV2 /> },
+      // the old design had a page per course group; its links land on the courses
+      { path: 'kursy/:groupKey', element: <Navigate to="/kursy" replace /> },
+      { path: 'festival', element: <FestivalPageV2 /> },
+      { path: 'o-teatre', element: <AboutPageV2 /> },
+      { path: 'komanda', element: <TeamPageV2 /> },
+      { path: 'galereya', element: <GalleryPageV2 /> },
+      { path: 'kontakty', element: <ContactsPageV2 /> },
+      { path: 'politika', element: <PrivacyPageV2 /> },
+      // links shared while the new design was being approved
+      { path: 'novaya/*', element: <FromNovaya /> },
+
+      // the previous design, kept for reference
+      { path: 'staryi', element: <HomePage /> },
+      { path: 'staryi/afisha', element: <AfishaPage /> },
+      { path: 'staryi/repertuar', element: <RepertoirePage /> },
+      { path: 'staryi/o-teatre', element: <AboutPage /> },
+      { path: 'staryi/komanda', element: <TeamPage /> },
+      { path: 'staryi/galereya', element: <GalleryPage /> },
+      { path: 'staryi/kursy', element: <CoursesPage /> },
+      { path: 'staryi/kursy/:groupKey', element: <CourseGroupPage /> },
+      { path: 'staryi/kontakty', element: <ContactsPage /> },
+      { path: 'staryi/politika', element: <PrivacyPolicyPage /> },
+      { path: 'staryi/*', element: <NotFoundPage /> },
+
+      { path: '*', element: <NotFoundPageV2 /> },
     ],
   },
 ])

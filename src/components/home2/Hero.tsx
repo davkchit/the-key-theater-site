@@ -127,7 +127,7 @@ export function Hero() {
               <p className="mt-4 max-w-md text-[18px]">
                 Молодёжный театр в Набережных Челнах. Новый сезон скоро в афише.
               </p>
-              <Link to="/novaya/afisha" className={`${BTN} bg-brand-red text-paper mt-6`}>
+              <Link to="/afisha" className={`${BTN} bg-brand-red text-paper mt-6`}>
                 Афиша
               </Link>
             </div>

@@ -35,7 +35,7 @@ export function CoursesPreview() {
           {courseGroups.map((g) => (
             <li key={g.key} className="border-t border-ink/15 first:border-t-0">
               <NavLink
-                to={`/kursy/${g.key}`}
+                to={`/staryi/kursy/${g.key}`}
                 className="group flex items-center justify-between gap-4 py-5.5 transition-colors hover:text-brand-red"
               >
                 <span className="font-heading text-[clamp(19px,2.1vw,26px)] leading-tight font-bold uppercase">{g.title}</span>
@@ -48,7 +48,7 @@ export function CoursesPreview() {
           ))}
           <li className="border-t border-ink/15 pt-5">
             <NavLink
-              to="/kursy"
+              to="/staryi/kursy"
               className="inline-flex items-center gap-2 rounded-[5px] bg-brand-yellow px-6 py-3.25 font-heading text-[13px] font-semibold tracking-[.08em] text-ink uppercase transition-transform duration-180 hover:-translate-y-0.5"
             >
               Записаться на курс <span aria-hidden="true">→</span>
@@ -59,7 +59,7 @@ export function CoursesPreview() {
         {/* the camp is a separate paid product of the theatre's, running since
             2022 -- it has no page of its own yet, so this points at the
             section of /o-teatre that describes it */}
-        <NavLink to="/o-teatre" className="group relative flex min-h-62 flex-col justify-end overflow-hidden rounded-[5px] p-6 text-paper">
+        <NavLink to="/staryi/o-teatre" className="group relative flex min-h-62 flex-col justify-end overflow-hidden rounded-[5px] p-6 text-paper">
           <img
             src={campPhoto}
             alt=""

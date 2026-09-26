@@ -29,13 +29,13 @@ export function CourseGroupCard({ group, index = 0 }: CourseGroupCardProps) {
       </p>
       <div className="mt-4.5 flex flex-wrap gap-2.5">
         <NavLink
-          to={`/kursy/${group.key}`}
+          to={`/staryi/kursy/${group.key}`}
           className="inline-flex items-center gap-1.5 rounded-[7px] border-2 border-current px-4 py-2.25 font-heading text-xs font-semibold tracking-[.06em] uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95"
         >
           Подробнее <span aria-hidden="true">→</span>
         </NavLink>
         <NavLink
-          to={`/kursy?course=${group.courseKeys[0]}`}
+          to={`/staryi/kursy?course=${group.courseKeys[0]}`}
           className={[
             'inline-flex items-center rounded-[7px] px-4 py-2.25 font-heading text-xs font-semibold tracking-[.06em] uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95',
             group.bg === 'yellow' ? 'bg-ink text-paper' : 'bg-brand-yellow text-ink',

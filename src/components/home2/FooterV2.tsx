@@ -9,14 +9,14 @@ import logoWordmark from '../../../assets/logo-wordmark.png'
 
 const COLS = [
   [
-    { label: 'Афиша', to: '/novaya/afisha' },
-    { label: 'Спектакли', to: '/novaya/repertuar' },
-    { label: 'Курсы', to: '/novaya/kursy' },
+    { label: 'Афиша', to: '/afisha' },
+    { label: 'Спектакли', to: '/repertuar' },
+    { label: 'Курсы', to: '/kursy' },
   ],
   [
-    { label: 'Фестиваль', to: '/novaya/festival' },
-    { label: 'О театре', to: '/novaya/o-teatre' },
-    { label: 'Контакты', to: '/novaya/kontakty' },
+    { label: 'Фестиваль', to: '/festival' },
+    { label: 'О театре', to: '/o-teatre' },
+    { label: 'Контакты', to: '/kontakty' },
   ],
 ]
 
@@ -60,7 +60,7 @@ export function FooterV2() {
       </div>
       <div className="border-paper/15 text-paper/70 mx-auto flex max-w-[1760px] flex-col gap-1.5 border-t px-4 py-6 text-[13px] sm:px-6.5 lg:px-12">
         <span>© 2026 АНО «Молодёжный театр „Ключ“»</span>
-        <Link to="/novaya/politika" className="hover:text-paper">
+        <Link to="/politika" className="hover:text-paper">
           Политика обработки персональных данных
         </Link>
       </div>

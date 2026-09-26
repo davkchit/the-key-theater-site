@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { navItems } from '../../data/nav'
+import { oldNavItems as navItems } from '../../data/nav'
 import { useScrolled } from '../../hooks/useScrolled'
 import { Burger } from './Burger'
 import { MobileMenu } from './MobileMenu'
@@ -19,7 +19,7 @@ export function Header() {
         ].join(' ')}
       >
         <div className="mx-auto flex max-w-320 items-center gap-7 px-6.5 py-4.5">
-          <NavLink to="/" className="flex flex-shrink-0 items-center text-paper">
+          <NavLink to="/staryi" className="flex flex-shrink-0 items-center text-paper">
             <img src={logoBadge} alt="Театр Ключ" className="h-13 w-13 object-contain" />
           </NavLink>
 
@@ -41,7 +41,7 @@ export function Header() {
           </nav>
 
           <NavLink
-            to="/afisha"
+            to="/staryi/afisha"
             className="hidden flex-shrink-0 rounded bg-brand-yellow px-5 py-3 font-heading text-[13px] font-semibold tracking-[.1em] text-ink uppercase transition-transform duration-180 hover:-translate-y-0.5 active:scale-95 lg:block"
           >
             Купить билет

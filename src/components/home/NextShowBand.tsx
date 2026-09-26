@@ -18,7 +18,7 @@ interface NextShowBandProps {
 export function NextShowBand({ show }: NextShowBandProps) {
   return (
     <div className="mx-auto mt-5 max-w-320 px-6.5">
-      <NavLink to="/kontakty" className="group relative block">
+      <NavLink to="/staryi/kontakty" className="group relative block">
         <TornEdge className="absolute -top-2.75 left-0 h-3 w-full text-ink" />
 
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 bg-ink px-6 py-5 text-paper transition-transform duration-200 group-hover:-translate-y-0.5 md:px-9 md:py-6">

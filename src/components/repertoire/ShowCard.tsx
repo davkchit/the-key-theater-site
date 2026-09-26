@@ -50,7 +50,7 @@ export function ShowCard({ show, index = 0 }: ShowCardProps) {
           <span>{show.dur ?? ''}</span>
         </div>
         <NavLink
-          to="/afisha"
+          to="/staryi/afisha"
           className="mt-4 rounded-md bg-ink py-3.25 text-center font-heading text-[13px] font-semibold tracking-[.08em] text-paper uppercase"
         >
           Расписание

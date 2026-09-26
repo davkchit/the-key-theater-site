@@ -57,14 +57,14 @@ export function Hero() {
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <NavLink
-              to="/afisha"
+              to="/staryi/afisha"
               className="rounded-[5px] bg-ink px-7.5 py-4 font-heading text-[15px] font-semibold tracking-[.08em] text-paper uppercase transition-transform duration-180 hover:-translate-y-0.75 active:scale-[.96]"
             >
               Афиша сезона
             </NavLink>
             <span className="relative inline-flex items-center gap-3.5">
               <NavLink
-                to="/kursy"
+                to="/staryi/kursy"
                 className="inline-block rounded-[5px] bg-brand-yellow px-7.5 py-4 font-heading text-[15px] font-semibold tracking-[.08em] text-ink uppercase transition-transform duration-180 hover:-translate-y-0.75 active:scale-[.96]"
               >
                 Записаться на курс

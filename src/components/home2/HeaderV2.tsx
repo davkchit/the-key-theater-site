@@ -10,12 +10,12 @@ import logoWordmark from '../../../assets/logo-wordmark.png'
 // the full width of the screen, with a torn bottom edge over the first screen.
 
 const ITEMS = [
-  { label: 'Афиша', to: '/novaya/afisha' },
-  { label: 'Спектакли', to: '/novaya/repertuar' },
-  { label: 'Курсы', to: '/novaya/kursy' },
-  { label: 'Фестиваль', to: '/novaya/festival' },
-  { label: 'О театре', to: '/novaya/o-teatre' },
-  { label: 'Контакты', to: '/novaya/kontakty' },
+  { label: 'Афиша', to: '/afisha' },
+  { label: 'Спектакли', to: '/repertuar' },
+  { label: 'Курсы', to: '/kursy' },
+  { label: 'Фестиваль', to: '/festival' },
+  { label: 'О театре', to: '/o-teatre' },
+  { label: 'Контакты', to: '/kontakty' },
 ]
 
 export function HeaderV2() {
@@ -25,7 +25,7 @@ export function HeaderV2() {
       <header className="text-paper sticky top-0 z-40 bg-[#121212]">
         <HeaderEdge />
         <div className={`flex h-[72px] items-center gap-8 md:h-[96px] ${WRAP}`}>
-          <Link to="/novaya" className="flex-shrink-0" aria-label="Театр «Ключ», на главную">
+          <Link to="/" className="flex-shrink-0" aria-label="Театр «Ключ», на главную">
             <img src={logoWordmark} alt="Театр Ключ" className="h-11 w-auto md:h-15" />
           </Link>
 
@@ -42,7 +42,7 @@ export function HeaderV2() {
           </nav>
 
           <Link
-            to="/novaya/afisha"
+            to="/afisha"
             className="bg-brand-red font-heading ml-auto hidden flex-shrink-0 rounded-md px-7 py-3.5 text-[18px] font-semibold tracking-[.04em] uppercase transition-transform duration-180 hover:-translate-y-0.5 sm:inline-flex lg:ml-4"
           >
             Купить билет

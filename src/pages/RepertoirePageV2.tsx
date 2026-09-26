@@ -9,7 +9,7 @@ import { Reveal } from '../components/ui/Reveal'
 import starSvg from '../../assets/el-star.svg'
 
 // «Спектакли»: every show in the repertoire as a poster, with a filter by age,
-// and the nearest show on a black band. New design, lives under /novaya.
+// and the nearest show on a black band.
 
 type Filter = 'all' | 'kids' | 'adults'
 const FILTERS: [Filter, string][] = [

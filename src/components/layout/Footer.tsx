@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { navItems } from '../../data/nav'
+import { oldNavItems as navItems } from '../../data/nav'
 import { socials } from '../../data/socials'
 import { SocialIcon } from '../ui/SocialIcon'
 import { SwallowIcon } from '../ui/SwallowIcon'
@@ -73,7 +73,7 @@ export function Footer() {
       <div className="relative border-t border-[#2a2620]">
         <div className="mx-auto flex max-w-320 flex-wrap justify-between gap-3 px-6.5 py-4.5 text-xs text-[#6B655A]">
           <span>© 2026 АНО «Молодёжный театр „Ключ“». Все права защищены.</span>
-          <NavLink to="/politika" className="transition-colors duration-200 hover:text-paper">
+          <NavLink to="/staryi/politika" className="transition-colors duration-200 hover:text-paper">
             Политика обработки персональных данных
           </NavLink>
           <span>Сайт разработан на Vite + React + TypeScript</span>
