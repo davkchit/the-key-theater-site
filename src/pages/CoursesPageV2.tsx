@@ -22,6 +22,7 @@ import { GRAIN_URL, Torn } from '../components/home2/paper'
 import { galleryPhoto, teamPhoto } from '../components/home2/homeData'
 import { Modal } from '../components/ui/Modal'
 import { Reveal } from '../components/ui/Reveal'
+import { scrollToId } from '../lib/scrollToId'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { SignupForm } from '../components/courses/SignupForm'
 import { DirectionForm } from '../components/directions/DirectionForm'
@@ -242,7 +243,11 @@ export default function CoursesPageV2() {
               Актёрские курсы для детей и взрослых. Набор продолжается.
             </p>
             <div className="mt-8 flex items-end gap-6">
-              <a href="#zapis" className={`${BTN} bg-ink text-paper px-9 py-4.5 text-[17px]`}>
+              <a
+                href="#zapis"
+                onClick={scrollToId('zapis')}
+                className={`${BTN} bg-ink text-paper px-9 py-4.5 text-[17px]`}
+              >
                 Записаться
               </a>
               <img

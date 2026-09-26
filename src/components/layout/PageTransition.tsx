@@ -1,14 +1,23 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useLocation, useOutlet } from 'react-router-dom'
+import { useLocation, useNavigationType, useOutlet } from 'react-router-dom'
 
 /** Fades + rises each route's content in on navigation, keyed by pathname. */
 export function PageTransition() {
   const location = useLocation()
   const outlet = useOutlet()
   const reduceMotion = useReducedMotion()
+  const navType = useNavigationType()
 
   return (
-    <AnimatePresence mode="wait">
+    // The old page fades out first, then the new one comes in: that is the
+    // moment to jump to the top, or a link clicked in the footer opens the next
+    // page scrolled to its bottom.
+    <AnimatePresence
+      mode="wait"
+      onExitComplete={() => {
+        if (navType !== 'POP') window.scrollTo(0, 0)
+      }}
+    >
       <motion.div
         key={location.pathname}
         initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}

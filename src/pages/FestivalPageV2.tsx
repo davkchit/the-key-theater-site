@@ -15,6 +15,7 @@ import { GRAIN_URL, Grain, Torn } from '../components/home2/paper'
 import { galleryPhoto } from '../components/home2/homeData'
 import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { Reveal } from '../components/ui/Reveal'
+import { scrollToId } from '../lib/scrollToId'
 import starSvg from '../../assets/el-star.svg'
 
 // The festival «Действующие лица»: what it is, how to apply, the programme,
@@ -101,6 +102,7 @@ export default function FestivalPageV2() {
             {open ? (
               <a
                 href="#zayavka"
+                onClick={scrollToId('zayavka')}
                 className={`${BTN} bg-paper text-ink mt-8 px-9 py-4.5 text-[17px]`}
               >
                 Подать заявку{' '}
