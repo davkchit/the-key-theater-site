@@ -1,18 +1,19 @@
 # Decap CMS config. Docs: https://decapcms.org/docs/configuration-options/
 #
-# backend.base_url must point at an OAuth proxy that can exchange a GitHub
-# auth code for a token (Decap's GitHub backend needs this because the
-# exchange requires a client secret, which can't live in the browser).
-# We are NOT hosting the site on Netlify, but you can still use Netlify purely
-# as a free OAuth proxy for this one step -- create an empty Netlify site,
-# enable Identity + the "GitHub" auth provider in its dashboard, and put that
-# site's URL below. Only the person editing content ever touches this URL;
-# site visitors never do.
+# Login goes through our own server (bot/server/oauth.mjs): GitHub needs a
+# client secret for it, which cannot live in the browser. Saved changes are
+# commits to master; a GitHub Action rebuilds the site and puts it on the
+# server a couple of minutes later (.github/workflows/deploy-server.yml).
 backend:
   name: github
   repo: davkchit/the-key-theater-site
   branch: master
-  base_url: https://REPLACE-ME.netlify.app
+  base_url: https://kluch.194-226-123-13.sslip.io
+  auth_endpoint: api/oauth/auth
+
+site_url: https://kluch.194-226-123-13.sslip.io
+display_url: https://kluch.194-226-123-13.sslip.io
+locale: ru
 
 # Lets /admin run against a local proxy (`npx decap-server`) instead of real
 # GitHub -- for trying out the CMS UI before the OAuth proxy above is wired
