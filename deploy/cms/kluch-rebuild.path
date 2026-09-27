@@ -2,8 +2,9 @@
 Description=Watch for new commits from the Kluch admin
 
 [Path]
-# git appends a line here on every commit
-PathModified=/opt/kluch/src/.git/logs/HEAD
+# the branch file changes only when something is saved (a commit); logs/HEAD
+# also changes on the checkouts decap-server does around every save
+PathModified=/opt/kluch/src/.git/refs/heads/master
 Unit=kluch-rebuild.service
 
 [Install]
