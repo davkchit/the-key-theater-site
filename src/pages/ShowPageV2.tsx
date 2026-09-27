@@ -146,8 +146,10 @@ export default function ShowPageV2() {
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
           <Reveal>
             <h2 className={H2}>О спектакле</h2>
-            <p className="mt-6 max-w-[60ch] text-[17px] leading-[1.6] md:text-[19px]">
-              {show.synopsis || show.based}
+            {/* «по мотивам…» is already on the first screen: without a synopsis
+                the block just says that the description is on its way */}
+            <p className="mt-6 max-w-[60ch] text-[17px] leading-[1.6] whitespace-pre-line md:text-[19px]">
+              {show.synopsis || 'Описание спектакля скоро появится. А пока — даты и билеты ниже.'}
             </p>
           </Reveal>
           <Reveal index={1}>

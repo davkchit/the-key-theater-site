@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { heroShows, longDate, galleryPhoto, showPath } from './homeData'
@@ -27,11 +27,31 @@ export function Hero() {
 
   const slide = heroShows[i]
 
+  // Swipe on a phone (or drag with the mouse): a clear sideways movement of
+  // 50 px changes the slide; an up-down movement is left to scroll the page.
+  const swipe = useRef<{ x: number; y: number } | null>(null)
+  const onPointerDown = (e: PointerEvent) => {
+    swipe.current = { x: e.clientX, y: e.clientY }
+  }
+  const onPointerUp = (e: PointerEvent) => {
+    const s0 = swipe.current
+    swipe.current = null
+    if (!s0 || count < 2) return
+    const dx = e.clientX - s0.x
+    const dy = e.clientY - s0.y
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.2) return
+    setI((v) => (v + (dx < 0 ? 1 : -1) + count) % count)
+  }
+
   return (
     <section
       className="bg-ink text-paper relative isolate"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => (swipe.current = null)}
+      style={{ touchAction: 'pan-y' }}
       aria-roledescription="карусель"
       aria-label="Ближайшие спектакли"
     >
@@ -40,7 +60,7 @@ export function Hero() {
           <AnimatePresence initial={false}>
             <motion.img
               key={slide?.photo ?? 'stage'}
-              src={slide?.photo ?? galleryPhoto('simon-3')}
+              src={slide?.photo ?? galleryPhoto('simon-1')}
               alt=""
               initial={{ opacity: 0, scale: reduce ? 1 : 1.05 }}
               animate={{ opacity: 1, scale: 1 }}

@@ -35,7 +35,6 @@ const FRAME: Record<string, [string, number]> = {
   'lilya-ravilova': ['45% 35%', 1.6],
   'elya-sharova': ['65% 40%', 1.2],
   'svetochka-malova': ['58% 68%', 2.2],
-  'marat-sufiyarov': ['12% 62%', 1.2],
   'marat-minhaerov': ['70% 92%', 2.4],
   'daniil-zimukov': ['45% 25%', 1.3],
 }

@@ -208,8 +208,8 @@ export function CoursesBand() {
         <Reveal>
           <RoughFrame>
             <img
-              src={galleryPhoto('simon-3')}
-              alt="Сцена из спектакля «Симон»"
+              src={galleryPhoto('lager-1')}
+              alt="Ученики театра на сцене"
               loading="lazy"
               className="aspect-[5/4] w-full object-cover"
             />

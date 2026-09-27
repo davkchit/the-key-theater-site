@@ -79,7 +79,7 @@ export default function AboutPageV2() {
             <br />
             свободы
           </h1>
-          <p className="font-script text-brand-red mt-6 max-w-md text-[28px] leading-[1.15] md:text-[34px]">
+          <p className="font-heading text-brand-red mt-6 max-w-md text-[24px] leading-[1.15] font-semibold uppercase md:text-[28px]">
             Нам нравится жить по правилам, которые мы сами придумываем.
           </p>
           <p className="mt-6 max-w-lg text-[17px] leading-[1.6] md:text-[18px]">
@@ -90,7 +90,7 @@ export default function AboutPageV2() {
         <Reveal className="relative">
           <RoughFrame>
             <img
-              src={galleryPhoto('posledstviy-3')}
+              src={galleryPhoto('posledstviy-5')}
               alt="Актёры театра «Ключ» на сцене"
               className="aspect-[4/3] w-full object-cover"
             />

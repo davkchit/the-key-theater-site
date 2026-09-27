@@ -61,7 +61,6 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             Купить билет
           </NavLink>
 
-          <div className="mt-auto font-script text-[30px] text-brand-red">любовь — это театр</div>
         </motion.div>
       )}
     </AnimatePresence>
