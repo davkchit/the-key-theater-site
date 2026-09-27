@@ -1,0 +1,14 @@
+#!/bin/sh
+# Puts the freshly built site live: /opt/kluch/src/dist -> /opt/kluch/site.
+# Root only (installed to /usr/local/sbin), called after a successful rebuild.
+set -eu
+src=/opt/kluch/src/dist
+test -f "$src/index.html" || { echo 'нет собранного сайта' >&2; exit 1; }
+rm -rf /opt/kluch/site.new /opt/kluch/site.old
+cp -a "$src" /opt/kluch/site.new
+chown -R root:root /opt/kluch/site.new
+chmod -R a+rX /opt/kluch/site.new
+mv /opt/kluch/site /opt/kluch/site.old
+mv /opt/kluch/site.new /opt/kluch/site
+rm -rf /opt/kluch/site.old
+echo 'сайт обновлён'

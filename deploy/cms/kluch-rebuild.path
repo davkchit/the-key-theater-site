@@ -1,0 +1,10 @@
+[Unit]
+Description=Watch for new commits from the Kluch admin
+
+[Path]
+# git appends a line here on every commit
+PathModified=/opt/kluch/src/.git/logs/HEAD
+Unit=kluch-rebuild.service
+
+[Install]
+WantedBy=multi-user.target

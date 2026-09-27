@@ -1,0 +1,20 @@
+[Unit]
+Description=Rebuild the Kluch site after an edit in the admin
+
+[Service]
+Type=oneshot
+User=kluch-cms
+Group=kluch-cms
+ExecStart=/opt/kluch/cms/rebuild.sh
+# "+" = as root: only this step touches the live site
+ExecStartPost=+/usr/local/sbin/kluch-site-publish
+# the build peaks around 270 MB; if it ever needs more, it fails, not the
+# other services on this server
+MemoryMax=450M
+Nice=10
+TimeoutStartSec=600
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/kluch/src
+ProtectHome=true
+PrivateTmp=true

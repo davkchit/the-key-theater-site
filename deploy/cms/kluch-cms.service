@@ -1,0 +1,25 @@
+[Unit]
+Description=Kluch site admin (decap-server, saves as git commits)
+After=network-online.target
+
+[Service]
+User=kluch-cms
+Group=kluch-cms
+WorkingDirectory=/opt/kluch/cms
+Environment=MODE=git
+Environment=GIT_REPO_DIRECTORY=/opt/kluch/src
+Environment=BIND_HOST=127.0.0.1
+Environment=PORT=8081
+Environment=LOG_LEVEL=warn
+ExecStart=/usr/bin/node node_modules/decap-server/dist/index.js
+Restart=always
+RestartSec=5
+MemoryMax=160M
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/kluch/src
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

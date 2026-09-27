@@ -1,0 +1,34 @@
+# The site's block in /etc/caddy/Caddyfile. Replace SITE and HASH
+# (HASH: `caddy hash-password`, login name "teatr").
+SITE {
+    encode gzip
+
+    # the bot: chat on the site, forms
+    handle /api/* {
+        reverse_proxy 127.0.0.1:8787
+    }
+
+    # the admin's saves -> decap-server (/admin/api/v1 -> /api/v1)
+    handle /admin/api/* {
+        basic_auth {
+            teatr HASH
+        }
+        uri strip_prefix /admin
+        reverse_proxy 127.0.0.1:8081
+    }
+
+    # the admin page itself
+    handle /admin* {
+        basic_auth {
+            teatr HASH
+        }
+        root * /opt/kluch/site
+        file_server
+    }
+
+    handle {
+        root * /opt/kluch/site
+        try_files {path} /index.html
+        file_server
+    }
+}
