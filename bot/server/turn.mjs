@@ -13,9 +13,6 @@
 
 import { leadLetter } from './mail.mjs'
 
-const MODEL_DOWN_TEXT =
-  'Я сейчас перегружен и не успеваю ответить, простите. Спросите, пожалуйста, через пару минут. Или позвоните: +7 906 120-22-62 (пн–пт, 15:00–21:00).'
-
 export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now = () => Date.now() }) {
   const ADMIN = env.ADMIN_CHAT_ID ? String(env.ADMIN_CHAT_ID) : ''
   const useParser = env.BOT_PARSER !== '0'
@@ -104,7 +101,9 @@ export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now 
           {
             model: env.LLM_PARSER_MODEL || env.LLM_MODEL,
             messages: res.parse.messages,
-            max_tokens: 200,
+            // gpt-oss thinks before it answers, ~100-400 tokens even for «стоп»;
+            // at 200 the thinking ate it all and two parses in three came back empty
+            max_tokens: 800,
             temperature: 0,
             response_format: { type: 'json_schema', json_schema: res.parse.schema },
           },
@@ -136,7 +135,7 @@ export function createTurn({ env, lib, store, getKnowledge, llm, send, log, now 
       } catch (e) {
         log('модель не ответила:', e.message)
         const ctx = res.model.ctx || {}
-        res.out.push({ chat_id: res.state.chatId, text: MODEL_DOWN_TEXT })
+        res.out.push({ chat_id: res.state.chatId, text: lib.modelDownText(knowledge) })
         if (ctx.reprompt) res.out.push(Object.assign({ chat_id: res.state.chatId, text: ctx.reprompt }, ctx.repromptMarkup ? { reply_markup: ctx.repromptMarkup } : {}))
         res.effects.push({ type: 'devAlert', text: 'Модель не ответила: ' + String(e.message).slice(0, 300) })
       }

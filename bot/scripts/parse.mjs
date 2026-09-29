@@ -44,7 +44,7 @@ async function parse(text, opts = {}) {
   const r = await callModel(env, lib.parserMessages(text, [], hasLead, step, opts.lastTopics || null), {
     parser: true,
     schema: lib.parserSchema(),
-    maxTokens: 200,
+    maxTokens: 800,
     temperature: 0,
   })
   totalTokens += r.tokens
