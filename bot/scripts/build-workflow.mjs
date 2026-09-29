@@ -4,7 +4,7 @@
 //   node bot/scripts/build-workflow.mjs
 //
 // Output: bot/workflows/*.json -- import with `n8n import:workflow`.
-// Re-run after any change to bot/core (logic, faq.md) or to the site content.
+// Re-run after any change to bot/core (logic) or to the site content.
 
 import fs from 'node:fs'
 import path from 'node:path'

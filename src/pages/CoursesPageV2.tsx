@@ -28,6 +28,7 @@ import { SignupForm } from '../components/courses/SignupForm'
 import { DirectionForm } from '../components/directions/DirectionForm'
 import boyFence from '../../assets/el-boy-fence.svg'
 import starSvg from '../../assets/el-star.svg'
+import { HOURS, PHONE, telHref } from '../data/contacts'
 
 // «Курсы»: the four groups, how lessons go, what else one can sign up for,
 // the teachers and a short form. Every signup lands where the bot's do.
@@ -450,12 +451,12 @@ export default function CoursesPageV2() {
             <div className="mt-8 flex items-center gap-5">
               <div>
                 <a
-                  href="tel:+79061202262"
+                  href={telHref(PHONE)}
                   className="font-heading block text-[30px] leading-tight font-bold whitespace-nowrap hover:underline md:text-[34px]"
                 >
-                  +7 906 120-22-62
+                  {PHONE}
                 </a>
-                <p className="mt-1 text-[14px]">пн–пт, 15:00–21:00</p>
+                <p className="mt-1 text-[14px]">{HOURS}</p>
               </div>
               <SwallowIcon className="text-ink h-14 -rotate-6" />
             </div>

@@ -2,6 +2,8 @@
 // The conversation itself lives on the server; the browser keeps a copy of
 // what was shown, so a page change or a reload does not wipe it.
 
+import { PHONE } from './contacts'
+
 const API = (import.meta.env.VITE_API_BASE ?? '').replace(/\/$/, '')
 const STORE_KEY = 'kluch-chat-v1'
 const KEEP_MESSAGES = 60
@@ -33,7 +35,7 @@ interface ServerMessage {
   chips: string[] | null
 }
 
-export const CHAT_FAILED = 'Не получилось отправить. Проверьте интернет и попробуйте ещё раз или позвоните: +7 906 120-22-62.'
+export const CHAT_FAILED = `Не получилось отправить. Проверьте интернет и попробуйте ещё раз или позвоните: ${PHONE}.`
 
 function newSession(): string {
   const bytes = new Uint8Array(15)

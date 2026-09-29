@@ -1,3 +1,7 @@
 {
-  "ticketsWidgetUrl": "https://bileton.ru/widget/teatr_kluch"
+  "ticketsWidgetUrl": "https://bileton.ru/widget/teatr_kluch",
+  "phone": "+7 906 120-22-62",
+  "phone2": "+7 962 573-92-19",
+  "hours": "пн–пт, 15:00–21:00",
+  "email": "kluchtheatre@mail.ru"
 }

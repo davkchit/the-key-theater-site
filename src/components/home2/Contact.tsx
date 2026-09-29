@@ -8,6 +8,7 @@ import { directionByType } from '../../data/directions'
 import { SwallowIcon } from '../ui/SwallowIcon'
 import { BTN, H2, RoughFrame, SectionHead, WRAP } from './parts'
 import { Torn } from './paper'
+import { EMAIL, HOURS, PHONE, PHONE2, telHref } from '../../data/contacts'
 
 /* ─────────────── newsletter ─────────────── */
 
@@ -182,24 +183,26 @@ export function FindUs() {
             <div>
               <div className="flex flex-col gap-1">
                 <a
-                  href="tel:+79061202262"
+                  href={telHref(PHONE)}
                   className="font-heading hover:text-brand-red text-[34px] leading-tight font-bold tracking-[.01em] md:text-[38px]"
                 >
-                  +7 906 120-22-62
+                  {PHONE}
                 </a>
-                <a
-                  href="tel:+79625739219"
-                  className="font-heading hover:text-brand-red text-[34px] leading-tight font-bold tracking-[.01em] md:text-[38px]"
-                >
-                  +7 962 573-92-19
-                </a>
+                {PHONE2 && (
+                  <a
+                    href={telHref(PHONE2)}
+                    className="font-heading hover:text-brand-red text-[34px] leading-tight font-bold tracking-[.01em] md:text-[38px]"
+                  >
+                    {PHONE2}
+                  </a>
+                )}
               </div>
-              <p className="mt-6 text-[17px]">пн–пт, 15:00–21:00</p>
+              <p className="mt-6 text-[17px]">{HOURS}</p>
               <a
-                href="mailto:kluchtheatre@mail.ru"
+                href={'mailto:' + EMAIL}
                 className="mt-4 inline-block text-[17px] underline-offset-4 hover:underline"
               >
-                kluchtheatre@mail.ru
+                {EMAIL}
               </a>
               <div className="mt-7">
                 <a

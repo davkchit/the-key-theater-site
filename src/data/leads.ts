@@ -9,12 +9,14 @@
 // VITE_API_BASE: where the server is. Empty (the default) means the same site
 // ("/api/lead"), which is how it runs on the VPS; in development Vite forwards
 // /api to the local bot (vite.config.ts).
+
+import { PHONE } from './contacts'
+
 const API = (import.meta.env.VITE_API_BASE ?? '').replace(/\/$/, '')
 
 export type LeadForm = 'course' | 'festival' | 'audience' | 'direction'
 
-export const LEAD_FAILED =
-  'Не получилось отправить заявку. Проверьте интернет и попробуйте ещё раз или позвоните: +7 906 120-22-62.'
+export const LEAD_FAILED = `Не получилось отправить заявку. Проверьте интернет и попробуйте ещё раз или позвоните: ${PHONE}.`
 
 export async function submitLead(
   form: LeadForm,
@@ -37,7 +39,7 @@ export async function submitLead(
   // "слишком много заявок подряд"), the generic message otherwise
   throw new Error(
     res.status === 409 || res.status === 429
-      ? `${body?.error ?? 'Сейчас заявку не принять'}. Телефон: +7 906 120-22-62.`
+      ? `${body?.error ?? 'Сейчас заявку не принять'}. Телефон: ${PHONE}.`
       : LEAD_FAILED,
   )
 }

@@ -80,6 +80,17 @@ console.log('\nСкриншот: заявка уже есть, человек с
   check('«Новая заявка» ведёт на согласие', n.buttons.includes('consent:yes'), n)
 }
 
+console.log('\nБез разборщика «куда ты оформляешь заявку» — ответ, а не форма согласия')
+{
+  const c = chat(4)
+  for (const q of ['куда ты оформляешь заявку', 'а кому уходит заявка', 'где моя заявка']) {
+    const r = c.text(q)
+    check(`«${q}» уходит в модель`, Boolean(r.model) && !r.buttons.includes('consent:yes'), r)
+  }
+  const r = chat(5).text('хочу записаться')
+  check('а «хочу записаться» по-прежнему открывает форму', r.buttons.includes('consent:yes'), r)
+}
+
 console.log('\n«ещё дочку запишите» при открытой заявке — сразу к той же заявке')
 {
   const c = chat(3)

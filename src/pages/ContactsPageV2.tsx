@@ -3,6 +3,7 @@ import { PrintFilters, WRAP } from '../components/home2/parts'
 import { GRAIN_URL } from '../components/home2/paper'
 import { FindUs, NewsletterBand } from '../components/home2/Contact'
 import { SocialIcon } from '../components/ui/SocialIcon'
+import { EMAIL } from '../data/contacts'
 
 // «Контакты»: the ways to reach the theatre at a glance, then the map block
 // and the newsletter from the homepage.
@@ -19,10 +20,10 @@ export default function ContactsPageV2() {
           <div>
             <div className="text-ink/65 text-[14px] tracking-[.05em] uppercase">Написать</div>
             <a
-              href="mailto:kluchtheatre@mail.ru"
+              href={'mailto:' + EMAIL}
               className="mt-2 block text-[22px] font-medium hover:underline md:text-[24px]"
             >
-              kluchtheatre@mail.ru
+              {EMAIL}
             </a>
             <p className="mt-2 text-[15px]">или спросите кота театра в углу страницы</p>
           </div>

@@ -262,6 +262,29 @@ collections:
                   - { label: Варианты для выбора, name: options, widget: list, required: false, field: { label: Вариант, name: option, widget: string }, hint: 'Только для типа «Выбор из вариантов»' }
                   - { label: Как спросить, name: ask, widget: string, required: false, hint: 'Например: Из какого вы города?' }
 
+  - name: bot
+    label: Ответы бота
+    files:
+      - name: bot
+        label: Что знает кот в чате
+        file: src/content/bot.json
+        fields:
+          - label: Разделы
+            name: sections
+            widget: list
+            summary: '{{fields.title}}'
+            hint: 'Бот отвечает только по тому, что здесь и в других разделах админки (афиша, спектакли, курсы, фестиваль). Цены курсов, афишу, фестиваль, телефоны и почту сюда не пишите — бот берёт их оттуда (телефоны — в «Настройках сайта»). Изменения доходят до бота минут через 10–15 после сохранения.'
+            fields:
+              - { label: Служебная метка, name: id, widget: hidden, required: false }
+              - { label: Заголовок, name: title, widget: string, hint: 'Например: Билеты, Парковка' }
+              - { label: Текст, name: text, widget: text, hint: 'Коротко, по пункту на строку, каждый пункт с «- ». Только то, что театр готов подтвердить: бот повторит это людям как факт' }
+          - label: Пока не подтверждено (бот отправляет к администратору)
+            name: unconfirmed
+            widget: list
+            required: false
+            hint: 'Темы, на которые бот сам не отвечает, а говорит «уточнит администратор». Когда ответ появится — впишите его в раздел выше и уберите тему отсюда'
+            field: { label: Тема, name: item, widget: string }
+
   - name: settings
     label: Настройки сайта
     files:
@@ -270,6 +293,10 @@ collections:
         file: src/content/settings.json
         fields:
           - { label: Ссылка на страницу театра на Билетоне, name: ticketsWidgetUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Ссылка должна начинаться с https://'], hint: 'Витрина со всеми показами и местами. Бот даёт её на вопросы про билеты' }
+          - { label: Телефон администратора, name: phone, widget: string, pattern: ['^\+?[0-9 ()-]{10,20}$', 'Например: +7 906 120-22-62'], hint: 'Главный номер: его показывает сайт и называет бот, когда отправляет к администратору' }
+          - { label: Второй телефон, name: phone2, widget: string, required: false, pattern: ['^$|^\+?[0-9 ()-]{10,20}$', 'Например: +7 962 573-92-19'] }
+          - { label: Когда звонить, name: hours, widget: string, hint: 'Например: пн–пт, 15:00–21:00. Бот говорит, что администратор перезвонит в это время' }
+          - { label: Почта театра, name: email, widget: string, pattern: ['^[^@ ]+@[^@ ]+[.][^@ ]+$', 'Проверьте адрес почты'] }
       - name: home
         label: Главная страница
         file: src/content/home.json

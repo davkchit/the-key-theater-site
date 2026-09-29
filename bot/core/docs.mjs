@@ -12,7 +12,7 @@
 //   bot/docs/people.docx  «о наших людях»
 //
 // What the documents do not have (course prices, show synopses, the ticket
-// link, the FAQ) still comes from the site and faq.md.
+// link, the FAQ) still comes from the site and the handbook (src/content/bot.json).
 //
 // Nothing here guesses silently. A line of the plan that is neither a show nor
 // something known to skip is reported by `npm run knowledge`, so a new kind of
@@ -362,7 +362,7 @@ export function knowledgeFromDocs(repoRoot, base, nowMs = Date.now()) {
   const aboutFile = path.join(dir, 'about.docx')
   if (fs.existsSync(aboutFile)) {
     faq.push(...aboutSections(aboutFile))
-    // the document's history replaces the short one in faq.md; keeping both
+    // the document's history replaces the short one in the handbook; keeping both
     // doubled the text and gave the model two versions of the same years
     const about = section('about')
     if (about) {

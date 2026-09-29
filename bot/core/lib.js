@@ -173,6 +173,8 @@ function smallTalkReply(text, nowMs) {
   return null
 }
 
+const ABOUT_SIGNUP_Q = /(^|\s)(куда|кому|где|зачем|почему|откуда|кто|что|сколько|когда)(\s|$)|(^|\s)ли(\s|$)/i
+
 function looksLikeQuestion(text) {
   return /\?/.test(text) || text.split(/\s+/).length > 6
 }
@@ -237,12 +239,30 @@ function coursesText(knowledge) {
   return '<b>Актёрские курсы:</b>\n' + lines.join('\n') + '\n\nНабор в группы продолжается. Стоимость и расписание расскажет администратор, когда перезвонит.'
 }
 
+// The phone and hours the bot's own phrases name. They come from «Настройки
+// сайта» with the knowledge (knowledge.contact); the defaults only cover an
+// old knowledge.json built before the admin had those fields.
+const DEFAULT_CONTACT = { phone: '+7 906 120-22-62', phone2: '+7 962 573-92-19', hours: 'пн–пт, 15:00–21:00', email: 'kluchtheatre@mail.ru' }
+let CONTACT = DEFAULT_CONTACT
+function useContact(knowledge) {
+  const c = knowledge && knowledge.contact
+  CONTACT = c && c.phone && c.hours && c.email ? c : DEFAULT_CONTACT
+}
+// "+7 906 120-22-62 (пн–пт, 15:00–21:00)"
+function phoneWithHours() {
+  return CONTACT.phone + ' (' + CONTACT.hours + ')'
+}
+function modelDownText(knowledge) {
+  useContact(knowledge)
+  return 'Я сейчас перегружен и не успеваю ответить, простите. Спросите, пожалуйста, через пару минут. Или позвоните: ' + phoneWithHours() + '.'
+}
+
 function contactsText() {
   return [
     '<b>Театр «Ключ»</b>',
     '📍 Набережные Челны, Новый город, 1/02, молодёжный центр «НУР», второй вход',
-    '📞 +7 906 120-22-62, +7 962 573-92-19 (пн–пт, 15:00–21:00)',
-    '✉️ kluchtheatre@mail.ru',
+    '📞 ' + esc(CONTACT.phone + (CONTACT.phone2 ? ', ' + CONTACT.phone2 : '') + ' (' + CONTACT.hours + ')'),
+    '✉️ ' + esc(CONTACT.email),
     'ВКонтакте: vk.com/teatr_kluch',
   ].join('\n')
 }
@@ -253,7 +273,7 @@ function ticketsText(knowledge, nowMs) {
 }
 
 // Every block the model may be told about, keyed by topic id. The ids of the
-// first three are fixed here; the rest come from the section labels in faq.md.
+// first three are fixed here; the rest are the handbook sections (bot/core/knowledge.mjs).
 
 // One flat list of forty lines made the model drop the end of a month ("что в
 // ноябре?" lost the 28th). A heading per month with its count lets it see where
@@ -1085,7 +1105,7 @@ function dirStep(state, ev, nowMs) {
       effects.push({ type: 'leadSave', lead, isNew: true, notice: '🆕 Новая заявка' })
       state.step = null
       state.draft = null
-      out.push(msg(state.chatId, 'Готово, ' + esc(lead.name) + '! Заявка «' + esc(lead.direction) + '» принята.' + (lead.phone ? ' Администратор перезвонит на ' + esc(lead.phone) + ' в рабочее время (пн–пт, 15:00–21:00).' : ' Мы свяжемся с вами.'), mainKeyboard()))
+      out.push(msg(state.chatId, 'Готово, ' + esc(lead.name) + '! Заявка «' + esc(lead.direction) + '» принята.' + (lead.phone ? ' Администратор перезвонит на ' + esc(lead.phone) + ' в рабочее время (' + esc(CONTACT.hours) + ').' : ' Мы свяжемся с вами.'), mainKeyboard()))
       return { out, effects }
     }
     if (ev.kind === 'callback' && ev.data === 'confirm:edit') {
@@ -1327,7 +1347,7 @@ function signupStep(state, ev, nowMs, knowledge, parsedIntent) {
       effects.push({ type: 'leadSave', lead, isNew: true, notice: '🆕 Новая заявка' })
       state.lastLead = Object.assign({}, lead, { at: nowMs })
       state.step = null; state.draft = null
-      out.push(msg(state.chatId, 'Готово, ' + esc(lead.name) + '! Заявка принята, администратор перезвонит на ' + lead.phone + ' в рабочее время (пн–пт, 15:00–21:00).', mainKeyboard()))
+      out.push(msg(state.chatId, 'Готово, ' + esc(lead.name) + '! Заявка принята, администратор перезвонит на ' + lead.phone + ' в рабочее время (' + esc(CONTACT.hours) + ').', mainKeyboard()))
       return { out, effects }
     }
     if (ev.kind === 'callback' && ev.data === 'confirm:edit') {
@@ -1384,6 +1404,7 @@ function adminLeadKeyboard(leadId) {
 // most one model call). If res.model is set, n8n calls the model and passes
 // the raw reply to afterModel(), which finishes the turn.
 function decide(ev, stateIn, globalIn, knowledge, cfg) {
+  useContact(knowledge)
   const nowMs = cfg.nowMs
   const adminChatId = cfg.adminChatId ? String(cfg.adminChatId) : ''
   const res = { state: null, global: globalIn || null, out: [], effects: [], model: null, answerCallback: null }
@@ -1538,7 +1559,9 @@ function decide(ev, stateIn, globalIn, knowledge, cfg) {
   if (CANCEL_RE.test(t)) { cancelLeadAsk(res.out, s); return res }
   // a short "как записаться?" is not a question worth a model call -- the
   // answer to it is the form itself
-  if (SIGNUP_WORDS.test(t) && (words <= 5 || (!/\?/.test(t) && words <= 8))) {
+  // ...but "куда / кому / где / зачем заявку?" asks about the signup itself,
+  // and opening the consent form in reply to it read as not listening
+  if (SIGNUP_WORDS.test(t) && !ABOUT_SIGNUP_Q.test(t) && (words <= 5 || (!/\?/.test(t) && words <= 8))) {
     s.pendingAge = extractAge(t)
     s.pendingExtra = ANOTHER_CHILD.test(t)
     // a closed direction is answered by the model instead of opening a form
@@ -1556,10 +1579,10 @@ function humanRequest(out, effects, s) {
   if (s.lastLead && !s.lastLead.cancelled) {
     s.lastLead.nudges = (s.lastLead.nudges || 0) + 1
     effects.push(leadSaveEffect(s.lastLead, '⏰ Напоминает о себе, ждёт звонка'))
-    out.push(msg(s.chatId, 'Вижу вашу заявку и уже напомнил администратору, что вы ждёте звонка. Звонят в рабочее время: пн–пт, 15:00–21:00.\n\nЕсли не хотите ждать, позвоните сами: +7 906 120-22-62.', mainKeyboard()))
+    out.push(msg(s.chatId, 'Вижу вашу заявку и уже напомнил администратору, что вы ждёте звонка. Звонят в рабочее время: ' + esc(CONTACT.hours) + '.\n\nЕсли не хотите ждать, позвоните сами: ' + esc(CONTACT.phone) + '.', mainKeyboard()))
     return
   }
-  out.push(msg(s.chatId, 'Администратор на связи по телефону: +7 906 120-22-62 (пн–пт, 15:00–21:00).\n\nИли оставьте заявку, и вам перезвонят.', inline([[['✍️ Оставить заявку', 'signup:start']]])))
+  out.push(msg(s.chatId, 'Администратор на связи по телефону: ' + esc(phoneWithHours()) + '.\n\nИли оставьте заявку, и вам перезвонят.', inline([[['✍️ Оставить заявку', 'signup:start']]])))
 }
 
 function requestModel(res, s, knowledge, nowMs, text, ctx, topics) {
@@ -1574,7 +1597,7 @@ function requestModel(res, s, knowledge, nowMs, text, ctx, topics) {
       g.alerted = true
       res.effects.push({ type: 'devAlert', text: 'Бот «Ключ»: достигнут дневной лимит обращений к модели (' + CFG.maxLlmGlobalPerDay + '). Бот отвечает только кнопками до завтра.' })
     }
-    res.out.push(msg(s.chatId, 'Столько вопросов за раз я уже не унесу, мяу. Кнопки внизу работают, а на всё остальное лучше ответит администратор: +7 906 120-22-62 (пн–пт, 15:00–21:00).', mainKeyboard()))
+    res.out.push(msg(s.chatId, 'Столько вопросов за раз я уже не унесу, мяу. Кнопки внизу работают, а на всё остальное лучше ответит администратор: ' + esc(phoneWithHours()) + '.', mainKeyboard()))
     if (ctx.reprompt) res.out.push(msg(s.chatId, ctx.reprompt, ctx.repromptMarkup))
     return res
   }
@@ -1625,6 +1648,7 @@ function prettyReply(text, knowledge) {
 }
 
 function afterModel(res, rawReply, nowMs, knowledge) {
+  useContact(knowledge)
   const s = res.state
   const parsed = parseModelReply(rawReply)
   // "27 сентября 2026" -> "27 сентября": nobody writes the current year, and it
@@ -1712,11 +1736,11 @@ function afterModel(res, rawReply, nowMs, knowledge) {
     // the admin to ignore real ones. Real complaints ("не перезвонили") are
     // caught in code before the model and nudge from there.
     if (text) out.push(msg(s.chatId, html))
-    out.push(msg(s.chatId, 'Администратор на связи по телефону: +7 906 120-22-62 (пн–пт, 15:00–21:00).', mainKeyboard()))
+    out.push(msg(s.chatId, 'Администратор на связи по телефону: ' + esc(phoneWithHours()) + '.', mainKeyboard()))
     return { out, effects }
   }
   // An empty reply is our failure (the model ran out of room), not the
   // person's: "не понял вопрос" blamed them for a perfectly clear question.
-  out.push(msg(s.chatId, html || 'Не успел собрать ответ, простите. Спросите, пожалуйста, ещё раз, можно по частям. Или позвоните: +7 906 120-22-62.', mainKeyboard()))
+  out.push(msg(s.chatId, html || 'Не успел собрать ответ, простите. Спросите, пожалуйста, ещё раз, можно по частям. Или позвоните: ' + esc(CONTACT.phone) + '.', mainKeyboard()))
   return { out, effects }
 }

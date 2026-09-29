@@ -8,6 +8,7 @@ import { GRAIN_URL, Torn } from '../components/home2/paper'
 import { TICKETS_URL, heroShows, longDate, showPath } from '../components/home2/homeData'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import starSvg from '../../assets/el-star.svg'
+import { PHONE, telHref } from '../data/contacts'
 
 // «Афиша» from the approved mockup, in two versions the visitor can switch
 // between: «тёмный зал» (the schedule on a black band, like an auditorium
@@ -308,10 +309,10 @@ export default function AfishaPageV2() {
           </p>
           <div className="flex items-center gap-6">
             <a
-              href="tel:+79061202262"
+              href={telHref(PHONE)}
               className="font-heading text-[26px] leading-tight font-bold whitespace-nowrap hover:underline"
             >
-              +7 906 120-22-62
+              {PHONE}
             </a>
             <SwallowIcon className="text-ink h-10 -rotate-6" />
           </div>

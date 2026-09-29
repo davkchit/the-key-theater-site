@@ -17,6 +17,7 @@ import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { Reveal } from '../components/ui/Reveal'
 import { scrollToId } from '../lib/scrollToId'
 import starSvg from '../../assets/el-star.svg'
+import { PHONE, telHref } from '../data/contacts'
 
 // The festival «Действующие лица»: what it is, how to apply, the programme,
 // photos, questions and the application form. Text, programme, questions and
@@ -273,10 +274,10 @@ export default function FestivalPageV2() {
               вопросы.
             </p>
             <a
-              href="tel:+79061202262"
+              href={telHref(PHONE)}
               className="font-heading mt-8 block text-[30px] leading-tight font-bold hover:underline md:text-[34px]"
             >
-              +7 906 120-22-62
+              {PHONE}
             </a>
           </div>
           <div className="border-ink bg-paper relative border-2 p-5 shadow-[6px_6px_0_#1a1a1a] md:p-7">

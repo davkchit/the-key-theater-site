@@ -205,12 +205,27 @@ async function weeklyReport() {
   const from = new Date(Date.parse(w.key + 'T00:00:00+03:00') - 7 * 86400e3).toISOString()
   const csv = leadsCsv(store.db, from)
   try {
-    await mailer.sendNow({ to: 'leads', subject: 'Заявки за неделю: ' + csv.count, text: 'Заявки за прошлую неделю во вложении. Файл открывается в Excel.', attachments: [{ filename: 'заявки-' + w.key + '.csv', content: csv.text, contentType: 'text/csv; charset=utf-8' }] })
+    const text = 'Заявки за прошлую неделю во вложении. Файл открывается в Excel.' + unansweredSince(from)
+    await mailer.sendNow({ to: 'leads', subject: 'Заявки за неделю: ' + csv.count, text, attachments: [{ filename: 'заявки-' + w.key + '.csv', content: csv.text, contentType: 'text/csv; charset=utf-8' }] })
     store.putKv('weeklySent', w.key)
     log('недельная выгрузка отправлена:', csv.count, 'заявок')
   } catch (e) {
     log('недельная выгрузка не ушла, повторю через час:', e.message)
   }
+}
+// What the bot could not answer last week, for whoever keeps «Ответы бота» in
+// the admin: without this list the questions were saved and nobody ever saw
+// them. Phones and emails people typed are masked, repeats counted once.
+function unansweredSince(fromIso) {
+  const rows = store.db.prepare('SELECT question FROM unanswered WHERE asked_at >= ? ORDER BY id').all(fromIso)
+  const seen = new Map()
+  for (const r of rows) {
+    const q = String(r.question || '').replace(/\S+@\S+/g, '[почта]').replace(/\+?\d[\d\s()-]{5,}\d/g, '[номер]').replace(/\s+/g, ' ').trim().slice(0, 200)
+    if (q) seen.set(q.toLowerCase(), { q, n: (seen.get(q.toLowerCase())?.n || 0) + 1 })
+  }
+  if (!seen.size) return ''
+  const list = [...seen.values()].map((x) => '- ' + x.q + (x.n > 1 ? ' (×' + x.n + ')' : '')).join('\n')
+  return '\n\nНа эти вопросы кот в чате не нашёл ответа. Если ответ стоит давать, впишите его в админке, раздел «Ответы бота»:\n' + list
 }
 setInterval(weeklyReport, 3600e3).unref()
 

@@ -36,9 +36,11 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
     ageRange: c.ageRange,
     desc: c.desc,
     ...(c.price ? { price: c.price } : {}),
+    ...(c.start ? { start: c.start } : {}),
   }))
 
-  const faq = parseFaq(fs.readFileSync(path.join(repoRoot, 'bot/core/faq.md'), 'utf8'))
+  const festFile = path.join(repoRoot, 'src/content/festival.json')
+  const faq = faqFromContent(read('src/content/bot.json'), fs.existsSync(festFile) ? read('src/content/festival.json') : null)
 
   // Everything the theatre lets people sign up for besides the courses. Optional
   // file: a site without it simply has no directions.
@@ -68,8 +70,12 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
   // the theatre's shop window on Bileton: every show and its seats in one place
   const settings = read('src/content/settings.json')
   const ticketsUrl = /^https?:\/\//.test(settings.ticketsWidgetUrl || '') ? settings.ticketsWidgetUrl : ''
+  // «Настройки сайта»: the same phone the site shows, so the bot's own phrases
+  // ("позвоните …") change with it instead of keeping a number typed into code
+  const contact = contactFrom(settings)
+  faq.unshift({ id: 'phones', always: false, title: 'Телефон и почта', body: contactLines(contact) })
 
-  const base = { builtAt: new Date().toISOString(), afisha, shows, courses, faq, directions, ...(ticketsUrl ? { ticketsUrl } : {}), source: 'site' }
+  const base = { builtAt: new Date().toISOString(), afisha, shows, courses, faq, directions, contact, ...(ticketsUrl ? { ticketsUrl } : {}), source: 'site' }
   // The site is the source of truth: the theatre edits it in the admin and the
   // bot follows. The Word-document mode (bot/docs, the theatre's season plan)
   // stays for the day someone wants it: KNOWLEDGE_SOURCE=docs.
@@ -80,52 +86,85 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
   return base
 }
 
-// faq.md is split into labelled sections ("## [tickets] Билеты") so a turn can
-// carry only the sections it needs instead of the whole file. Sending everything
-// is paid for on every single call, and the file only grows as the theatre
-// confirms more facts.
-//
-// A label starting with "!" marks a section that is not a fact but a limit on
-// what the bot may say -- those always go into the prompt, whatever the topic.
-// A section without a label would silently glue itself onto the previous one
-// and start being served under the wrong topic; a section that grows past a
-// page defeats the point of splitting at all. Both fail the build instead,
-// because neither is visible in the bot's behaviour until someone complains.
-const MAX_SECTION_CHARS = 1800
-
-function checkFaq(md, sections) {
-  const problems = []
-  if (!sections.length) problems.push('в faq.md нет ни одного помеченного раздела «## [id] Заголовок»')
-  const unlabelled = md.split('\n').filter((l) => /^## /.test(l) && !/^## \[/.test(l))
-  for (const l of unlabelled) problems.push(`раздел без метки: «${l.trim()}» — добавьте «## [id] ...»`)
-  const seen = new Set()
-  for (const s of sections) {
-    if (seen.has(s.id)) problems.push(`метка «${s.id}» встречается дважды`)
-    seen.add(s.id)
-    if (!/^[a-z0-9_-]+$/.test(s.id)) problems.push(`метка «${s.id}» должна быть латиницей в нижнем регистре`)
-    if (s.body.length > MAX_SECTION_CHARS) problems.push(`раздел «${s.id}» разросся до ${s.body.length} знаков (предел ${MAX_SECTION_CHARS}) — разрежьте на две темы`)
-  }
-  if (!sections.some((s) => s.always)) problems.push('нет раздела с меткой «!» — список запретов обязателен')
-  if (problems.length) throw new Error('faq.md:\n  - ' + problems.join('\n  - '))
+// The build fails on a missing phone rather than ship a bot that tells people
+// to call "undefined".
+export function contactFrom(settings) {
+  const phone = String(settings.phone || '').trim()
+  const hours = String(settings.hours || '').trim()
+  const email = String(settings.email || '').trim()
+  if (!phone || !hours || !email) throw new Error('src/content/settings.json («Настройки сайта» в админке): нужны телефон, часы звонков и почта')
+  const phone2 = String(settings.phone2 || '').trim()
+  return { phone, ...(phone2 ? { phone2 } : {}), hours, email }
 }
 
-export function parseFaq(md) {
-  const sections = parseFaqSections(md)
-  checkFaq(md, sections)
+function contactLines(c) {
+  return [
+    '- Телефоны: ' + c.phone + (c.phone2 ? ' и ' + c.phone2 : '') + '. Звонить: ' + c.hours + '.',
+    '- Почта: ' + c.email,
+  ].join('\n')
+}
+
+// The bot's handbook: what the theatre edits in the admin under «Ответы бота»
+// (src/content/bot.json). Each section becomes one block of the prompt; the
+// "unconfirmed" list is not a fact but a limit on what the bot may say, so it
+// always goes in. Nothing here repeats what another admin file already holds
+// (prices live in the courses, the festival on its own page): a fact kept in
+// two places is a fact that goes stale in one of them.
+//
+// A broken file must not take the bot down or send it out with no limits at
+// all, so it fails the build instead: the site then stays as it was.
+const MAX_SECTION_CHARS = 1800
+const SIGNUP_SECTION = {
+  id: 'signup',
+  always: false,
+  title: 'Запись на курсы',
+  // how the bot itself works, so it is kept in code rather than in the admin
+  body: [
+    '- Заявка оформляется прямо в чате с ботом: он открывает короткую форму (имя, возраст, телефон). Отдельно заходить на сайт не нужно.',
+    '- После заявки администратор перезванивает и рассказывает про расписание и подходящую группу.',
+    '- Цены и набор — в разделе «Курсы».',
+  ].join('\n'),
+}
+
+export function faqFromContent(bot, festival) {
+  const problems = []
+  const sections = []
+  const seen = new Set()
+  ;(bot.sections || []).forEach((s, i) => {
+    const title = String(s.title || '').trim()
+    const body = String(s.text || '').trim()
+    if (!title || !body) { problems.push(`раздел №${i + 1}: нужны и заголовок, и текст`); return }
+    if (body.length > MAX_SECTION_CHARS) problems.push(`раздел «${title}» разросся до ${body.length} знаков (предел ${MAX_SECTION_CHARS}) — разделите на два`)
+    // sections added in the admin come without an id; the position gives one
+    let id = /^[a-z0-9_-]+$/.test(s.id || '') ? s.id : 'section' + (i + 1)
+    while (seen.has(id)) id += '_'
+    seen.add(id)
+    sections.push({ id, always: false, title, body })
+  })
+  sections.push(SIGNUP_SECTION)
+  const fest = festivalSection(festival)
+  if (fest) sections.push(fest)
+  const unconfirmed = (bot.unconfirmed || []).map((x) => String(x).trim()).filter(Boolean)
+  // the festival's programme is a fact only once the theatre has published it
+  if (festival && !(festival.program || []).length) unconfirmed.push('программа фестиваля по дням')
+  sections.push({
+    id: 'limits',
+    always: true,
+    title: 'Этого театр пока не подтвердил: бот НЕ отвечает сам, а говорит, что уточнит администратор',
+    body: unconfirmed.map((x) => '- ' + x).join('\n') || '- (всё подтверждено)',
+  })
+  if (problems.length) throw new Error('src/content/bot.json («Ответы бота» в админке):\n  - ' + problems.join('\n  - '))
   return sections
 }
 
-function parseFaqSections(md) {
-  return md.split(/^## \[/m).slice(1).map((part) => {
-    const nl = part.indexOf('\n')
-    const head = nl === -1 ? part : part.slice(0, nl)
-    const close = head.indexOf(']')
-    const raw = head.slice(0, close).trim()
-    return {
-      id: raw.replace(/^!/, ''),
-      always: raw.startsWith('!'),
-      title: head.slice(close + 1).trim(),
-      body: (nl === -1 ? '' : part.slice(nl + 1)).trim(),
-    }
-  })
+// The festival page's own text, so the bot says what the page says. Dates and
+// whether applications are open come from the festival's direction.
+function festivalSection(f) {
+  if (!f) return null
+  const lines = []
+  for (const p of f.intro || []) if (String(p).trim()) lines.push('- ' + String(p).trim())
+  for (const d of f.program || []) lines.push('- Программа, ' + d.day + ': ' + (d.items || []).join('; '))
+  for (const q of f.faq || []) if (q.q && q.a) lines.push('- ' + q.q + ' — ' + q.a)
+  lines.push('- Всё о фестивале — на странице «Фестиваль» на сайте. Заявку коллектива можно подать там или прямо в чате.')
+  return { id: 'festival', always: false, title: 'Фестиваль «Действующие лица»', body: lines.join('\n') }
 }
