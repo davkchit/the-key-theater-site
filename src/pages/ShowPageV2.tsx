@@ -16,11 +16,12 @@ import { TICKETS_URL, longDate, shortDate, showPath } from '../components/home2/
 import { Reveal } from '../components/ui/Reveal'
 import home from '../content/home.json'
 import { mediaUrl } from '../lib/mediaUrl'
+import { PLACE } from '../data/contacts'
+import { ReviewBand } from '../components/reviews/Review'
 
 // One show: what it is, when it plays, and a ticket button on every date.
 // Filled from the admin; blocks without data (photos, cast) simply stay away.
 
-const PLACE = 'Молодёжный центр «НУР», второй вход'
 const CAST_BLOCKS = ['bg-brand-red', 'bg-brand-yellow', 'bg-brand-blue', 'bg-ink']
 
 function heroPhotoFor(title: string, fallback: string) {
@@ -288,6 +289,8 @@ export default function ShowPageV2() {
           </div>
         </section>
       )}
+
+      <ReviewBand />
 
       <div
         aria-hidden="true"

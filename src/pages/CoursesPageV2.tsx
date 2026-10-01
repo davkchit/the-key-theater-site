@@ -19,7 +19,7 @@ import {
   type Tone,
 } from '../components/home2/parts'
 import { GRAIN_URL, Torn } from '../components/home2/paper'
-import { galleryPhoto, teamPhoto } from '../components/home2/homeData'
+import { galleryPhoto } from '../components/home2/homeData'
 import { Modal } from '../components/ui/Modal'
 import { Reveal } from '../components/ui/Reveal'
 import { scrollToId } from '../lib/scrollToId'
@@ -29,6 +29,7 @@ import { DirectionForm } from '../components/directions/DirectionForm'
 import boyFence from '../../assets/el-boy-fence.svg'
 import starSvg from '../../assets/el-star.svg'
 import { HOURS, PHONE, telHref } from '../data/contacts'
+import { teachers } from '../data/people'
 
 // «Курсы»: the four groups, how lessons go, what else one can sign up for,
 // the teachers and a short form. Every signup lands where the bot's do.
@@ -59,32 +60,8 @@ const STEPS = [
   ],
 ]
 
-const TEACHERS = [
-  {
-    name: 'Софья Дивногорская',
-    role: 'художественный руководитель, режиссёр, педагог',
-    file: 'sofya-divnogorskaya.jpg',
-    focus: '51% 48%',
-    zoom: 1.25,
-    block: 'bg-brand-red',
-  },
-  {
-    name: 'Марина Степанова',
-    role: 'режиссёр-педагог',
-    file: 'marina-stepanova.jpg',
-    focus: '50% 26%',
-    zoom: 1.35,
-    block: 'bg-brand-yellow',
-  },
-  {
-    name: 'Иван Поляков',
-    role: 'актёр, педагог',
-    file: 'ivan-polyakov.jpg',
-    focus: '45% 40%',
-    zoom: 1.15,
-    block: 'bg-brand-blue',
-  },
-]
+// picked in the admin's team list (src/data/people.ts)
+const TEACHERS = teachers
 
 /* ─────────────── short form at the bottom ─────────────── */
 
@@ -416,7 +393,7 @@ export default function CoursesPageV2() {
           {TEACHERS.map((t, i) => (
             <Reveal key={t.name} index={i}>
               <Portrait
-                src={teamPhoto(t.file)}
+                src={t.src}
                 alt={t.name}
                 focus={t.focus}
                 zoom={t.zoom}

@@ -10,6 +10,16 @@ cd /opt/kluch/src
 # saves come in bursts (a text and its photo): let them settle
 sleep 3
 
+# phone photos from the admin are shrunk in place, and the smaller files are
+# saved as a commit, so the repository and the site both stay light. A failed
+# commit (the admin saving at that very moment) is not fatal: the next
+# rebuild tries again, and the site is built from the shrunk files anyway.
+shrunk=$(node deploy/cms/shrink-uploads.mjs)
+if [ -n "$shrunk" ]; then
+  echo "$shrunk"
+  git add public/uploads && git commit -q -m "Фото уменьшены для сайта" || echo "не закоммитил уменьшенные фото, попробую в следующий раз"
+fi
+
 while :; do
   head=$(git rev-parse HEAD)
   rm -rf dist

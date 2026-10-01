@@ -21,13 +21,15 @@ import {
   type Tone,
 } from './parts'
 import { Grain, Torn } from './paper'
-import { upcomingCards, shortDate, galleryPhoto, teamPhoto, showPath } from './homeData'
+import { upcomingCards, shortDate, galleryPhoto, showPath } from './homeData'
 import boyFence from '../../../assets/el-boy-fence.svg'
 import starSvg from '../../../assets/el-star.svg'
 import ladderSvg from '../../../assets/el-ladder.svg'
 import faceSvg from '../../../assets/el-face.svg'
 import flowerSvg from '../../../assets/el-flower.svg'
 import chairSvg from '../../../assets/el-chair.svg'
+import { CITY, VENUE } from '../../data/contacts'
+import { homePeople } from '../../data/people'
 
 const courses = coursesContent.items as Course[]
 
@@ -305,7 +307,7 @@ export function NumbersBand() {
             <br />в цифрах
           </h2>
           <p className="mt-5 max-w-md text-[16px] opacity-85 md:text-[18px]">
-            Молодёжный центр «НУР», Набережные Челны. Здесь «Ключ» живёт, репетирует и играет.
+            {VENUE}, {CITY}. Здесь «Ключ» живёт, репетирует и играет.
           </p>
         </div>
         <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 md:flex md:justify-between md:gap-0">
@@ -333,41 +335,8 @@ export function NumbersBand() {
 
 /* ─────────────── people ─────────────── */
 
-// The team's photos are holiday snaps, so each one gets its own crop on the face.
-const PEOPLE = [
-  {
-    name: 'Софья Дивногорская',
-    role: 'художественный руководитель, педагог',
-    file: 'sofya-divnogorskaya.jpg',
-    focus: '51% 48%',
-    zoom: 1.25,
-    block: 'bg-brand-red',
-  },
-  {
-    name: 'Марина Степанова',
-    role: 'режиссёр-педагог',
-    file: 'marina-stepanova.jpg',
-    focus: '50% 26%',
-    zoom: 1.35,
-    block: 'bg-brand-yellow',
-  },
-  {
-    name: 'Иван Поляков',
-    role: 'актёр, технический директор',
-    file: 'ivan-polyakov.jpg',
-    focus: '45% 40%',
-    zoom: 1.15,
-    block: 'bg-brand-blue',
-  },
-  {
-    name: 'Галина Герасимова',
-    role: 'главный администратор',
-    file: 'galina-gerasimova.jpg',
-    focus: '52% 44%',
-    zoom: 1.7,
-    block: 'bg-ink',
-  },
-]
+// Who is shown and their crops come from the admin's team list (src/data/people.ts).
+const PEOPLE = homePeople
 
 export function PeopleSection() {
   // /#/?p=duo shows the yellow two-tone version, to compare with colour
@@ -383,7 +352,7 @@ export function PeopleSection() {
           {lead && (
             <Reveal className="col-span-2 md:col-span-1">
               <Portrait
-                src={teamPhoto(lead.file)}
+                src={lead.src}
                 alt={lead.name}
                 focus={lead.focus}
                 zoom={lead.zoom}
@@ -404,7 +373,7 @@ export function PeopleSection() {
               className={`md:pt-10 ${n === 2 ? 'col-span-2 mx-auto w-[calc(50%-10px)] md:col-span-1 md:mx-0 md:w-auto' : ''}`}
             >
               <Portrait
-                src={teamPhoto(p.file)}
+                src={p.src}
                 alt={p.name}
                 focus={p.focus}
                 zoom={p.zoom}

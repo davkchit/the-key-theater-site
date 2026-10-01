@@ -29,6 +29,10 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
     ...(s.dur ? { dur: s.dur } : {}),
     ...(s.synopsis ? { synopsis: s.synopsis } : {}),
     ...(s.ticketUrl ? { ticketUrl: s.ticketUrl } : {}),
+    // «В ролях» from the admin: names, and the part when the theatre gave it
+    ...(Array.isArray(s.cast) && s.cast.some((c) => c && c.name)
+      ? { cast: s.cast.filter((c) => c && c.name).map((c) => c.name + (c.role ? ' (' + c.role + ')' : '')) }
+      : {}),
   }))
 
   const courses = read('src/content/courses.json').items.map((c) => ({
@@ -73,7 +77,10 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
   // «Настройки сайта»: the same phone the site shows, so the bot's own phrases
   // ("позвоните …") change with it instead of keeping a number typed into code
   const contact = contactFrom(settings)
-  faq.unshift({ id: 'phones', always: false, title: 'Телефон и почта', body: contactLines(contact) })
+  faq.unshift({ id: 'phones', always: false, title: 'Адрес, контакты и где купить билеты', body: contactLines(contact) })
+  // The team, awards and past productions pages, so "кто у вас играет?" gets
+  // the same answer the site gives. Optional files, like the directions.
+  faq.push(...peopleSections(repoRoot, read))
 
   const base = { builtAt: new Date().toISOString(), afisha, shows, courses, faq, directions, contact, ...(ticketsUrl ? { ticketsUrl } : {}), source: 'site' }
   // The site is the source of truth: the theatre edits it in the admin and the
@@ -86,6 +93,34 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
   return base
 }
 
+function peopleSections(repoRoot, read) {
+  const has = (p) => fs.existsSync(path.join(repoRoot, p))
+  const out = []
+  const team = has('src/content/team.json') ? (read('src/content/team.json').members || []).filter((m) => m && m.name) : []
+  if (team.length) {
+    out.push({
+      id: 'team',
+      always: false,
+      // who plays whom and who teaches which group are not on the site
+      title: 'Команда театра (кто в каком спектакле играет и кто какую группу ведёт, здесь не сказано — не выдумывай, это уточнит администратор)',
+      body: team.map((m) => '- ' + m.name + (m.role ? ' — ' + m.role : '')).join('\n'),
+    })
+  }
+  const awards = has('src/content/awards.json') ? (read('src/content/awards.json').items || []).filter(Boolean) : []
+  if (awards.length) out.push({ id: 'awards', always: false, title: 'Награды и звания', body: awards.map((a) => '- ' + a).join('\n') })
+  const past = has('src/content/productions.json') ? (read('src/content/productions.json').items || []).filter((p) => p && p.title) : []
+  if (past.length) {
+    out.push({
+      id: 'history',
+      always: false,
+      // it lists current shows too, by the year of their premiere
+      title: 'Все постановки театра с 2003 года, по году премьеры (что идёт сейчас и на что есть билеты — только «Спектакли в репертуаре»)',
+      body: past.map((p) => (p.year ? p.year + ': ' : '') + '«' + p.title + '»').join('; '),
+    })
+  }
+  return out
+}
+
 // The build fails on a missing phone rather than ship a bot that tells people
 // to call "undefined".
 export function contactFrom(settings) {
@@ -93,14 +128,25 @@ export function contactFrom(settings) {
   const hours = String(settings.hours || '').trim()
   const email = String(settings.email || '').trim()
   if (!phone || !hours || !email) throw new Error('src/content/settings.json («Настройки сайта» в админке): нужны телефон, часы звонков и почта')
-  const phone2 = String(settings.phone2 || '').trim()
-  return { phone, ...(phone2 ? { phone2 } : {}), hours, email }
+  const address = String(settings.address || '').trim()
+  const venue = String(settings.venue || '').trim()
+  if (!address || !venue) throw new Error('src/content/settings.json («Настройки сайта» в админке): нужны адрес и площадка')
+  const opt = {}
+  for (const k of ['phone2', 'entrance', 'vk', 'telegram', 'ticketsWhere']) {
+    const v = String(settings[k] || '').trim()
+    if (v) opt[k] = v
+  }
+  return { phone, hours, email, address, venue, ...opt }
 }
 
 function contactLines(c) {
   return [
+    '- Адрес: ' + c.address + ', ' + c.venue + (c.entrance ? ', ' + c.entrance : '') + '.',
     '- Телефоны: ' + c.phone + (c.phone2 ? ' и ' + c.phone2 : '') + '. Звонить: ' + c.hours + '.',
     '- Почта: ' + c.email,
+    ...(c.vk ? ['- ВКонтакте: ' + c.vk] : []),
+    ...(c.telegram ? ['- Telegram: ' + c.telegram] : []),
+    ...(c.ticketsWhere ? ['- Билеты продаются ' + c.ticketsWhere + '.'] : []),
   ].join('\n')
 }
 

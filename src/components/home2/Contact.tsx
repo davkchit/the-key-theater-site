@@ -8,7 +8,7 @@ import { directionByType } from '../../data/directions'
 import { SwallowIcon } from '../ui/SwallowIcon'
 import { BTN, H2, RoughFrame, SectionHead, WRAP } from './parts'
 import { Torn } from './paper'
-import { EMAIL, HOURS, PHONE, PHONE2, telHref } from '../../data/contacts'
+import { ADDRESS, EMAIL, HOURS, PHONE, PHONE2, PLACE, telHref } from '../../data/contacts'
 
 /* ─────────────── newsletter ─────────────── */
 
@@ -131,7 +131,6 @@ export function NewsletterBand() {
 
 /* ─────────────── how to find us ─────────────── */
 
-const ADDRESS = 'Набережные Челны, Новый город, 1/02'
 // the theatre's own card on Yandex Maps ("Ключ", 1-й комплекс, 2): searching the
 // address finds only the district
 const MAP_QUERY = encodeURIComponent('Набережные Челны, театр Ключ')
@@ -166,7 +165,7 @@ export function FindUs() {
             <RoughFrame>
               <img
                 src={ENTRANCE_PHOTO}
-                alt="Вход в молодёжный центр «НУР»"
+                alt={'Вход: ' + PLACE}
                 className="aspect-[1/1] w-full object-cover"
               />
             </RoughFrame>
@@ -177,7 +176,7 @@ export function FindUs() {
           <div className="grid gap-8 md:grid-cols-[1fr_auto]">
             <div className="md:col-span-2">
               <p className="text-[17px]">{ADDRESS}</p>
-              <p className="mt-2 text-[17px] font-semibold">Молодёжный центр «НУР», второй вход</p>
+              <p className="mt-2 text-[17px] font-semibold">{PLACE}</p>
               <div className="border-ink/60 mt-6 border-t" />
             </div>
             <div>

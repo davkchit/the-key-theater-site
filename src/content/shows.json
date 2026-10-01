@@ -70,27 +70,6 @@
       "dur": "1 ч 20 мин",
       "photo": "/uploads/shows/photo-1.jpg",
       "bg": "yellow"
-    },
-    {
-      "photos": [
-        "/uploads/img_5286.jpg"
-      ],
-      "dur": "4242",
-      "genre": "2342",
-      "bg": "yellow",
-      "dir": "424",
-      "photo": "/uploads/img_5283.jpg",
-      "based": "4224",
-      "synopsis": "424",
-      "title": "k.,dsfa",
-      "age": "16",
-      "cast": [
-        {
-          "name": "K.,jq",
-          "role": "yhdsad",
-          "photo": "/uploads/img_5286.jpg"
-        }
-      ]
     }
   ]
 }

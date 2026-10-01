@@ -8,7 +8,8 @@ import { GRAIN_URL, Torn } from '../components/home2/paper'
 import { TICKETS_URL, heroShows, longDate, showPath } from '../components/home2/homeData'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import starSvg from '../../assets/el-star.svg'
-import { PHONE, telHref } from '../data/contacts'
+import { PHONE, PLACE, TICKETS_WHERE, telHref } from '../data/contacts'
+import { ReviewBand } from '../components/reviews/Review'
 
 // «Афиша» from the approved mockup, in two versions the visitor can switch
 // between: «тёмный зал» (the schedule on a black band, like an auditorium
@@ -46,6 +47,12 @@ const byTitle = (t: string) => shows.find((s) => s.title.toLowerCase() === t.toL
 const months = [...new Set(upcomingAfisha.map((i) => i.mon))]
 // the nearest show that has a proper photo picked for the homepage
 const featured = heroShows[0]
+
+// A theatre season runs September to August: "2026 / 2027" until next summer.
+function season(now = new Date()) {
+  const from = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1
+  return `${from} / ${from + 1}`
+}
 
 function readTheme(): Theme {
   try {
@@ -283,7 +290,7 @@ export default function AfishaPageV2() {
               Афиша
             </h1>
             <p className="mt-4 text-[17px] md:text-[19px]">
-              Сезон 2026 / 2027 · Молодёжный центр «НУР», второй вход
+              Сезон {season()} · {PLACE}
             </p>
           </div>
           <ThemeSwitch theme={theme} onChange={setTheme} />
@@ -299,13 +306,15 @@ export default function AfishaPageV2() {
         <section className={`${WRAP} pb-16`}>{schedule}</section>
       )}
 
+      <ReviewBand red />
+
       <section className="bg-brand-yellow relative">
         <Torn color="text-brand-yellow" seed={291} />
         <div
           className={`${WRAP} flex flex-col gap-3 py-8 md:flex-row md:items-center md:justify-between md:py-10`}
         >
           <p className="text-[16px] md:text-[18px]">
-            Даты и составы могут меняться. Билеты — на Билетоне, Яндекс Афише и в кассе театра.
+            Даты и составы могут меняться. Билеты — {TICKETS_WHERE}.
           </p>
           <div className="flex items-center gap-6">
             <a

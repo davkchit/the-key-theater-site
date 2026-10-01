@@ -5,91 +5,128 @@
       "role": "Художественный руководитель и педагог театра «Ключ», директор фестиваля «Действующие лица»",
       "photo": "/uploads/team/sofya-divnogorskaya.jpg",
       "bg": "red",
-      "lead": true
-    },
-    {
-      "name": "Иван Поляков",
-      "role": "Технический директор, актёр театра",
-      "photo": "/uploads/team/ivan-polyakov.jpg",
-      "bg": "blue"
-    },
-    {
-      "name": "Галина Герасимова",
-      "role": "Главный администратор театра «Ключ»",
-      "photo": "/uploads/team/galina-gerasimova.jpg",
-      "bg": "yellow"
-    },
-    {
-      "name": "Артур Батаев",
-      "role": "Актёр театра",
-      "photo": "/uploads/team/artur-bataev.jpg",
-      "bg": "ink"
-    },
-    {
-      "name": "Йолдыз Хангараева",
-      "role": "Актриса театра",
-      "photo": "/uploads/team/yoldyz-hangaraeva.jpg",
-      "bg": "blue"
-    },
-    {
-      "name": "Татьяна Низамова",
-      "role": "Актриса театра",
-      "photo": "/uploads/team/tatyana-nizamova.jpg",
-      "bg": "red"
-    },
-    {
-      "name": "Римма Якупова",
-      "role": "Актриса театра",
-      "photo": "/uploads/team/rimma-yakupova.jpg",
-      "bg": "yellow"
-    },
-    {
-      "name": "Светлана Круглая",
-      "role": "Актриса театра",
-      "photo": "/uploads/team/svetlana-kruglaya.jpg",
-      "bg": "ink"
-    },
-    {
-      "name": "Лиля Равилова",
-      "role": "Актриса театра",
-      "photo": "/uploads/team/lilya-ravilova.jpg",
-      "bg": "blue"
-    },
-    {
-      "name": "Эля Шарова",
-      "role": "Актриса театра",
-      "photo": "/uploads/team/elya-sharova.jpg",
-      "bg": "red"
-    },
-    {
-      "name": "Светочка Малова",
-      "role": "Актриса театра",
-      "photo": "/uploads/team/svetochka-malova.jpg",
-      "bg": "yellow"
-    },
-    {
-      "name": "Марат Минхаеров",
-      "role": "Актёр театра",
-      "photo": "/uploads/team/marat-minhaerov.jpg",
-      "bg": "blue"
-    },
-    {
-      "name": "Даниил Зимуков",
-      "role": "Актёр театра",
-      "photo": "/uploads/team/daniil-zimukov.jpg",
-      "bg": "red"
+      "lead": true,
+      "focus": "51% 48%",
+      "zoom": 1.25,
+      "homeCaption": "художественный руководитель, педагог",
+      "teacherCaption": "художественный руководитель, режиссёр, педагог"
     },
     {
       "name": "Марина Степанова",
       "role": "Режиссёр-педагог",
       "photo": "/uploads/team/marina-stepanova.jpg",
-      "bg": "yellow"
+      "bg": "yellow",
+      "focus": "50% 26%",
+      "zoom": 1.35,
+      "homeCaption": "режиссёр-педагог",
+      "teacherCaption": "режиссёр-педагог"
+    },
+    {
+      "name": "Иван Поляков",
+      "role": "Технический директор, актёр театра",
+      "photo": "/uploads/team/ivan-polyakov.jpg",
+      "bg": "blue",
+      "focus": "45% 40%",
+      "zoom": 1.15,
+      "homeCaption": "актёр, технический директор",
+      "teacherCaption": "актёр, педагог"
+    },
+    {
+      "name": "Галина Герасимова",
+      "role": "Главный администратор театра «Ключ»",
+      "photo": "/uploads/team/galina-gerasimova.jpg",
+      "bg": "yellow",
+      "focus": "52% 44%",
+      "zoom": 1.7,
+      "homeCaption": "главный администратор"
+    },
+    {
+      "name": "Артур Батаев",
+      "role": "Актёр театра",
+      "photo": "/uploads/team/artur-bataev.jpg",
+      "bg": "ink",
+      "focus": "22% 18%",
+      "zoom": 1.5
+    },
+    {
+      "name": "Йолдыз Хангараева",
+      "role": "Актриса театра",
+      "photo": "/uploads/team/yoldyz-hangaraeva.jpg",
+      "bg": "blue",
+      "focus": "45% 35%",
+      "zoom": 1.6
+    },
+    {
+      "name": "Татьяна Низамова",
+      "role": "Актриса театра",
+      "photo": "/uploads/team/tatyana-nizamova.jpg",
+      "bg": "red",
+      "focus": "50% 30%",
+      "zoom": 1.1
+    },
+    {
+      "name": "Римма Якупова",
+      "role": "Актриса театра",
+      "photo": "/uploads/team/rimma-yakupova.jpg",
+      "bg": "yellow",
+      "focus": "55% 24%",
+      "zoom": 1.9
+    },
+    {
+      "name": "Светлана Круглая",
+      "role": "Актриса театра",
+      "photo": "/uploads/team/svetlana-kruglaya.jpg",
+      "bg": "ink",
+      "focus": "45% 45%",
+      "zoom": 1.6
+    },
+    {
+      "name": "Лиля Равилова",
+      "role": "Актриса театра",
+      "photo": "/uploads/team/lilya-ravilova.jpg",
+      "bg": "blue",
+      "focus": "45% 35%",
+      "zoom": 1.6
+    },
+    {
+      "name": "Эля Шарова",
+      "role": "Актриса театра",
+      "photo": "/uploads/team/elya-sharova.jpg",
+      "bg": "red",
+      "focus": "65% 40%",
+      "zoom": 1.2
+    },
+    {
+      "name": "Светочка Малова",
+      "role": "Актриса театра",
+      "photo": "/uploads/team/svetochka-malova.jpg",
+      "bg": "yellow",
+      "focus": "58% 68%",
+      "zoom": 2.2
+    },
+    {
+      "name": "Марат Минхаеров",
+      "role": "Актёр театра",
+      "photo": "/uploads/team/marat-minhaerov.jpg",
+      "bg": "blue",
+      "focus": "70% 92%",
+      "zoom": 2.4
+    },
+    {
+      "name": "Даниил Зимуков",
+      "role": "Актёр театра",
+      "photo": "/uploads/team/daniil-zimukov.jpg",
+      "bg": "red",
+      "focus": "45% 25%",
+      "zoom": 1.3
     },
     {
       "name": "Лиля Тутлыкова",
       "role": "SMM-менеджер",
       "photo": "/uploads/team/lilya-tutlykova.jpg",
-      "bg": "ink"
+      "bg": "ink",
+      "focus": "50% 40%",
+      "zoom": 1.3
     }
   ]
 }

@@ -5,18 +5,13 @@ import { MobileMenu } from '../layout/MobileMenu'
 import { WRAP } from './parts'
 import { HeaderEdge } from './paper'
 import logoWordmark from '../../../assets/logo-wordmark.png'
+import { navItems } from '../../data/nav'
 
 // Menu of the approved mockup: wordmark, six sections, red "Купить билет",
 // the full width of the screen, with a torn bottom edge over the first screen.
 
-const ITEMS = [
-  { label: 'Афиша', to: '/afisha' },
-  { label: 'Спектакли', to: '/repertuar' },
-  { label: 'Курсы', to: '/kursy' },
-  { label: 'Фестиваль', to: '/festival' },
-  { label: 'О театре', to: '/o-teatre' },
-  { label: 'Контакты', to: '/kontakty' },
-]
+// the same list as the mobile menu (src/data/nav.ts)
+const ITEMS = navItems
 
 export function HeaderV2() {
   const [menuOpen, setMenuOpen] = useState(false)

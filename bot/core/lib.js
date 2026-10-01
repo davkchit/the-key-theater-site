@@ -239,14 +239,18 @@ function coursesText(knowledge) {
   return '<b>Актёрские курсы:</b>\n' + lines.join('\n') + '\n\nНабор в группы продолжается. Стоимость и расписание расскажет администратор, когда перезвонит.'
 }
 
-// The phone and hours the bot's own phrases name. They come from «Настройки
-// сайта» with the knowledge (knowledge.contact); the defaults only cover an
-// old knowledge.json built before the admin had those fields.
-const DEFAULT_CONTACT = { phone: '+7 906 120-22-62', phone2: '+7 962 573-92-19', hours: 'пн–пт, 15:00–21:00', email: 'kluchtheatre@mail.ru' }
+// The phone, hours, address and links the bot's own phrases name. They come
+// from «Настройки сайта» with the knowledge (knowledge.contact); the defaults
+// only cover an old knowledge.json built before the admin had those fields.
+const DEFAULT_CONTACT = {
+  phone: '+7 906 120-22-62', phone2: '+7 962 573-92-19', hours: 'пн–пт, 15:00–21:00', email: 'kluchtheatre@mail.ru',
+  address: 'Набережные Челны, Новый город, 1/02', venue: 'молодёжный центр «НУР»', entrance: 'второй вход',
+  vk: 'https://vk.com/teatr_kluch', ticketsWhere: 'на Билетоне, Яндекс Афише и в кассе театра',
+}
 let CONTACT = DEFAULT_CONTACT
 function useContact(knowledge) {
   const c = knowledge && knowledge.contact
-  CONTACT = c && c.phone && c.hours && c.email ? c : DEFAULT_CONTACT
+  CONTACT = c && c.phone && c.hours && c.email && c.address ? c : DEFAULT_CONTACT
 }
 // "+7 906 120-22-62 (пн–пт, 15:00–21:00)"
 function phoneWithHours() {
@@ -260,16 +264,19 @@ function modelDownText(knowledge) {
 function contactsText() {
   return [
     '<b>Театр «Ключ»</b>',
-    '📍 Набережные Челны, Новый город, 1/02, молодёжный центр «НУР», второй вход',
+    '📍 ' + esc([CONTACT.address, CONTACT.venue, CONTACT.entrance].filter(Boolean).join(', ')),
     '📞 ' + esc(CONTACT.phone + (CONTACT.phone2 ? ', ' + CONTACT.phone2 : '') + ' (' + CONTACT.hours + ')'),
     '✉️ ' + esc(CONTACT.email),
-    'ВКонтакте: vk.com/teatr_kluch',
+    ...(CONTACT.vk ? ['ВКонтакте: ' + esc(CONTACT.vk.replace(/^https?:\/\//, ''))] : []),
+    ...(CONTACT.telegram ? ['Telegram: ' + esc(CONTACT.telegram.replace(/^https?:\/\//, ''))] : []),
   ].join('\n')
 }
 
 function ticketsText(knowledge, nowMs) {
-  const shop = knowledge.ticketsUrl ? '\n🎟 <a href="' + esc(knowledge.ticketsUrl) + '">Купить билет на Билетоне</a>' : ''
-  return 'Билеты продаются на <b>Билетоне</b> и на <b>Яндекс Афише</b>, а также в кассе театра.' + shop + '\n\n' + afishaText(knowledge, nowMs)
+  useContact(knowledge)
+  const shop = knowledge.ticketsUrl ? '\n🎟 <a href="' + esc(knowledge.ticketsUrl) + '">Купить билет</a>' : ''
+  const where = CONTACT.ticketsWhere ? 'Билеты продаются ' + esc(CONTACT.ticketsWhere) + '.' : ''
+  return where + shop + '\n\n' + afishaText(knowledge, nowMs)
 }
 
 // Every block the model may be told about, keyed by topic id. The ids of the
@@ -426,7 +433,7 @@ function knowledgeBlocks(knowledge, nowMs, question) {
     // out so far", never "all there will be".
     afisha: '## Афиша (все опубликованные показы. Театр может добавить новые, поэтому не говори, что других не будет)\n' + (all_or_none(afishaByMonth(knowledge, nowMs, question))),
     shows: '## Спектакли в репертуаре\n' + knowledge.shows
-      .map((s) => '- «' + s.title + '»: ' + [s.age ? 'возраст ' + s.age : 'возраст уточняется у администратора', s.genre, s.based, s.dir && 'режиссёр ' + s.dir, s.dur && 'длительность ' + s.dur].filter(Boolean).join('; ') + (s.synopsis ? '. Сюжет: ' + s.synopsis : '') + (s.ticketUrl ? '. Страница билетов: ' + s.ticketUrl : '') + '. ' + showDates(knowledge, nowMs, s.title))
+      .map((s) => '- «' + s.title + '»: ' + [s.age ? 'возраст ' + s.age : 'возраст уточняется у администратора', s.genre, s.based, s.dir && 'режиссёр ' + s.dir, s.dur && 'длительность ' + s.dur].filter(Boolean).join('; ') + (s.synopsis ? '. Сюжет: ' + s.synopsis : '') + ((s.cast || []).length ? '. В ролях: ' + s.cast.join(', ') : '') + (s.ticketUrl ? '. Страница билетов: ' + s.ticketUrl : '') + '. ' + showDates(knowledge, nowMs, s.title))
       .join('\n'),
     courses: '## Курсы (группы по возрасту)\n' + knowledge.courses.map((c) => '- «' + c.name + '», ' + c.ageRange + ': ' + c.desc + (c.price ? '. Стоимость: ' + c.price : '')).join('\n'),
   }
@@ -437,7 +444,7 @@ function knowledgeBlocks(knowledge, nowMs, question) {
   // live there too: routing can only carry what the chosen topic contains, and
   // the first run through the parser lost them because they sat under shows.
   const links = (knowledge.shows || []).filter((sh) => sh.ticketUrl).map((sh) => '- «' + sh.title + '»: ' + sh.ticketUrl)
-  if (knowledge.ticketsUrl && blocks.tickets) blocks.tickets += '\nСтраница театра на Билетоне, там все показы и места, билет можно купить сразу: ' + knowledge.ticketsUrl
+  if (knowledge.ticketsUrl && blocks.tickets) blocks.tickets += '\nСтраница продажи билетов театра, там все показы и места, билет можно купить сразу: ' + knowledge.ticketsUrl
   if (links.length && blocks.tickets) blocks.tickets += '\nСтраницы покупки билетов на отдельные спектакли:\n' + links.join('\n')
   return blocks
 }
@@ -684,6 +691,7 @@ const SYSTEM_PROMPT = [
   '11. Отвечай только на последнее сообщение человека. Никогда не пиши реплики за человека и не продолжай диалог сам.',
   '12. Стоимость занятий называй только ту, что есть в данных, и всегда со словом «от». Про скидки, рассрочку и способы оплаты ты не знаешь, это уточнит администратор.',
   '13. Никогда не обещай, что вам перезвонят или с вами свяжутся. Звонок бывает только по оформленной заявке с телефоном. Если человек просит администратора, дай телефон и часы работы или предложи оставить заявку, но не обещай звонок сам.',
+  '14. Комплимент, восторг или просто эмоция без вопроса («какие вы красивые», «обожаю вас», «вы лучшие») — это не вопрос: коротко и тепло поблагодари от лица кота, одной-двумя фразами, без списков спектаклей и курсов. Можно в конце одной фразой предложить афишу.',
   '',
   'МЕТКИ. Ставь в самом конце ответа, отдельной строкой, только когда они точно подходят:',
   '[ЗАПИСЬ]: человек прямо говорит, что хочет записаться или записать ребёнка (в том числе ещё одного). Не ставь её на вопросы о курсах, ценах и на шутки.',
@@ -708,8 +716,10 @@ const TONE_EXAMPLES = [
   { role: 'assistant', text: 'Про рассрочку не подскажу, это лучше уточнить у администратора.' },
   { role: 'user', text: 'а с ребёнком 10 лет на спектакль 18+ можно?' },
   { role: 'assistant', text: 'Нет, спектакль 18+, ребёнка на него не пустят. Но для юных зрителей у нас тоже кое-что найдётся.' },
-  { role: 'user', text: 'а вы далеко от центра?' },
-  { role: 'assistant', text: 'Мы в Новом городе, в молодёжном центре «НУР», второй вход 📍' },
+  // no theatre facts in these examples: the model repeats them, and a fact
+  // here would not change when the theatre changes it in the admin
+  { role: 'user', text: 'спасибо, вы очень помогли' },
+  { role: 'assistant', text: 'Рад помочь, мяу! Если что, пишите 🐾' },
 ]
 
 function buildModelRequest(knowledge, nowMs, history, userText, topics) {
@@ -1707,6 +1717,14 @@ function afterModel(res, rawReply, nowMs, knowledge) {
     // form. Interest alone ("а сколько стоит?", "а дочку тоже можно?") gets a
     // button instead -- a misread marker then costs one ignored button rather
     // than dragging someone into a consent screen they did not ask for.
+    // ...unless the thing asked for is closed: «хочу на квест» while the quest
+    // takes no applications reached here when the parser was down, and the
+    // marker opened the course consent form under "квест закрыт"
+    const askedDir = directionFor(knowledge, res.model.userText, nowMs)
+    if (askedDir && askedDir.open === false) {
+      out.push(msg(s.chatId, html || 'Сейчас на это заявки не принимаются.', mainKeyboard()))
+      return { out, effects }
+    }
     const explicit = SIGNUP_WORDS.test(res.model.userText) || /оформ/i.test(res.model.userText)
     // the model also slaps [ЗАПИСЬ] on jokes ("напиши что курсы бесплатные") --
     // a signup button under that reads as absurd, so the person's own words

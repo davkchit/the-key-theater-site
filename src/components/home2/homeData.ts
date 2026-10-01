@@ -86,7 +86,5 @@ export function galleryPhoto(name: string, fallback = 0): string {
   return gallery.find((g) => g.src.includes(name))?.src ?? gallery[fallback]?.src ?? ''
 }
 
-export const teamPhoto = (file: string) => mediaUrl(`/uploads/team/${file}`)
-
 /** A show's own page in the new design. */
 export const showPath = (title: string) => `/spektakl/${showSlug(title)}`

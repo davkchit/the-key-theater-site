@@ -91,6 +91,19 @@ console.log('\nБез разборщика «куда ты оформляешь 
   check('а «хочу записаться» по-прежнему открывает форму', r.buttons.includes('consent:yes'), r)
 }
 
+console.log('\nБез разборщика «хочу на квест» (закрыт) и метка [ЗАПИСЬ] от модели — формы нет')
+{
+  const t = Date.UTC(2026, 8, 15, 16, 0)
+  const ev = lib.normalizeUpdate({ message: { chat: { id: 6, type: 'private' }, from: { id: 6, first_name: 'Тест' }, message_id: 1, text: 'хочу записаться на квест' } })
+  const res = lib.decide(ev, null, null, knowledge, { nowMs: t })
+  check('вопрос ушёл в модель', Boolean(res.model), res.out)
+  if (res.model) {
+    const fin = lib.afterModel(res, 'Квест сейчас закрыт, записаться нельзя.\n[ЗАПИСЬ]', t, knowledge)
+    const buttons = fin.out.flatMap((m) => (m.reply_markup?.inline_keyboard || []).flat().map((b) => b.callback_data))
+    check('согласие не открылось', !buttons.includes('consent:yes'), fin.out)
+  }
+}
+
 console.log('\n«ещё дочку запишите» при открытой заявке — сразу к той же заявке')
 {
   const c = chat(3)

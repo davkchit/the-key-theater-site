@@ -17,7 +17,7 @@ import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { Reveal } from '../components/ui/Reveal'
 import { scrollToId } from '../lib/scrollToId'
 import starSvg from '../../assets/el-star.svg'
-import { PHONE, telHref } from '../data/contacts'
+import { CITY, PHONE, VENUE, telHref } from '../data/contacts'
 
 // The festival «Действующие лица»: what it is, how to apply, the programme,
 // photos, questions and the application form. Text, programme, questions and
@@ -98,7 +98,7 @@ export default function FestivalPageV2() {
               </p>
             )}
             <p className="mt-2 text-[16px] md:text-[18px]">
-              Набережные Челны, молодёжный центр «НУР»
+              {VENUE}, {CITY}
             </p>
             {open ? (
               <a

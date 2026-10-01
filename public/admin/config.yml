@@ -156,6 +156,12 @@ collections:
                 widget: select
                 options: [red, yellow, blue, ink]
               - { label: Художественный руководитель (выделяется на странице), name: lead, widget: boolean, required: false, default: false }
+              - { label: О человеке, name: bio, widget: text, required: false, hint: 'Показывается, когда на сайте нажимают на карточку. Пара абзацев: что делает в театре, откуда пришёл, чем знаменит. Абзацы — с новой строки' }
+              - { label: Спектакли, name: shows, widget: list, required: false, field: { label: Спектакль, name: show, widget: string }, hint: 'Необязательно: спектакли, где человек указан в «В ролях», добавятся сами. Здесь — прошлые постановки или то, чего нет в репертуаре' }
+              - { label: Подпись на главной, name: homeCaption, widget: string, required: false, hint: 'Заполнено — человек показывается в блоке «Люди театра» на главной (первые четыре по порядку списка). Например: главный администратор' }
+              - { label: Подпись в «Педагогах» на странице курсов, name: teacherCaption, widget: string, required: false, hint: 'Заполнено — человек показывается среди педагогов. Например: режиссёр-педагог' }
+              - { label: Где лицо на фото (x% y%), name: focus, widget: string, required: false, hint: '50% 50% — центр, 50% 20% — выше. Если пусто — 50% 30%' }
+              - { label: Увеличение фото, name: zoom, widget: number, value_type: float, min: 1, max: 3, step: 0.05, required: false, hint: '1 — без увеличения, 1.5 — крупнее. Если лицо мелкое на фото' }
 
   - name: gallery
     label: Галерея
@@ -273,7 +279,7 @@ collections:
             name: sections
             widget: list
             summary: '{{fields.title}}'
-            hint: 'Бот отвечает только по тому, что здесь и в других разделах админки (афиша, спектакли, курсы, фестиваль). Цены курсов, афишу, фестиваль, телефоны и почту сюда не пишите — бот берёт их оттуда (телефоны — в «Настройках сайта»). Изменения доходят до бота минут через 10–15 после сохранения.'
+            hint: 'Бот отвечает только по тому, что здесь и в других разделах админки (афиша, спектакли, курсы, фестиваль). Цены курсов, афишу, фестиваль, команду, адрес, телефоны, почту, соцсети и где продаются билеты сюда не пишите — бот берёт их оттуда (контакты — в «Настройках сайта»). Изменения доходят до бота минут через 10–15 после сохранения.'
             fields:
               - { label: Служебная метка, name: id, widget: hidden, required: false }
               - { label: Заголовок, name: title, widget: string, hint: 'Например: Билеты, Парковка' }
@@ -297,6 +303,14 @@ collections:
           - { label: Второй телефон, name: phone2, widget: string, required: false, pattern: ['^$|^\+?[0-9 ()-]{10,20}$', 'Например: +7 962 573-92-19'] }
           - { label: Когда звонить, name: hours, widget: string, hint: 'Например: пн–пт, 15:00–21:00. Бот говорит, что администратор перезвонит в это время' }
           - { label: Почта театра, name: email, widget: string, pattern: ['^[^@ ]+@[^@ ]+[.][^@ ]+$', 'Проверьте адрес почты'] }
+          - { label: Где продаются билеты, name: ticketsWhere, widget: string, hint: 'Продолжение фразы «Билеты продаются …». Например: на Билетоне, Яндекс Афише и в кассе театра' }
+          - { label: Адрес, name: address, widget: string, hint: 'Город, район, дом. Например: Набережные Челны, Новый город, 1/02. По нему строится ссылка на карту' }
+          - { label: Где играем (площадка), name: venue, widget: string, hint: 'Например: Молодёжный центр «НУР»' }
+          - { label: Как пройти, name: entrance, widget: string, required: false, hint: 'Например: второй вход. Если пусто — не показывается' }
+          - { label: ВКонтакте (ссылка), name: vk, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Если пусто — значок не показывается' }
+          - { label: Отзывы в 2ГИС (ссылка), name: review2gis, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Страница театра в 2ГИС, вкладка «Отзывы». Если пусто — кнопки 2ГИС в блоке отзывов не будет' }
+          - { label: Отзывы в Яндекс Картах (ссылка), name: reviewYandex, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Страница театра в Яндекс Картах, вкладка «Отзывы». Если обе ссылки пустые — блок отзывов не показывается' }
+          - { label: Telegram-канал (ссылка), name: telegram, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Если пусто — значок не показывается' }
       - name: home
         label: Главная страница
         file: src/content/home.json

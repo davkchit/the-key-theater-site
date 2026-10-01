@@ -5,6 +5,7 @@ import { PageTransition } from './components/layout/PageTransition'
 import { Mascot } from './components/mascot/Mascot'
 import { HeaderV2 } from './components/home2/HeaderV2'
 import { FooterV2 } from './components/home2/FooterV2'
+import { ReviewInvite } from './components/reviews/Review'
 import bgPattern from '../assets/bg-pattern.png'
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       <PageTransition />
       {redesign ? <FooterV2 /> : <Footer />}
       <Mascot />
+      {redesign && <ReviewInvite />}
     </div>
   )
 }

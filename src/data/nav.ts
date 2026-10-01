@@ -5,7 +5,7 @@ export const navItems: NavItem[] = [
   { key: 'afisha', label: 'Афиша', to: '/afisha' },
   { key: 'shows', label: 'Спектакли', to: '/repertuar' },
   { key: 'join', label: 'Курсы', to: '/kursy' },
-  { key: 'festival', label: 'Фестиваль', to: '/festival' },
+  { key: 'team', label: 'Команда', to: '/komanda' },
   { key: 'about', label: 'О театре', to: '/o-teatre' },
   { key: 'contacts', label: 'Контакты', to: '/kontakty' },
 ]
