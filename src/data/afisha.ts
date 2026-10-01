@@ -9,6 +9,7 @@ interface RawAfishaItem {
   hall?: string
   time: string
   band: 'paper' | 'red' | 'blue'
+  ticketUrl?: string
 }
 
 const raw = afishaContent.items as RawAfishaItem[]

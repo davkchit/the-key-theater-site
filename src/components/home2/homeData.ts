@@ -54,7 +54,7 @@ for (const item of upcomingAfisha) {
     item,
     show,
     photo: show?.photo ?? '',
-    ticketUrl: show?.ticketUrl || TICKETS_URL,
+    ticketUrl: item.ticketUrl || show?.ticketUrl || TICKETS_URL,
   })
 }
 

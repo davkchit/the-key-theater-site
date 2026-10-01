@@ -100,7 +100,7 @@ function AgeRing({ age, dark }: { age?: string; dark: boolean }) {
 
 function Row({ item, dark }: { item: AfishaItem; dark: boolean }) {
   const show = byTitle(item.title)
-  const ticket = show?.ticketUrl || TICKETS_URL
+  const ticket = item.ticketUrl || show?.ticketUrl || TICKETS_URL
   const to = show ? showPath(show.title) : null
   return (
     <li

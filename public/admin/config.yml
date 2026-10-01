@@ -80,6 +80,7 @@ collections:
               - { label: Возрастная маркировка, name: age, widget: string, required: false, hint: 'Например 16+' }
               - { label: Зал, name: hall, widget: string, required: false }
               - { label: Время, name: time, widget: string, hint: 'Например 18:00' }
+              - { label: Ссылка на покупку этого сеанса, name: ticketUrl, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Страница именно этой даты на Билетоне (например https://bileton.ru/events/spektakl-simon-272476). Если пусто — кнопка «Купить» ведёт на страницу спектакля, а если нет и её — на витрину театра' }
               - label: Цвет строки
                 name: band
                 widget: select
@@ -307,6 +308,7 @@ collections:
           - { label: Адрес, name: address, widget: string, hint: 'Город, район, дом. Например: Набережные Челны, Новый город, 1/02. По нему строится ссылка на карту' }
           - { label: Где играем (площадка), name: venue, widget: string, hint: 'Например: Молодёжный центр «НУР»' }
           - { label: Как пройти, name: entrance, widget: string, required: false, hint: 'Например: второй вход. Если пусто — не показывается' }
+          - { label: Точка на карте (широта, долгота), name: mapPoint, widget: string, pattern: ['^\s*-?\d+[.]\d+\s*,\s*-?\d+[.]\d+\s*$', 'Два числа через запятую, например: 55.741678, 52.424845'], hint: 'Центр карты в «Как нас найти». Менять, только если театр переехал: в 2ГИС нажать правой кнопкой на здание и скопировать координаты. Сама карта и кнопка «Построить маршрут» берутся из ссылки на отзывы в 2ГИС' }
           - { label: ВКонтакте (ссылка), name: vk, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Если пусто — значок не показывается' }
           - { label: Отзывы в 2ГИС (ссылка), name: review2gis, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Страница театра в 2ГИС, вкладка «Отзывы». Если пусто — кнопки 2ГИС в блоке отзывов не будет' }
           - { label: Отзывы в Яндекс Картах (ссылка), name: reviewYandex, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Страница театра в Яндекс Картах, вкладка «Отзывы». Если обе ссылки пустые — блок отзывов не показывается' }

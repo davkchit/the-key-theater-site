@@ -27,6 +27,8 @@ export interface AfishaItem {
   time: string
   /** row background: 'paper' -> cream neutral card, else the brand color */
   band: 'paper' | 'red' | 'blue'
+  /** this very date on the ticket site; else the show's link, else the shop */
+  ticketUrl?: string
 }
 
 export interface Show {

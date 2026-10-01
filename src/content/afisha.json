@@ -77,7 +77,8 @@
       "title": "Симон",
       "age": "18+",
       "time": "18:00",
-      "band": "blue"
+      "band": "blue",
+      "ticketUrl": "https://bileton.ru/events/spektakl-simon-272476"
     },
     {
       "date": "2026-11-07",
@@ -110,7 +111,8 @@
       "title": "Симон",
       "age": "18+",
       "time": "18:00",
-      "band": "red"
+      "band": "red",
+      "ticketUrl": "https://bileton.ru/events/spektakl-simon-272478"
     },
     {
       "date": "2026-11-21",
@@ -149,7 +151,8 @@
       "title": "Симон",
       "age": "18+",
       "time": "18:00",
-      "band": "red"
+      "band": "red",
+      "ticketUrl": "https://bileton.ru/events/spektakl-simon-272481"
     },
     {
       "date": "2026-12-06",

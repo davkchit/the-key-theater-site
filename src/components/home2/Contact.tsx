@@ -8,7 +8,17 @@ import { directionByType } from '../../data/directions'
 import { SwallowIcon } from '../ui/SwallowIcon'
 import { BTN, H2, RoughFrame, SectionHead, WRAP } from './parts'
 import { Torn } from './paper'
-import { ADDRESS, EMAIL, HOURS, PHONE, PHONE2, PLACE, telHref } from '../../data/contacts'
+import {
+  ADDRESS,
+  MAP_EMBED,
+  MAP_LINK,
+  EMAIL,
+  HOURS,
+  PHONE,
+  PHONE2,
+  PLACE,
+  telHref,
+} from '../../data/contacts'
 
 /* ─────────────── newsletter ─────────────── */
 
@@ -131,24 +141,19 @@ export function NewsletterBand() {
 
 /* ─────────────── how to find us ─────────────── */
 
-// the theatre's own card on Yandex Maps ("Ключ", 1-й комплекс, 2): searching the
-// address finds only the district
-const MAP_QUERY = encodeURIComponent('Набережные Челны, театр Ключ')
-const MAP_SRC = `https://yandex.ru/map-widget/v1/?text=${MAP_QUERY}&z=16`
-const MAP_LINK = `https://yandex.ru/maps/?text=${MAP_QUERY}`
-
 // Photo of the entrance with the "второй вход" arrow, as in the mockup. Empty
 // until the theatre sends one; then the map moves to the right-hand column.
 const ENTRANCE_PHOTO = ''
 
 function MapFrame({ className = '' }: { className?: string }) {
+  if (!MAP_EMBED) return null
   return (
     <div className={`bg-ink/5 relative overflow-hidden ${className}`}>
       <iframe
-        src={MAP_SRC}
+        src={MAP_EMBED}
         title="Театр «Ключ» на карте"
         loading="lazy"
-        className="absolute inset-0 h-full w-full grayscale-[.4] sepia-[.15]"
+        className="absolute inset-0 h-full w-full border-0"
       />
     </div>
   )
@@ -203,16 +208,18 @@ export function FindUs() {
               >
                 {EMAIL}
               </a>
-              <div className="mt-7">
-                <a
-                  href={MAP_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${BTN} border-ink border-2`}
-                >
-                  Построить маршрут
-                </a>
-              </div>
+              {MAP_LINK && (
+                <div className="mt-7">
+                  <a
+                    href={MAP_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${BTN} border-ink border-2`}
+                  >
+                    Построить маршрут
+                  </a>
+                </div>
+              )}
             </div>
             {ENTRANCE_PHOTO && <MapFrame className="aspect-[3/4] w-full md:w-56" />}
           </div>

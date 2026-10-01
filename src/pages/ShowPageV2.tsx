@@ -53,7 +53,9 @@ export default function ShowPageV2() {
 
   const dates = upcomingAfisha.filter((a) => a.title.toLowerCase() === show.title.toLowerCase())
   const next = dates[0]
+  // a date's own link goes straight to that session; else the show's page
   const ticket = show.ticketUrl || TICKETS_URL
+  const nextTicket = next?.ticketUrl || ticket
   const hero = heroPhotoFor(show.title, show.photo)
   const others = shows
     .filter((s) => s.title !== show.title && upcomingAfisha.some((a) => a.title === s.title))
@@ -105,9 +107,9 @@ export default function ShowPageV2() {
               {show.dur && <span>{show.dur}</span>}
               {show.dir && <span>Режиссёр — {show.dir}</span>}
             </div>
-            {ticket && (
+            {nextTicket && (
               <a
-                href={ticket}
+                href={nextTicket}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${BTN} bg-brand-red text-paper mt-8 self-start px-9 py-4.5 text-[17px]`}
@@ -128,9 +130,9 @@ export default function ShowPageV2() {
           <p className="font-heading text-[22px] leading-tight font-semibold md:text-[28px]">
             {next ? `Ближайший показ — ${longDate(next)}` : 'Новые даты скоро появятся в афише'}
           </p>
-          {next && ticket && (
+          {next && nextTicket && (
             <a
-              href={ticket}
+              href={nextTicket}
               target="_blank"
               rel="noopener noreferrer"
               className={`${BTN} bg-paper text-ink self-start py-3 sm:self-auto`}
@@ -199,9 +201,9 @@ export default function ShowPageV2() {
                   </div>
                   <div className="hidden md:block" />
                   <AgeBadge age={d.age} className="hidden md:inline-block" />
-                  {ticket ? (
+                  {d.ticketUrl || ticket ? (
                     <a
-                      href={ticket}
+                      href={d.ticketUrl || ticket}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`${BTN} bg-ink text-paper px-6 py-3 text-[14px]`}
