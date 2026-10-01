@@ -20,6 +20,13 @@ if [ -n "$shrunk" ]; then
   git add public/uploads && git commit -q -m "Фото уменьшены для сайта" || echo "не закоммитил уменьшенные фото, попробую в следующий раз"
 fi
 
+# shows over three months old leave the afisha list (the same way, a commit)
+pruned=$(node deploy/cms/prune-afisha.mjs)
+if [ -n "$pruned" ]; then
+  echo "убраны старые показы: $pruned"
+  git add src/content/afisha.json && git commit -q -m "Старые показы убраны из афиши" || echo "не закоммитил афишу, попробую в следующий раз"
+fi
+
 while :; do
   head=$(git rev-parse HEAD)
   rm -rf dist

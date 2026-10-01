@@ -20,7 +20,37 @@ local_backend: true
 media_folder: public/uploads
 public_folder: /uploads
 
+# the preview pane showed raw unstyled data, not the site: off
+editor:
+  preview: false
+
 collections:
+  - name: afisha
+    label: Афиша (расписание)
+    files:
+      - name: afisha
+        label: Показы
+        file: src/content/afisha.json
+        fields:
+          - label: Показы
+            name: items
+            widget: list
+            summary: "{{fields.date | date('DD.MM.YYYY')}} · {{fields.time}} — {{fields.title}}"
+            fields:
+              - { label: Дата, name: date, widget: date, format: 'YYYY-MM-DD', hint: 'День недели сайт определит сам по этой дате' }
+              - { label: Название спектакля, name: title, widget: string }
+              - { label: Возрастная маркировка, name: age, widget: string, required: false, hint: 'Например 16+' }
+              - { label: Зал, name: hall, widget: string, required: false }
+              - { label: Время, name: time, widget: string, hint: 'Например 18:00' }
+              - { label: Ссылка на покупку этого сеанса, name: ticketUrl, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Страница именно этой даты на Билетоне (например https://bileton.ru/events/spektakl-simon-272476). Если пусто — кнопка «Купить» ведёт на страницу спектакля, а если нет и её — на витрину театра' }
+              - label: Цвет строки
+                name: band
+                widget: select
+                options:
+                  - { label: Светлая (обычная), value: paper }
+                  - { label: Красная (выделить), value: red }
+                  - { label: Синяя (выделить), value: blue }
+
   - name: shows
     label: Репертуар
     files:
@@ -61,30 +91,11 @@ collections:
               - label: Цвет карточки
                 name: bg
                 widget: select
-                options: [red, yellow, blue, ink]
-
-  - name: afisha
-    label: Афиша (расписание)
-    files:
-      - name: afisha
-        label: Показы
-        file: src/content/afisha.json
-        fields:
-          - label: Показы
-            name: items
-            widget: list
-            summary: '{{date}} — {{title}}'
-            fields:
-              - { label: Дата, name: date, widget: date, format: 'YYYY-MM-DD', hint: 'День недели сайт определит сам по этой дате' }
-              - { label: Название спектакля, name: title, widget: string }
-              - { label: Возрастная маркировка, name: age, widget: string, required: false, hint: 'Например 16+' }
-              - { label: Зал, name: hall, widget: string, required: false }
-              - { label: Время, name: time, widget: string, hint: 'Например 18:00' }
-              - { label: Ссылка на покупку этого сеанса, name: ticketUrl, widget: string, required: false, pattern: ['^$|^https://', 'Ссылка должна начинаться с https://'], hint: 'Страница именно этой даты на Билетоне (например https://bileton.ru/events/spektakl-simon-272476). Если пусто — кнопка «Купить» ведёт на страницу спектакля, а если нет и её — на витрину театра' }
-              - label: Цвет строки
-                name: band
-                widget: select
-                options: [paper, red, blue]
+                options:
+                  - { label: Красный, value: red }
+                  - { label: Жёлтый, value: yellow }
+                  - { label: Синий, value: blue }
+                  - { label: Чёрный, value: ink }
 
   - name: courses
     label: Курсы
@@ -104,7 +115,11 @@ collections:
               - label: Цвет карточки
                 name: bg
                 widget: select
-                options: [red, yellow, blue, ink]
+                options:
+                  - { label: Красный, value: red }
+                  - { label: Жёлтый, value: yellow }
+                  - { label: Синий, value: blue }
+                  - { label: Чёрный, value: ink }
               - { label: Описание, name: desc, widget: text }
               - { label: Цена, name: price, widget: string }
               - { label: Старт группы, name: start, widget: string }
@@ -129,86 +144,17 @@ collections:
               - label: Цвет карточки
                 name: bg
                 widget: select
-                options: [red, yellow, blue, ink]
+                options:
+                  - { label: Красный, value: red }
+                  - { label: Жёлтый, value: yellow }
+                  - { label: Синий, value: blue }
+                  - { label: Чёрный, value: ink }
               - { label: Ключи курсов из раздела «Курсы» (через запятую), name: courseKeys, widget: list }
               - label: Фото группы (если пусто — блок галереи на странице не показывается)
                 name: photos
                 widget: list
                 required: false
                 field: { label: Фото, name: photo, widget: image }
-
-  - name: team
-    label: Команда
-    files:
-      - name: team
-        label: Состав
-        file: src/content/team.json
-        fields:
-          - label: Люди
-            name: members
-            widget: list
-            summary: '{{name}} — {{role}}'
-            fields:
-              - { label: Имя, name: name, widget: string }
-              - { label: Роль, name: role, widget: string }
-              - { label: Фото, name: photo, widget: image, required: false }
-              - label: Цвет карточки
-                name: bg
-                widget: select
-                options: [red, yellow, blue, ink]
-              - { label: Художественный руководитель (выделяется на странице), name: lead, widget: boolean, required: false, default: false }
-              - { label: О человеке, name: bio, widget: text, required: false, hint: 'Показывается, когда на сайте нажимают на карточку. Пара абзацев: что делает в театре, откуда пришёл, чем знаменит. Абзацы — с новой строки' }
-              - { label: Спектакли, name: shows, widget: list, required: false, field: { label: Спектакль, name: show, widget: string }, hint: 'Необязательно: спектакли, где человек указан в «В ролях», добавятся сами. Здесь — прошлые постановки или то, чего нет в репертуаре' }
-              - { label: Подпись на главной, name: homeCaption, widget: string, required: false, hint: 'Заполнено — человек показывается в блоке «Люди театра» на главной (первые четыре по порядку списка). Например: главный администратор' }
-              - { label: Подпись в «Педагогах» на странице курсов, name: teacherCaption, widget: string, required: false, hint: 'Заполнено — человек показывается среди педагогов. Например: режиссёр-педагог' }
-              - { label: Где лицо на фото (x% y%), name: focus, widget: string, required: false, hint: '50% 50% — центр, 50% 20% — выше. Если пусто — 50% 30%' }
-              - { label: Увеличение фото, name: zoom, widget: number, value_type: float, min: 1, max: 3, step: 0.05, required: false, hint: '1 — без увеличения, 1.5 — крупнее. Если лицо мелкое на фото' }
-
-  - name: gallery
-    label: Галерея
-    files:
-      - name: gallery
-        label: Фото
-        file: src/content/gallery.json
-        fields:
-          - label: Фотографии
-            name: images
-            widget: list
-            summary: '{{src}}'
-            fields:
-              - { label: Фото, name: src, widget: image }
-              - label: Размер плитки
-                name: span
-                widget: select
-                options: [normal, wide]
-                default: normal
-
-  - name: awards
-    label: Награды
-    files:
-      - name: awards
-        label: Список наград
-        file: src/content/awards.json
-        fields:
-          - label: Награды
-            name: items
-            widget: list
-            field: { label: Награда, name: award, widget: string }
-
-  - name: productions
-    label: Все постановки (страница «О театре»)
-    files:
-      - name: productions
-        label: Список постановок
-        file: src/content/productions.json
-        fields:
-          - label: Постановки
-            name: items
-            widget: list
-            summary: '{{year}} — {{title}}'
-            fields:
-              - { label: Год, name: year, widget: string }
-              - { label: Название, name: title, widget: string, hint: 'Без кавычек — они добавятся сами' }
 
   - name: directions
     label: Направления (запись и заявки)
@@ -268,6 +214,58 @@ collections:
                       - { label: Выбор из вариантов, value: choice }
                   - { label: Варианты для выбора, name: options, widget: list, required: false, field: { label: Вариант, name: option, widget: string }, hint: 'Только для типа «Выбор из вариантов»' }
                   - { label: Как спросить, name: ask, widget: string, required: false, hint: 'Например: Из какого вы города?' }
+
+  - name: team
+    label: Команда
+    files:
+      - name: team
+        label: Состав
+        file: src/content/team.json
+        fields:
+          - label: Люди
+            name: members
+            widget: list
+            summary: '{{name}} — {{role}}'
+            fields:
+              - { label: Имя, name: name, widget: string }
+              - { label: Роль, name: role, widget: string }
+              - { label: Фото, name: photo, widget: image, required: false }
+              - label: Цвет карточки
+                name: bg
+                widget: select
+                options:
+                  - { label: Красный, value: red }
+                  - { label: Жёлтый, value: yellow }
+                  - { label: Синий, value: blue }
+                  - { label: Чёрный, value: ink }
+              - { label: Художественный руководитель (выделяется на странице), name: lead, widget: boolean, required: false, default: false }
+              - { label: О человеке, name: bio, widget: text, required: false, hint: 'Показывается, когда на сайте нажимают на карточку. Пара абзацев: что делает в театре, откуда пришёл, чем знаменит. Абзацы — с новой строки' }
+              - { label: Спектакли, name: shows, widget: list, required: false, field: { label: Спектакль, name: show, widget: string }, hint: 'Необязательно: спектакли, где человек указан в «В ролях», добавятся сами. Здесь — прошлые постановки или то, чего нет в репертуаре' }
+              - { label: Подпись на главной, name: homeCaption, widget: string, required: false, hint: 'Заполнено — человек показывается в блоке «Люди театра» на главной (первые четыре по порядку списка). Например: главный администратор' }
+              - { label: Подпись в «Педагогах» на странице курсов, name: teacherCaption, widget: string, required: false, hint: 'Заполнено — человек показывается среди педагогов. Например: режиссёр-педагог' }
+              - { label: Где лицо на фото (x% y%), name: focus, widget: string, required: false, hint: '50% 50% — центр, 50% 20% — выше. Если пусто — 50% 30%' }
+              - { label: Увеличение фото, name: zoom, widget: number, value_type: float, min: 1, max: 3, step: 0.05, required: false, hint: '1 — без увеличения, 1.5 — крупнее. Если лицо мелкое на фото' }
+
+  - name: gallery
+    label: Галерея
+    files:
+      - name: gallery
+        label: Фото
+        file: src/content/gallery.json
+        fields:
+          - label: Фотографии
+            name: images
+            widget: list
+            summary: '{{src}}'
+            fields:
+              - { label: Фото, name: src, widget: image }
+              - label: Размер плитки
+                name: span
+                widget: select
+                options:
+                  - { label: Обычное, value: normal }
+                  - { label: Широкое (на две колонки), value: wide }
+                default: normal
 
   - name: bot
     label: Ответы бота
@@ -365,3 +363,30 @@ collections:
             required: false
             hint: 'Показываются, если фото хотя бы три'
             field: { label: Фото, name: photo, widget: image }
+
+  - name: awards
+    label: Награды
+    files:
+      - name: awards
+        label: Список наград
+        file: src/content/awards.json
+        fields:
+          - label: Награды
+            name: items
+            widget: list
+            field: { label: Награда, name: award, widget: string }
+
+  - name: productions
+    label: Все постановки (страница «О театре»)
+    files:
+      - name: productions
+        label: Список постановок
+        file: src/content/productions.json
+        fields:
+          - label: Постановки
+            name: items
+            widget: list
+            summary: '{{year}} — {{title}}'
+            fields:
+              - { label: Год, name: year, widget: string }
+              - { label: Название, name: title, widget: string, hint: 'Без кавычек — они добавятся сами' }
