@@ -991,8 +991,8 @@ function offerStillOpen(s, nowMs) {
 // with its own list of questions. One generic scenario asks them, so a new kind
 // of event is a new row in the admin, not new code.
 
-const DIR_TYPE_LABEL = { prep: 'подготовительная группа', festival: 'фестиваль', quest: 'квест', carnival: 'карнавальная ночь', newsletter: 'рассылка', other: 'событие' }
-const DIR_TYPE_RE = { prep: /подготовит/i, festival: /фестивал/i, quest: /квест/i, carnival: /карнавал/i, newsletter: /рассылк|подписа/i }
+const DIR_TYPE_LABEL = { prep: 'подготовительная группа', festival: 'фестиваль', quest: 'квест', carnival: 'карнавальная ночь', lab: 'лаборатория', camp: 'лагерь', newsletter: 'рассылка', other: 'событие' }
+const DIR_TYPE_RE = { prep: /подготовит/i, festival: /фестивал/i, quest: /квест/i, carnival: /карнавал/i, lab: /лаборатор|лсд/i, camp: /лагер/i, newsletter: /рассылк|подписа/i }
 
 // Seasonal ones (quests and carnival nights only run in winter) show up and go
 // away by their dates, with nobody touching the admin.
@@ -1026,7 +1026,10 @@ function directionsBlock(knowledge, nowMs) {
     (d.schedule ? ', ' + d.schedule : '') +
     ((d.prices || []).length ? '. Цена: ' + d.prices.map((x) => x.name + ' ' + x.price).join('; ') : '') +
     '. ' + (d.open === false ? 'Заявки сейчас закрыты, записаться нельзя' : 'Заявки открыты, под ответом будет кнопка записи') +
-    (d.desc ? '. ' + d.desc : '')
+    (d.desc ? '. ' + d.desc : '')+
+    // its own dates from the afisha (a carnival night in December is beyond
+    // the four weeks of afisha the prompt otherwise carries)
+    (showDates(knowledge, nowMs, d.title).startsWith('Все') ? '. ' + showDates(knowledge, nowMs, d.title).replace('показы', 'даты') : '')
   ).join('\n')
 }
 

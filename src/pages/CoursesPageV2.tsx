@@ -49,7 +49,7 @@ const GROUP_PHOTO: Record<string, string> = {
   podrostki: 'spektakl-1',
   vzroslye: 'posledstviy-2',
 }
-const MORE_TYPES: Direction['type'][] = ['prep', 'quest', 'carnival', 'other']
+const MORE_TYPES: Direction['type'][] = ['prep', 'quest', 'carnival', 'camp', 'other']
 
 const STEPS = [
   ['Этюды и игры', 'Учимся быть настоящими на сцене, раскрываем себя через игру и импровизацию.'],
@@ -377,6 +377,14 @@ export default function CoursesPageV2() {
                       </svg>
                       Приём заявок пока закрыт
                     </div>
+                  )}
+                  {d.slug && d.page && (
+                    <Link
+                      to={'/' + d.slug}
+                      className="mt-4 self-start text-[14px] font-semibold underline underline-offset-4"
+                    >
+                      Подробнее о мероприятии →
+                    </Link>
                   )}
                 </div>
               ))}

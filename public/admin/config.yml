@@ -178,6 +178,8 @@ collections:
                   - { label: Фестиваль, value: festival }
                   - { label: Квест, value: quest }
                   - { label: Карнавальная ночь, value: carnival }
+                  - { label: Лаборатория, value: lab }
+                  - { label: Лагерь, value: camp }
                   - { label: Рассылка, value: newsletter }
                   - { label: Другое, value: other }
               - { label: Название, name: title, widget: string }
@@ -194,7 +196,7 @@ collections:
                   - { label: Цена, name: price, widget: string, hint: 'Например: 1 500 ₽' }
               - { label: Показывать с, name: showFrom, widget: date, format: 'YYYY-MM-DD', required: false, hint: 'Пусто, если показывать всегда. Квесты и карнавальные ночи сами появятся и пропадут по датам' }
               - { label: Показывать по, name: showTo, widget: date, format: 'YYYY-MM-DD', required: false }
-              - { label: Заявки открыты, name: open, widget: boolean, default: true, hint: 'Выключите, когда приём закрыт: бот скажет об этом и не предложит записаться' }
+              - { label: Приём заявок открыт, name: open, widget: boolean, default: true, hint: 'Главный переключатель сезона. Выключено — на сайте пропадают кнопки и формы записи, плашка фестиваля на главной, а бот говорит, что запись закрыта. Страница мероприятия остаётся' }
               - { label: Спрашивать телефон, name: askPhone, widget: boolean, default: true }
               - label: Вопросы анкеты
                 name: fields
@@ -214,6 +216,65 @@ collections:
                       - { label: Выбор из вариантов, value: choice }
                   - { label: Варианты для выбора, name: options, widget: list, required: false, field: { label: Вариант, name: option, widget: string }, hint: 'Только для типа «Выбор из вариантов»' }
                   - { label: Как спросить, name: ask, widget: string, required: false, hint: 'Например: Из какого вы города?' }
+              - { label: Адрес страницы на сайте, name: slug, widget: string, required: false, pattern: ['^$|^[a-z0-9-]+$', 'Только латиница, цифры и дефис, например kvest'], hint: 'Например kvest — страница будет на сайте по адресу /kvest. Пусто — своей страницы нет. Не меняйте у существующих: на них ведут ссылки' }
+              - label: Страница на сайте
+                name: page
+                widget: object
+                required: false
+                collapsed: true
+                hint: 'Что написано на странице мероприятия. Пустые блоки на сайте не показываются'
+                fields:
+                  - { label: Строка над названием, name: kicker, widget: string, required: false, hint: 'Например: Летний театральный лагерь' }
+                  - label: Цвет первого экрана
+                    name: tone
+                    widget: select
+                    default: red
+                    options:
+                      - { label: Красный, value: red }
+                      - { label: Жёлтый, value: yellow }
+                      - { label: Синий, value: blue }
+                      - { label: Чёрный, value: ink }
+                  - { label: Главное фото, name: photo, widget: image, required: false, hint: 'Горизонтальное. Если пусто — будет рисунок тушью' }
+                  - { label: Текст о мероприятии, name: intro, widget: text, required: false, hint: 'Каждый абзац с новой строки' }
+                  - label: Цифры сбоку
+                    name: facts
+                    widget: list
+                    required: false
+                    summary: '{{fields.big}} — {{fields.note}}'
+                    fields:
+                      - { label: Число, name: big, widget: string, hint: 'Например: 2012, 3 дня' }
+                      - { label: Подпись, name: note, widget: string, hint: 'Например: первая лаборатория' }
+                  - label: Как записаться (шаги)
+                    name: steps
+                    widget: list
+                    required: false
+                    summary: '{{fields.title}}'
+                    hint: 'Показываются, только когда приём заявок открыт'
+                    fields:
+                      - { label: Шаг, name: title, widget: string }
+                      - { label: Пояснение, name: text, widget: string, required: false }
+                  - label: Программа по дням
+                    name: program
+                    widget: list
+                    required: false
+                    summary: '{{fields.day}}'
+                    fields:
+                      - { label: День, name: day, widget: string, hint: 'Например: 18 декабря' }
+                      - { label: Пункты, name: items, widget: list, field: { label: Пункт, name: item, widget: string } }
+                  - label: Вопросы и ответы
+                    name: faq
+                    widget: list
+                    required: false
+                    summary: '{{fields.q}}'
+                    fields:
+                      - { label: Вопрос, name: q, widget: string }
+                      - { label: Ответ, name: a, widget: text }
+                  - label: Фото
+                    name: photos
+                    widget: list
+                    required: false
+                    hint: 'Показываются, если фото хотя бы три'
+                    field: { label: Фото, name: photo, widget: image }
 
   - name: team
     label: Команда

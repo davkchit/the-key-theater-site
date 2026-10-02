@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { animate, useInView, useReducedMotion } from 'motion/react'
-import { directionByType } from '../../data/directions'
+import { directionByType, directionPath } from '../../data/directions'
 import coursesContent from '../../content/courses.json'
 import type { Course } from '../../types/content'
 import { mediaUrl } from '../../lib/mediaUrl'
@@ -412,14 +412,14 @@ const MORE = [
     note: 'современная драматургия, с 2012 года',
     photo: 'spektakl-1',
     block: 'bg-brand-yellow',
-    to: '/o-teatre',
+    to: directionPath('lab') ?? '/o-teatre',
   },
   {
     title: 'Лагерь «Солнечная пыль»',
     note: 'летний театральный лагерь',
     photo: 'lager-1',
     block: 'bg-brand-blue',
-    to: '/o-teatre',
+    to: directionPath('camp') ?? '/o-teatre',
   },
 ]
 

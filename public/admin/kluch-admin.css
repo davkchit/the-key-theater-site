@@ -1,0 +1,211 @@
+/* The admin in the site's look: paper, ink, the brand red; Oswald for headings,
+   Manrope for the rest. Decap's elements carry readable labels in their class
+   names (css-xxxx-AppHeader…), and the Decap copy is pinned (decap-cms-3.16.3.js),
+   so these selectors keep working until someone updates it on purpose. */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap');
+
+:root {
+  --k-paper: #f6f0e0;
+  --k-card: #fbf8ef;
+  --k-ink: #1a1a1a;
+  --k-line: #d3ccbb;
+  --k-red: #e32324;
+  --k-yellow: #ffd700;
+  --k-muted: #6b655a;
+}
+
+body,
+#nc-root,
+[class*='-AppMainContainer'],
+[class*='-StyledAuthenticationPage'] {
+  background: var(--k-paper) !important;
+  color: var(--k-ink);
+  font-family: 'Manrope', system-ui, sans-serif !important;
+}
+
+/* top bar: black like the site's header */
+[class*='-AppHeader-css'] {
+  background: var(--k-ink) !important;
+  box-shadow: none !important;
+}
+[class*='-AppHeader-css'] [class*='-AppHeaderButton'],
+[class*='-AppHeader-css'] [class*='-AppHeaderSiteLink'] {
+  color: var(--k-paper) !important;
+  font-family: 'Oswald', sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+[class*='-AppHeader-css'] [class*='-AppHeaderButton'] svg {
+  color: var(--k-paper) !important;
+}
+[class*='-AppHeader-css'] [class*='buttonActive'] {
+  color: var(--k-yellow) !important;
+}
+[class*='-AppHeader-css'] [class*='buttonActive'] svg {
+  color: var(--k-yellow) !important;
+}
+[class*='-AppHeaderContent'] {
+  align-items: center !important;
+}
+[class*='-AppHeaderContent']::before {
+  content: '';
+  width: 104px;
+  height: 44px;
+  margin: 0 28px 0 4px;
+  align-self: center;
+  background: url('logo.png') left center / contain no-repeat;
+  flex: none;
+}
+
+/* cards: paper with an ink border and a hard shadow, like the site's forms */
+[class*='-SidebarContainer'],
+[class*='-CollectionTopContainer'],
+[class*='-ListCard-card'] {
+  background: var(--k-card) !important;
+  border: 2px solid var(--k-ink) !important;
+  border-radius: 14px !important;
+  box-shadow: 5px 5px 0 var(--k-ink) !important;
+}
+[class*='-ListCard-card'] {
+  box-shadow: 3px 3px 0 var(--k-ink) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+[class*='-ListCard-card']:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--k-red) !important;
+}
+[class*='-SidebarHeading'],
+[class*='-CollectionTopHeading'],
+[class*='-ListCardTitle'] {
+  font-family: 'Oswald', sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--k-ink) !important;
+}
+[class*='-SidebarNavLink'] {
+  color: var(--k-ink) !important;
+  font-weight: 600;
+  border-left: 3px solid transparent !important;
+}
+[class*='-SidebarNavLink'] svg {
+  color: var(--k-muted) !important;
+}
+/* the active one is marked by aria-current; the class label is on all of them */
+a[aria-current='page'][class*='-SidebarNavLink'],
+[class*='-SidebarNavLink']:hover {
+  color: var(--k-red) !important;
+  background: #fff3d1 !important;
+  border-left-color: var(--k-red) !important;
+}
+a[aria-current='page'][class*='-SidebarNavLink'] svg {
+  color: var(--k-red) !important;
+}
+[class*='-SearchInput'] {
+  background: var(--k-paper) !important;
+  border: 2px solid var(--k-line) !important;
+  border-radius: 10px !important;
+}
+
+/* the editor */
+[class*='-ToolbarContainer'] {
+  background: var(--k-card) !important;
+  border-bottom: 2px solid var(--k-ink) !important;
+  box-shadow: none !important;
+}
+[class*='-ControlPaneContainer'],
+[class*='-EditorContainer'],
+[class*='-NoPreviewContainer'] {
+  background: var(--k-paper) !important;
+}
+[class*='-FieldLabel'] {
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  border-color: var(--k-ink) !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em;
+  border-radius: 6px 6px 0 0 !important;
+}
+[class*='-ControlContainer'] input,
+[class*='-ControlContainer'] textarea,
+[class*='-ControlContainer'] [class*='-control'],
+[class*='-TextControl'] {
+  background: #fffdf7 !important;
+  border-color: var(--k-line) !important;
+  font-family: 'Manrope', system-ui, sans-serif !important;
+}
+[class*='-ControlContainer']:focus-within [class*='-FieldLabel'] {
+  background: var(--k-red) !important;
+  border-color: var(--k-red) !important;
+}
+[class*='-ControlContainer']:focus-within input,
+[class*='-ControlContainer']:focus-within textarea {
+  border-color: var(--k-red) !important;
+}
+[class*='-ControlHint'] {
+  color: var(--k-muted) !important;
+}
+
+/* lists (afisha, shows, team…) */
+[class*='ListItemTopBar'],
+[class*='-TopBarContainer'] {
+  background: #ece4cf !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+[class*='-SortableListItem'],
+[class*='-listControlItem'] {
+  border: 1.5px solid var(--k-line) !important;
+  border-radius: 10px !important;
+  background: var(--k-card) !important;
+}
+[class*='-NestedObjectLabel'] {
+  background: var(--k-card) !important;
+  color: var(--k-ink) !important;
+  font-weight: 600;
+  border-color: var(--k-line) !important;
+}
+/* the white box a list or an object sits in */
+[class*='-ControlContainer'] > div:has(> [class*='-TopBarContainer']),
+[class*='-ControlContainer'] > div:has([class*='-SortableListItem']) {
+  background: transparent !important;
+  border-color: var(--k-line) !important;
+}
+[class*='-AddButton'] {
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+  border-radius: 8px !important;
+}
+
+/* buttons */
+[class*='-ToolbarButton'],
+[class*='-PublishedButton'],
+[class*='-LoginButton'] {
+  border-radius: 8px !important;
+  font-family: 'Oswald', sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+[class*='-LoginButton'] {
+  background: var(--k-ink) !important;
+  color: var(--k-paper) !important;
+}
+[class*='-ToolbarButton'][class*='Publish'],
+[class*='-PublishButton'],
+[class*='-SaveButton'] {
+  background: var(--k-red) !important;
+  color: #fff !important;
+}
+[class*='-BooleanBackground'] {
+  border-radius: 999px !important;
+}
+
+/* login page: the theatre's logo instead of Decap's */
+[class*='-DecapLogoIcon'] {
+  width: 240px !important;
+  height: 80px !important;
+  background: url('logo-dark.png') center / contain no-repeat;
+}
+[class*='-DecapLogoIcon'] svg {
+  display: none !important;
+}

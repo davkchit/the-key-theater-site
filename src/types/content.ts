@@ -96,9 +96,24 @@ export interface DirectionField {
  *  the festival, a quest, a carnival night, the newsletter. Lives in
  *  src/content/directions.json (Decap CMS); the bot reads the same file, so a
  *  direction added in the admin can be booked on the site and in the chat. */
+/** A seasonal event's own page (/laboratoriya, /kvest…), filled in the admin. */
+export interface DirectionPage {
+  /** small line above the title, e.g. «Лаборатория современной драматургии» */
+  kicker?: string
+  /** paragraphs */
+  intro: string[]
+  facts: { big: string; note: string }[]
+  steps: { title: string; text: string }[]
+  program: { day: string; items: string[] }[]
+  faq: { q: string; a: string }[]
+  photo?: string
+  photos: string[]
+  tone: 'red' | 'yellow' | 'blue' | 'ink'
+}
+
 export interface Direction {
   id: string
-  type: 'prep' | 'festival' | 'quest' | 'carnival' | 'newsletter' | 'other'
+  type: 'prep' | 'festival' | 'quest' | 'carnival' | 'lab' | 'camp' | 'newsletter' | 'other'
   title: string
   desc?: string
   age?: string
@@ -110,4 +125,7 @@ export interface Direction {
   open: boolean
   askPhone: boolean
   fields: DirectionField[]
+  /** the page's address without slashes; no slug, no page */
+  slug?: string
+  page?: DirectionPage
 }

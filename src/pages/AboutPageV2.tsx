@@ -17,6 +17,7 @@ import { galleryPhoto } from '../components/home2/homeData'
 import { Reveal } from '../components/ui/Reveal'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import starSvg from '../../assets/el-star.svg'
+import { directionPath } from '../data/directions'
 
 // «О театре»: who we are, the history year by year, the numbers over the
 // building, what else the theatre does, awards and every production.
@@ -50,12 +51,14 @@ const DIRECTIONS = [
     note: 'Молодые режиссёры вместе с актёрами «Ключа» за три дня готовят эскизы спектаклей и показывают их зрителям.',
     photo: 'spektakl-1',
     block: 'bg-brand-yellow',
+    to: directionPath('lab'),
   },
   {
     title: 'Лагерь «Солнечная пыль»',
     note: 'Каждое лето: занятия с педагогами, игры, экскурсии в другие театры и итоговая постановка для родителей.',
     photo: 'lager-1',
     block: 'bg-brand-blue',
+    to: directionPath('camp'),
   },
 ]
 

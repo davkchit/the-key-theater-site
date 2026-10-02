@@ -13,6 +13,7 @@ import ShowPageV2 from './pages/ShowPageV2'
 import CoursesPageV2 from './pages/CoursesPageV2'
 import NotFoundPageV2 from './pages/NotFoundPageV2'
 import FestivalPageV2 from './pages/FestivalPageV2'
+import EventPageV2 from './pages/EventPageV2'
 import AboutPageV2 from './pages/AboutPageV2'
 import TeamPageV2 from './pages/TeamPageV2'
 import AfishaPageV2 from './pages/AfishaPageV2'
@@ -65,6 +66,8 @@ export const router = createHashRouter([
       { path: 'staryi/politika', element: <PrivacyPolicyPage /> },
       { path: 'staryi/*', element: <NotFoundPage /> },
 
+      // seasonal events: /laboratoriya, /lager, /kvest…; any other single word is a 404 there
+      { path: ':slug', element: <EventPageV2 /> },
       { path: '*', element: <NotFoundPageV2 /> },
     ],
   },
