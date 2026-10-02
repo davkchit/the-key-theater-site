@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { AnimatePresence } from 'motion/react'
 import { gallery } from '../data/gallery'
 import { PrintFilters, WRAP } from '../components/home2/parts'
-import { GRAIN_URL } from '../components/home2/paper'
 import { Lightbox } from '../components/home2/Gallery'
 import { Reveal } from '../components/ui/Reveal'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
@@ -53,12 +52,6 @@ export default function GalleryPageV2() {
           <Lightbox index={open} list={list} onClose={() => setOpen(null)} onMove={move} />
         )}
       </AnimatePresence>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

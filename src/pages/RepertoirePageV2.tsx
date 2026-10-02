@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { shows } from '../data/shows'
 import { PrintFilters, BTN, H2, WRAP } from '../components/home2/parts'
-import { GRAIN_URL, Grain, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { ShowPoster } from '../components/home2/ShowPoster'
 import { heroShows, longDate, showPath } from '../components/home2/homeData'
 import { Reveal } from '../components/ui/Reveal'
@@ -87,7 +87,6 @@ export default function RepertoirePageV2() {
             />
             <div className="from-ink via-ink/60 md:via-ink/30 absolute inset-0 bg-gradient-to-t to-transparent md:bg-gradient-to-r md:via-30%" />
           </div>
-          <Grain opacity={0.45} />
           <div className={`${WRAP} relative z-[3] py-16 md:py-24`}>
             <div className="font-heading flex items-center gap-3 text-[18px] tracking-[.06em] uppercase md:text-[22px]">
               <img src={starSvg} alt="" aria-hidden="true" className="h-8 w-8 invert" />
@@ -126,12 +125,6 @@ export default function RepertoirePageV2() {
         </section>
       )}
       <div className="h-16" />
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

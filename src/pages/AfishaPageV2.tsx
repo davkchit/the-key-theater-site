@@ -4,7 +4,7 @@ import type { AfishaItem } from '../types/content'
 import { upcomingAfisha } from '../data/afisha'
 import { shows } from '../data/shows'
 import { PrintFilters, BTN, RoughFrame, WRAP } from '../components/home2/parts'
-import { GRAIN_URL, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { TICKETS_URL, heroShows, longDate, showPath } from '../components/home2/homeData'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import starSvg from '../../assets/el-star.svg'
@@ -327,12 +327,6 @@ export default function AfishaPageV2() {
           </div>
         </div>
       </section>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

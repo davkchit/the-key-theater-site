@@ -18,7 +18,7 @@ import {
   WRAP,
   type Tone,
 } from '../components/home2/parts'
-import { GRAIN_URL, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { galleryPhoto } from '../components/home2/homeData'
 import { Modal } from '../components/ui/Modal'
 import { Reveal } from '../components/ui/Reveal'
@@ -499,12 +499,6 @@ export default function CoursesPageV2() {
             />
           ))}
       </Modal>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

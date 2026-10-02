@@ -12,7 +12,7 @@ import {
   SectionHead,
   WRAP,
 } from '../components/home2/parts'
-import { GRAIN_URL, Grain, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { galleryPhoto } from '../components/home2/homeData'
 import { Reveal } from '../components/ui/Reveal'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
@@ -146,7 +146,6 @@ export default function AboutPageV2() {
           className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_35%] opacity-45"
         />
         <div className="from-ink/85 via-ink/50 to-ink/90 absolute inset-0 -z-10 bg-gradient-to-b" />
-        <Grain opacity={0.5} />
         <div className={`${WRAP} relative z-[2] py-20 md:py-28`}>
           <SectionHead title="Театр в цифрах" dark />
           <dl className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
@@ -243,12 +242,6 @@ export default function AboutPageV2() {
           </div>
         </div>
       </section>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

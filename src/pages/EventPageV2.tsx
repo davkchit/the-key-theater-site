@@ -12,7 +12,7 @@ import {
   SectionHead,
   WRAP,
 } from '../components/home2/parts'
-import { GRAIN_URL, Grain, Torn } from '../components/home2/paper'
+import { Grain, Torn } from '../components/home2/paper'
 import { PosterArt } from '../components/home2/ShowPoster'
 import { longDate } from '../components/home2/homeData'
 import { DirectionForm } from '../components/directions/DirectionForm'
@@ -348,12 +348,6 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
           </div>
         </div>
       </section>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

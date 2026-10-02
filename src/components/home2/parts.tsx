@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { GRAIN_URL } from './paper'
 
 // Small pieces the new homepage repeats: the two-tone photo, section headings,
 // "Вся афиша →" links.
@@ -49,31 +48,7 @@ export function PrintFilters() {
             height="100%"
           >
             <feColorMatrix in="SourceGraphic" type="matrix" values={LUMA} result="grey" />
-            {/* grain is mixed into the greys before the ink curve, so it
-                breaks up into specks exactly where a print would */}
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.75"
-              numOctaves="2"
-              seed="7"
-              result="noise"
-            />
-            <feColorMatrix
-              in="noise"
-              type="matrix"
-              values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 0 1"
-              result="gnoise"
-            />
-            <feComposite
-              in="grey"
-              in2="gnoise"
-              operator="arithmetic"
-              k1="0"
-              k2="1.1"
-              k3="0.5"
-              k4="-0.2"
-            />
-            <feComponentTransfer>
+            <feComponentTransfer in="grey">
               <feFuncR type="table" tableValues={table(lo[0], hi[0])} />
               <feFuncG type="table" tableValues={table(lo[1], hi[1])} />
               <feFuncB type="table" tableValues={table(lo[2], hi[2])} />
@@ -194,11 +169,6 @@ export function Portrait({
               : 'sepia(.16) saturate(1.08) contrast(1.06) brightness(1.02)',
           }}
           className="h-full w-full object-cover"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-40 mix-blend-multiply"
-          style={{ backgroundImage: GRAIN_URL }}
         />
       </div>
     </div>

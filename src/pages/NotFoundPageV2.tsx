@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import { BTN, WRAP } from '../components/home2/parts'
-import { GRAIN_URL } from '../components/home2/paper'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 
 // 404 of the new design: a dry yellow brush stroke behind a huge «404», two
@@ -188,11 +187,6 @@ export default function NotFoundPageV2() {
           </div>
         </div>
       </section>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

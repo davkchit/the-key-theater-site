@@ -20,7 +20,7 @@ import {
   WRAP,
   type Tone,
 } from './parts'
-import { Grain, Torn } from './paper'
+import { Torn } from './paper'
 import { upcomingCards, shortDate, galleryPhoto, showPath } from './homeData'
 import boyFence from '../../../assets/el-boy-fence.svg'
 import starSvg from '../../../assets/el-star.svg'
@@ -296,7 +296,6 @@ export function NumbersBand() {
         className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_35%] opacity-55 grayscale-[.3]"
       />
       <div className="from-ink/85 via-ink/50 to-ink/95 absolute inset-0 -z-10 bg-gradient-to-b" />
-      <Grain opacity={0.55} />
       <div
         className={`${WRAP} relative z-[2] flex min-h-[640px] flex-col justify-between py-16 md:min-h-[min(92svh,860px)] md:py-24`}
       >

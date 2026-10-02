@@ -15,7 +15,10 @@ export function PageTransition() {
     <AnimatePresence
       mode="wait"
       onExitComplete={() => {
-        if (navType !== 'POP') window.scrollTo(0, 0)
+        // instant: the page has scroll-behavior: smooth, and a smooth trip up a
+        // long page was still going when the next page appeared (and a touch on a
+        // phone stopped it halfway, leaving people at the bottom)
+        if (navType !== 'POP') window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
       }}
     >
       <motion.div

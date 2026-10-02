@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { Hero } from '../components/home2/Hero'
 import { PrintFilters } from '../components/home2/parts'
-import { GRAIN_URL } from '../components/home2/paper'
 import {
   CoursesBand,
   FestivalStrip,
@@ -39,12 +38,6 @@ export default function HomePageV2() {
       <GalleryCarousel />
       <NewsletterBand />
       <FindUs />
-      {/* paper grain over the whole page, as on the printed mockup */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

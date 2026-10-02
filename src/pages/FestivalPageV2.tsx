@@ -11,7 +11,7 @@ import {
   SectionHead,
   WRAP,
 } from '../components/home2/parts'
-import { GRAIN_URL, Grain, Torn } from '../components/home2/paper'
+import { Grain, Torn } from '../components/home2/paper'
 import { galleryPhoto } from '../components/home2/homeData'
 import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { Reveal } from '../components/ui/Reveal'
@@ -299,12 +299,6 @@ export default function FestivalPageV2() {
           </div>
         </div>
       </section>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

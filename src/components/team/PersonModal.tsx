@@ -7,7 +7,6 @@ import { useLockBodyScroll } from '../../hooks/useLockBodyScroll'
 import { mediaUrl } from '../../lib/mediaUrl'
 import { frameOf, type TeamEntry } from '../../data/people'
 import { Portrait } from '../home2/parts'
-import { GRAIN_URL } from '../home2/paper'
 import { SPRING } from '../home2/motion'
 
 // A person from «Команда» in a sheet of paper over the page: photo on the
@@ -34,7 +33,7 @@ export function PersonModal({ person, block, shows, onClose }: PersonModalProps)
     <AnimatePresence>
       {person && (
         <motion.div
-          className="bg-ink/70 fixed inset-0 z-80 flex items-end justify-center p-0 md:items-center md:p-8"
+          className="bg-ink/70 fixed inset-0 z-80 flex items-center justify-center p-3 md:p-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -46,7 +45,7 @@ export function PersonModal({ person, block, shows, onClose }: PersonModalProps)
             role="dialog"
             aria-modal="true"
             aria-labelledby="person-name"
-            className="relative max-h-[92vh] w-full max-w-[1080px] md:max-h-[88vh]"
+            className="relative max-h-[86dvh] w-full max-w-[1080px] md:max-h-[88vh]"
             initial={{ opacity: 0, y: 40, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
@@ -59,12 +58,7 @@ export function PersonModal({ person, block, shows, onClose }: PersonModalProps)
               aria-hidden="true"
               className="bg-paper absolute inset-0"
               style={{ filter: 'url(#torn-photo)' }}
-            >
-              <div
-                className="absolute inset-0 opacity-[.22] mix-blend-multiply"
-                style={{ backgroundImage: GRAIN_URL }}
-              />
-            </div>
+            />
 
             <button
               type="button"
@@ -83,7 +77,7 @@ export function PersonModal({ person, block, shows, onClose }: PersonModalProps)
               </svg>
             </button>
 
-            <div className="no-scrollbar relative max-h-[92vh] overflow-y-auto px-6 pt-14 pb-10 md:max-h-[88vh] md:px-14 md:pt-16 md:pb-14">
+            <div className="no-scrollbar relative max-h-[86dvh] overflow-y-auto px-6 pt-14 pb-10 md:max-h-[88vh] md:px-14 md:pt-16 md:pb-14">
               <div className="grid gap-8 md:grid-cols-[0.85fr_1.15fr] md:items-center md:gap-14">
                 {person.photo ? (
                   <Portrait

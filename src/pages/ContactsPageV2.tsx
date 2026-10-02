@@ -1,6 +1,5 @@
 import { socials } from '../data/socials'
 import { PrintFilters, WRAP } from '../components/home2/parts'
-import { GRAIN_URL } from '../components/home2/paper'
 import { FindUs, NewsletterBand } from '../components/home2/Contact'
 import { SocialIcon } from '../components/ui/SocialIcon'
 import { EMAIL } from '../data/contacts'
@@ -44,11 +43,6 @@ export default function ContactsPageV2() {
       <FindUs />
       <NewsletterBand />
       <div className="h-10" />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

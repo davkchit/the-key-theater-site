@@ -5,7 +5,6 @@ import { heroShows, longDate, galleryPhoto, showPath } from './homeData'
 import { BTN, WRAP } from './parts'
 
 import { SPRING } from './motion'
-import { Grain } from './paper'
 
 // First screen: the nearest shows as a slider over a live stage photo across
 // the whole screen, as in the mockup; the title lies on the dark side of it. Big title, age, date, one red "Купить билет".
@@ -76,7 +75,6 @@ export function Hero() {
         {/* the photo fades into black on its left, so faces never sit under the title */}
         <div className="from-ink via-ink/70 absolute inset-y-0 left-[30%] hidden w-[40%] bg-gradient-to-r to-transparent md:block" />
         <div className="from-ink/80 absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t to-transparent" />
-        <Grain opacity={0.5} />
 
         <div
           className={`${WRAP} relative z-[3] flex h-full flex-col justify-end pb-20 md:justify-center md:pb-10`}

@@ -10,7 +10,7 @@ import {
   SectionHead,
   WRAP,
 } from '../components/home2/parts'
-import { GRAIN_URL, Grain, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { AgeBadge, PosterArt } from '../components/home2/ShowPoster'
 import { TICKETS_URL, longDate, shortDate, showPath } from '../components/home2/homeData'
 import { Reveal } from '../components/ui/Reveal'
@@ -87,7 +87,6 @@ export default function ShowPageV2() {
             </div>
           )}
           <div className="from-ink via-ink/60 absolute inset-0 bg-gradient-to-t to-transparent md:hidden" />
-          <Grain opacity={0.45} />
           <div
             className={`${WRAP} relative z-[3] flex h-full min-h-[520px] flex-col justify-end pt-40 pb-14 md:justify-center md:pt-0 md:pb-10`}
           >
@@ -293,12 +292,6 @@ export default function ShowPageV2() {
       )}
 
       <ReviewBand />
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { awards } from '../data/awards'
 import { mediaUrl } from '../lib/mediaUrl'
 import { PrintFilters, BTN, H2, Portrait, SectionHead, WRAP } from '../components/home2/parts'
-import { GRAIN_URL, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { Reveal } from '../components/ui/Reveal'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import { frameOf, showsOf, teamMembers, type TeamEntry } from '../data/people'
@@ -194,12 +194,6 @@ export default function TeamPageV2() {
           </Link>
         </div>
       </section>
-
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[.22] mix-blend-multiply"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
 
       <PersonModal
         person={open?.m ?? null}
