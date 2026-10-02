@@ -11,6 +11,8 @@
   --k-ink: #1a1a1a;
   --k-line: #d3ccbb;
   --k-red: #e32324;
+  --k-blue: #0b54a0;
+  --k-blue-soft: #e3ecf7;
   --k-yellow: #ffd700;
   --k-muted: #6b655a;
 }
@@ -73,7 +75,7 @@ body,
 }
 [class*='-ListCard-card']:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--k-red) !important;
+  box-shadow: 5px 5px 0 var(--k-blue) !important;
 }
 [class*='-SidebarHeading'],
 [class*='-CollectionTopHeading'],
@@ -94,12 +96,12 @@ body,
 /* the active one is marked by aria-current; the class label is on all of them */
 a[aria-current='page'][class*='-SidebarNavLink'],
 [class*='-SidebarNavLink']:hover {
-  color: var(--k-red) !important;
-  background: #fff3d1 !important;
-  border-left-color: var(--k-red) !important;
+  color: var(--k-blue) !important;
+  background: var(--k-blue-soft) !important;
+  border-left-color: var(--k-blue) !important;
 }
 a[aria-current='page'][class*='-SidebarNavLink'] svg {
-  color: var(--k-red) !important;
+  color: var(--k-blue) !important;
 }
 [class*='-SearchInput'] {
   background: var(--k-paper) !important;
@@ -118,10 +120,12 @@ a[aria-current='page'][class*='-SidebarNavLink'] svg {
 [class*='-NoPreviewContainer'] {
   background: var(--k-paper) !important;
 }
+/* fields: blue; red is kept for one thing only — a field that still needs
+   filling in (Decap lists the error next to the label after «Опубликовать») */
 [class*='-FieldLabel'] {
-  background: var(--k-ink) !important;
+  background: var(--k-blue) !important;
   color: var(--k-paper) !important;
-  border-color: var(--k-ink) !important;
+  border-color: var(--k-blue) !important;
   font-family: 'Oswald', sans-serif !important;
   font-weight: 500 !important;
   letter-spacing: 0.04em;
@@ -135,13 +139,23 @@ a[aria-current='page'][class*='-SidebarNavLink'] svg {
   border-color: var(--k-line) !important;
   font-family: 'Manrope', system-ui, sans-serif !important;
 }
-[class*='-ControlContainer']:focus-within [class*='-FieldLabel'] {
+[class*='-ControlContainer'] input:focus,
+[class*='-ControlContainer'] textarea:focus {
+  border-color: var(--k-blue) !important;
+}
+[class*='-ControlContainer']:has(> [class*='-ControlTopbar'] > [class*='-ControlErrorsList'] li)
+  > [class*='-ControlTopbar']
+  > [class*='-FieldLabel'] {
   background: var(--k-red) !important;
   border-color: var(--k-red) !important;
 }
-[class*='-ControlContainer']:focus-within input,
-[class*='-ControlContainer']:focus-within textarea {
+[class*='-ControlContainer']:has(> [class*='-ControlTopbar'] > [class*='-ControlErrorsList'] li)
+  > :not([class*='-ControlTopbar']):not([class*='-ControlHint'])
+  :is(input, textarea, [class*='-TextControl']) {
   border-color: var(--k-red) !important;
+}
+[class*='-ControlErrorsList'] {
+  color: var(--k-red) !important;
 }
 [class*='-ControlHint'] {
   color: var(--k-muted) !important;
@@ -193,7 +207,7 @@ a[aria-current='page'][class*='-SidebarNavLink'] svg {
 [class*='-ToolbarButton'][class*='Publish'],
 [class*='-PublishButton'],
 [class*='-SaveButton'] {
-  background: var(--k-red) !important;
+  background: var(--k-blue) !important;
   color: #fff !important;
 }
 [class*='-BooleanBackground'] {
