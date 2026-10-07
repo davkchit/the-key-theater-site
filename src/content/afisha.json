@@ -67,20 +67,6 @@
       "age": "16+"
     },
     {
-      "date": "2026-10-25",
-      "title": "Эмиль из Леннеберги",
-      "age": "6+",
-      "time": "12:00",
-      "band": "blue"
-    },
-    {
-      "date": "2026-10-25",
-      "title": "Бесконечный апрель",
-      "time": "18:00",
-      "band": "paper",
-      "age": "12+"
-    },
-    {
       "date": "2026-10-31",
       "title": "Лариса",
       "age": "16+",
@@ -97,33 +83,12 @@
       "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Simon/event/?id_event=272476"
     },
     {
-      "date": "2026-11-07",
-      "title": "Лариса",
-      "time": "18:00",
-      "band": "paper",
-      "age": "16+"
-    },
-    {
-      "date": "2026-11-08",
-      "title": "Бесконечный апрель",
-      "time": "18:00",
-      "band": "red",
-      "age": "12+"
-    },
-    {
       "date": "2026-11-14",
       "title": "Никаких последствий",
       "age": "16+",
       "time": "18:00",
       "band": "blue",
       "ticketUrl": "https://bileton.ru/widget/teatr_kluch_no_consequences/event/?id_event=272477"
-    },
-    {
-      "date": "2026-11-15",
-      "title": "Эмиль из Леннеберги",
-      "age": "6+",
-      "time": "12:00",
-      "band": "paper"
     },
     {
       "date": "2026-11-15",
@@ -140,26 +105,6 @@
       "band": "blue",
       "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Larisa/event/?id_event=272479",
       "age": "16+"
-    },
-    {
-      "date": "2026-11-22",
-      "title": "Ева Кюн",
-      "age": "12+",
-      "time": "12:00",
-      "band": "paper"
-    },
-    {
-      "date": "2026-11-22",
-      "title": "Бесконечный апрель",
-      "time": "18:00",
-      "band": "red",
-      "age": "12+"
-    },
-    {
-      "date": "2026-11-28",
-      "title": "Обыкновенное чудо",
-      "time": "12:00",
-      "band": "blue"
     },
     {
       "date": "2026-11-28",
@@ -184,129 +129,6 @@
       "band": "paper",
       "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Larisa/event/?id_event=272482",
       "age": "16+"
-    },
-    {
-      "date": "2026-12-06",
-      "title": "Бесконечный апрель",
-      "time": "18:00",
-      "band": "blue",
-      "age": "12+"
-    },
-    {
-      "date": "2026-12-18",
-      "title": "Карнавальная ночь",
-      "time": "19:00",
-      "band": "red"
-    },
-    {
-      "date": "2027-01-02",
-      "title": "Эмиль из Леннеберги",
-      "age": "6+",
-      "time": "12:00",
-      "band": "paper"
-    },
-    {
-      "date": "2027-01-02",
-      "title": "Симон",
-      "age": "18+",
-      "time": "18:00",
-      "band": "red"
-    },
-    {
-      "date": "2027-01-03",
-      "title": "Обыкновенное чудо",
-      "time": "12:00",
-      "band": "blue"
-    },
-    {
-      "date": "2027-01-03",
-      "title": "Никаких последствий",
-      "age": "16+",
-      "time": "18:00",
-      "band": "paper"
-    },
-    {
-      "date": "2027-01-09",
-      "title": "Лариса",
-      "time": "18:00",
-      "band": "red",
-      "age": "16+"
-    },
-    {
-      "date": "2027-01-10",
-      "title": "Ева Кюн",
-      "age": "12+",
-      "time": "12:00",
-      "band": "blue"
-    },
-    {
-      "date": "2027-01-10",
-      "title": "Бесконечный апрель",
-      "time": "18:00",
-      "band": "paper",
-      "age": "12+"
-    },
-    {
-      "date": "2027-01-15",
-      "title": "Обыкновенное чудо",
-      "time": "18:00",
-      "band": "red"
-    },
-    {
-      "date": "2027-01-16",
-      "title": "Никаких последствий",
-      "age": "16+",
-      "time": "18:00",
-      "band": "blue"
-    },
-    {
-      "date": "2027-01-17",
-      "title": "Симон",
-      "age": "18+",
-      "time": "18:00",
-      "band": "paper"
-    },
-    {
-      "date": "2027-01-22",
-      "title": "Ева Кюн",
-      "age": "12+",
-      "time": "18:00",
-      "band": "red"
-    },
-    {
-      "date": "2027-01-23",
-      "title": "Лариса",
-      "time": "18:00",
-      "band": "blue",
-      "age": "16+"
-    },
-    {
-      "date": "2027-01-24",
-      "title": "Эмиль из Леннеберги",
-      "age": "6+",
-      "time": "12:00",
-      "band": "paper"
-    },
-    {
-      "date": "2027-01-24",
-      "title": "Бесконечный апрель",
-      "time": "18:00",
-      "band": "red",
-      "age": "12+"
-    },
-    {
-      "date": "2027-01-30",
-      "title": "Никаких последствий",
-      "age": "16+",
-      "time": "18:00",
-      "band": "blue"
-    },
-    {
-      "date": "2027-01-31",
-      "title": "Симон",
-      "age": "18+",
-      "time": "18:00",
-      "band": "paper"
     }
   ]
 }

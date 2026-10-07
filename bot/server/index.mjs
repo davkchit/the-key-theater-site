@@ -230,8 +230,9 @@ function unansweredSince(fromIso) {
 setInterval(weeklyReport, 3600e3).unref()
 
 // ---- the afisha follows Bileton's widgets hourly (deploy/cms/bileton-sync.sh),
-// which leaves a status file. Problems go to the mailbox that gets the leads —
-// whoever runs the site — once per new set of problems, not every hour.
+// which leaves a status file. What it removed and what failed goes to the
+// mailbox that gets the leads — whoever runs the site — once per run that
+// had something to say, not every hour.
 const BILETON_STATUS = env.BOT_BILETON_STATUS || '/opt/kluch/cms/bileton-status.json'
 function checkBileton() {
   let st
@@ -243,18 +244,19 @@ function checkBileton() {
   const broken = [...(st.errors || [])]
   const stale = Date.now() - Date.parse(st.checkedAt || 0)
   if (stale > 3 * 3600e3) broken.unshift('Синхронизация не запускалась с ' + new Date(Date.parse(st.checkedAt || 0)).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' }))
-  const extra = st.mismatches || []
-  const sig = broken.concat(extra).join('\n')
+  const gone = st.removed || []
+  // a run's removals are news once; a lasting failure is news until fixed
+  const sig = broken.join('\n') + '|' + (gone.length ? st.checkedAt : '')
   if (store.getKv('biletonSig') === sig) return
   store.putKv('biletonSig', sig)
-  if (!sig) return
+  if (!broken.length && !gone.length) return
   const parts = []
+  if (gone.length) parts.push('С сайта убраны даты, которых нет на Билетоне (отменены, перенесены или не заводились):\n- ' + gone.join('\n- '))
   if (broken.length) parts.push('Не получилось прочитать Билетон, даты этих спектаклей на сайте сейчас не обновляются:\n- ' + broken.join('\n- '))
-  if (extra.length) parts.push('Эти даты есть в афише сайта, но не продаются на Билетоне. Если показ отменён — уберите его в админке, раздел «Афиша»; если ещё не в продаже — ничего делать не нужно:\n- ' + extra.join('\n- '))
-  const text = 'Афиша сайта сверяется с Билетоном каждый час.\n\n' + parts.join('\n\n')
+  const text = 'Афиша сайта берётся с Билетона и обновляется каждый час.\n\n' + parts.join('\n\n')
   store.commit({ chats: [], leads: [], statuses: [], unanswered: [], mail: [{ at: new Date().toISOString(), to: 'leads', subject: 'Сайт «Ключ»: афиша и Билетон', text, html: '' }] })
   mailer.flush()
-  log('Билетон: письмо о расхождениях —', broken.length, 'ошибок,', extra.length, 'дат')
+  log('Билетон: письмо —', gone.length, 'убрано,', broken.length, 'ошибок')
 }
 setInterval(checkBileton, 30 * 60e3).unref()
 setTimeout(checkBileton, 60e3).unref()

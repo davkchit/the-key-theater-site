@@ -1,13 +1,14 @@
-// Puts the sessions from each show's Bileton widget into the afisha. A show
-// takes part when its «Ссылка на билеты» in the admin is a widget link
-// (https://bileton.ru/widget/teatr_kluch_Simon). Run hourly by
-// kluch-bileton.timer through bileton-sync.sh, which commits the result like
-// an admin edit. Prints one line per change (for the commit message) and
-// writes a status file the bot reads to warn about problems by email.
+// Makes the afisha's upcoming dates exactly what Bileton sells: Bileton is the
+// one source. A show takes part when its «Виджет Билетона» in the admin is a
+// widget link (https://bileton.ru/widget/teatr_kluch_Simon); upcoming dates of
+// anything else leave the afisha. Run hourly by kluch-bileton.timer through
+// bileton-sync.sh, which commits the result like an admin edit. Prints one line
+// per change (for the commit message) and writes a status file the bot reads
+// to tell people by email what was removed or what failed.
 //
 //   node deploy/cms/sync-bileton.mjs [status.json]
 import fs from 'node:fs'
-import { fetchWidget, isWidgetUrl, parseWidget, syncShow } from '../../bot/core/bileton.mjs'
+import { dropNotOnBileton, fetchWidget, isWidgetUrl, parseWidget, syncShow } from '../../bot/core/bileton.mjs'
 
 const STATUS = process.argv[2] || ''
 const AFISHA = 'src/content/afisha.json'
@@ -21,35 +22,45 @@ const afisha = JSON.parse(fs.readFileSync(AFISHA, 'utf8'))
 const before = JSON.stringify(afisha.items)
 
 const errors = []
-const mismatches = []
 const changes = []
+const removed = []
+const synced = []
+const failed = []
 let sessions = 0
-let checked = 0
 for (const show of shows) {
   if (!show.title || !isWidgetUrl(show.ticketUrl)) continue
-  checked++
   try {
     const list = parseWidget(await fetchWidget(show.ticketUrl.trim()), today)
     sessions += list.length
     const r = syncShow(afisha.items, show.title, list, today)
     afisha.items = r.items
     changes.push(...r.changes)
-    mismatches.push(...r.mismatches)
+    removed.push(...r.removed)
+    synced.push(show.title)
   } catch (e) {
-    // one broken widget leaves that show's dates as they were
+    // a widget that did not load leaves that show's dates as they were
     errors.push(`«${show.title}»: ${e.message}`)
+    failed.push(show.title)
   }
+}
+
+// nothing read at all (Bileton down, no widgets yet): touch nothing
+if (synced.length) {
+  const r = dropNotOnBileton(afisha.items, synced, failed, today)
+  afisha.items = r.items
+  removed.push(...r.removed)
 }
 
 if (JSON.stringify(afisha.items) !== before) {
   fs.writeFileSync(AFISHA, JSON.stringify(afisha, null, 2) + '\n')
+  const lines = [...changes, ...removed.map((r) => `убран ${r} — нет на Билетоне`)]
   // a pure link-format update has no change line of its own
-  console.log(changes.length ? changes.join('\n') : 'ссылки на покупку обновлены')
+  console.log(lines.length ? lines.join('\n') : 'ссылки на покупку обновлены')
 }
 
 if (STATUS) {
   fs.writeFileSync(
     STATUS,
-    JSON.stringify({ checkedAt: new Date().toISOString(), today, shows: checked, sessions, errors, mismatches, changes }, null, 2) + '\n',
+    JSON.stringify({ checkedAt: new Date().toISOString(), today, shows: synced.length, sessions, errors, changes, removed }, null, 2) + '\n',
   )
 }

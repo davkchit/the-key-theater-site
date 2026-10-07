@@ -64,24 +64,36 @@ export const sessionIdOf = (url) => {
   return m ? Number(m[1] || m[2]) : null
 }
 
+const short = (iso) => `${iso.slice(8)}.${iso.slice(5, 7)}`
+const sameTitle = (a, title) => String(a.title || '').trim().toLowerCase() === String(title).trim().toLowerCase()
+
 /**
- * Brings one show's afisha dates in line with its widget. Adds sessions the
- * site lacks and fixes time, link and age; never removes anything — a date on
- * the site but not on sale may be a plan or a cancellation, and that is a
- * person's call. Returns the new items and what changed or looks wrong.
+ * Makes one show's upcoming dates exactly its widget's: Bileton is the one
+ * source of the afisha. Adds what the site lacks, fixes time, link and age,
+ * and removes upcoming dates Bileton no longer sells (cancelled, moved).
+ * Past dates stay — the review card looks at them, and they leave the list
+ * by themselves after three months (prune-afisha.mjs).
  */
 export function syncShow(items, title, sessions, todayIso) {
-  const same = (a) => String(a.title || '').trim().toLowerCase() === title.trim().toLowerCase()
+  const same = (a) => sameTitle(a, title)
   const out = items.map((i) => ({ ...i }))
   const changes = []
-  const mismatches = []
-  const short = (iso) => `${iso.slice(8)}.${iso.slice(5, 7)}`
+  const removed = []
+  const claimed = new Set()
   for (const s of sessions) {
     if (s.date < todayIso) continue
-    // the same show that day: by session number first, then by date
-    let item = out.find((i) => same(i) && sessionIdOf(i.ticketUrl) === s.id) || out.find((i) => same(i) && i.date === s.date)
+    // the same session on the site: by its number, then by day and hour,
+    // then by day (a show can play twice a day, at 12:00 and at 18:00)
+    const free = (i) => same(i) && !claimed.has(i)
+    let item =
+      out.find((i) => free(i) && sessionIdOf(i.ticketUrl) === s.id) ||
+      out.find((i) => free(i) && i.date === s.date && i.time === s.time) ||
+      out.find((i) => free(i) && i.date === s.date)
+    if (item) claimed.add(item)
     if (!item) {
-      out.push({ date: s.date, title, time: s.time, ...(s.age ? { age: s.age } : {}), band: 'paper', ticketUrl: s.link })
+      const added = { date: s.date, title, time: s.time, ...(s.age ? { age: s.age } : {}), band: 'paper', ticketUrl: s.link }
+      out.push(added)
+      claimed.add(added)
       changes.push(`добавлен «${title}» ${short(s.date)} ${s.time}`)
       continue
     }
@@ -102,17 +114,29 @@ export function syncShow(items, title, sessions, todayIso) {
       changes.push(`«${title}»: возраст ${s.age}`)
     }
   }
-  // on the site, not on Bileton: only within what Bileton already sells —
-  // dates beyond its last session are the season plan, not a problem
-  const last = sessions.map((s) => s.date).sort().pop()
-  for (const i of out) {
-    if (!same(i) || i.date < todayIso) continue
-    if (sessions.some((s) => s.date === i.date)) continue
-    const hadLink = sessionIdOf(i.ticketUrl) !== null
-    if (hadLink || (last && i.date <= last)) {
-      mismatches.push(`«${title}» ${short(i.date)} ${i.time || ''} — на сайте есть, на Билетоне нет${hadLink ? ' (был в продаже: отменён или распродан?)' : ''}`)
-    }
-  }
-  out.sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')))
-  return { items: out, changes, mismatches }
+  const kept = out.filter((i) => {
+    if (!same(i) || i.date < todayIso || claimed.has(i)) return true
+    removed.push(`«${title}» ${short(i.date)} ${i.time || ''}`.trim())
+    return false
+  })
+  kept.sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')))
+  return { items: kept, changes, removed }
+}
+
+/**
+ * Upcoming dates of anything without a readable widget — shows not on
+ * Bileton, events typed in by hand — leave the afisha: Bileton is its one
+ * source. `protect` are titles whose widget failed to load this time; their
+ * dates stay until it loads again, so a Bileton hiccup never empties them.
+ */
+export function dropNotOnBileton(items, onBileton, protect, todayIso) {
+  const removed = []
+  const keep = (i) =>
+    i.date < todayIso || onBileton.some((t) => sameTitle(i, t)) || protect.some((t) => sameTitle(i, t))
+  const out = items.filter((i) => {
+    if (keep(i)) return true
+    removed.push(`«${i.title}» ${short(i.date)} ${i.time || ''}`.trim())
+    return false
+  })
+  return { items: out, removed }
 }
