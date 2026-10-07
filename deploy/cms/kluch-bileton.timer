@@ -2,8 +2,9 @@
 Description=Kluch afisha from Bileton, every hour
 
 [Timer]
-OnBootSec=5min
-OnUnitActiveSec=1h
+# a fixed minute every hour: "an hour after the last run" never started on a
+# timer switched on after a manual run
+OnCalendar=*-*-* *:07:00
 RandomizedDelaySec=5min
 Persistent=true
 
