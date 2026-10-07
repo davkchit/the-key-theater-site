@@ -9,7 +9,7 @@
       ],
       "dur": "1 ч 40 мин",
       "genre": "весёлые похороны",
-      "ticketUrl": "https://bileton.ru/events/spektakl-simon-270401",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Simon",
       "bg": "red",
       "dir": "Софья Дивногорская",
       "photo": "/uploads/shows/simon.jpg",
@@ -34,14 +34,14 @@
       "synopsis": "Во время поездки по Германии молодой дворянин Дмитрий Санин при весьма драматических обстоятельствах знакомится с Джеммой и её семьёй — итальянцами, которые много лет живут во Франкфурте. Между молодыми людьми возникает чувство, и, несмотря на препятствия, они решают пожениться. Чтобы решить финансовые вопросы, связанные с предстоящей свадьбой, Дмитрий на несколько дней уезжает в Висбаден… И тут что-то пошло не так.",
       "title": "Никаких последствий",
       "age": "16+",
-      "ticketUrl": "https://bileton.ru/events/spektakl-nikakih-posledstviy-272477"
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_no_consequences"
     },
     {
       "title": "Лариса",
       "based": "новый спектакль сезона 2026/2027",
       "photo": "",
       "bg": "yellow",
-      "ticketUrl": "https://bileton.ru/events/spektakl-larisa-272475",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Larisa",
       "age": "16+"
     },
     {
@@ -49,7 +49,7 @@
       "based": "в репертуаре сезона 2026/2027",
       "photo": "",
       "bg": "ink",
-      "ticketUrl": "https://bileton.ru/events/beskonechnyy-aprel-270390",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_endless_April",
       "age": "12+"
     },
     {

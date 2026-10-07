@@ -1,0 +1,13 @@
+[Unit]
+Description=Kluch afisha from the shows' Bileton widgets
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=kluch-cms
+Group=kluch-cms
+Environment=HOME=/opt/kluch/cms
+ExecStart=/opt/kluch/cms/bileton-sync.sh
+MemoryMax=200M
+TimeoutStartSec=300

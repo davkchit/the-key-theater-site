@@ -36,6 +36,7 @@ collections:
             name: items
             widget: list
             summary: "{{fields.date | date('DD.MM.YYYY')}} · {{fields.time}} — {{fields.title}}"
+            hint: 'Даты спектаклей, у которых в «Репертуаре» вписан виджет Билетона, сайт каждый час берёт с Билетона сам: новые сеансы появляются здесь без вас. Вручную — только то, чего на Билетоне нет. Если дата есть на сайте, но не продаётся на Билетоне, придёт письмо'
             fields:
               - { label: Дата, name: date, widget: date, format: 'YYYY-MM-DD', hint: 'День недели сайт определит сам по этой дате' }
               - { label: Название спектакля, name: title, widget: string }
@@ -71,7 +72,7 @@ collections:
               - { label: Режиссёр, name: dir, widget: string, required: false }
               - { label: Длительность, name: dur, widget: string, required: false, hint: 'Например 1 ч 40 мин' }
               - { label: Фото со спектакля, name: photo, widget: image, required: false, hint: 'Если пусто — покажем фирменную заглушку' }
-              - { label: Ссылка на билеты, name: ticketUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Начните со https://'], hint: 'Страница этого спектакля на Билетоне или Яндекс Афише. Если пусто — бот просто скажет, где продаются билеты' }
+              - { label: Виджет Билетона (ссылка на билеты), name: ticketUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Начните со https://'], hint: 'Ссылка на виджет этого спектакля, например https://bileton.ru/widget/teatr_kluch_Simon. По ней сайт сам берёт даты в афишу и открывает покупку поверх сайта. Новому спектаклю виджет делает Билетон — попросите в письме при заведении. Если пусто — «Купить» ведёт на общую витрину' }
               - label: Фото спектакля
                 name: photos
                 widget: list

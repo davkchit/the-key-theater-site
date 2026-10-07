@@ -28,9 +28,10 @@ echo '== decap-server'
 
 install -m 755 -o root -g root "$HERE/rebuild.sh" /opt/kluch/cms/rebuild.sh
 install -m 755 -o root -g root "$HERE/kluch-site-publish" /usr/local/sbin/kluch-site-publish
-install -m 644 "$HERE/kluch-cms.service" "$HERE/kluch-rebuild.service" "$HERE/kluch-rebuild.path" /etc/systemd/system/
+install -m 755 -o root -g root "$HERE/bileton-sync.sh" /opt/kluch/cms/bileton-sync.sh
+install -m 644 "$HERE/kluch-cms.service" "$HERE/kluch-rebuild.service" "$HERE/kluch-rebuild.path" "$HERE/kluch-bileton.service" "$HERE/kluch-bileton.timer" /etc/systemd/system/
 systemctl daemon-reload
-systemctl enable --now kluch-cms.service kluch-rebuild.path
+systemctl enable --now kluch-cms.service kluch-rebuild.path kluch-bileton.timer
 
 echo '== первая сборка'
 systemctl start kluch-rebuild.service
