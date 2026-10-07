@@ -4,7 +4,7 @@ import { shows } from '../data/shows'
 import { PrintFilters, BTN, H2, WRAP } from '../components/home2/parts'
 import { Torn } from '../components/home2/paper'
 import { ShowPoster } from '../components/home2/ShowPoster'
-import { heroShows, longDate, showPath } from '../components/home2/homeData'
+import { heroShows, longDate, showPath, upcomingCards } from '../components/home2/homeData'
 import { Reveal } from '../components/ui/Reveal'
 import starSvg from '../../assets/el-star.svg'
 
@@ -30,7 +30,15 @@ const fits = (f: Filter, age?: string) => {
 export default function RepertoirePageV2() {
   const [filter, setFilter] = useState<Filter>('all')
   const list = shows.filter((s) => fits(filter, s.age))
-  const featured = heroShows[0]
+  // the very next show on the schedule, with its first-screen photo when the
+  // admin picked one (heroShows only holds shows that have such a photo)
+  const nearest = upcomingCards[0]
+  const heroPick = nearest && heroShows.find((h) => h.item.title === nearest.item.title)
+  const featured = nearest && {
+    ...nearest,
+    photo: heroPick?.photo || nearest.photo,
+    focus: heroPick?.focus,
+  }
 
   return (
     <div className="bg-paper relative overflow-x-clip">
@@ -77,16 +85,18 @@ export default function RepertoirePageV2() {
       {featured && (
         <section className="bg-ink text-paper relative isolate">
           <Torn color="text-ink" seed={131} />
-          <div className="absolute inset-0 -z-10 overflow-hidden md:left-[40%]">
-            <img
-              src={featured.photo}
-              alt=""
-              loading="lazy"
-              className="h-full w-full object-cover opacity-60 md:opacity-100"
-              style={{ objectPosition: featured.focus ?? '60% 40%' }}
-            />
-            <div className="from-ink via-ink/60 md:via-ink/30 absolute inset-0 bg-gradient-to-t to-transparent md:bg-gradient-to-r md:via-30%" />
-          </div>
+          {featured.photo && (
+            <div className="absolute inset-0 -z-10 overflow-hidden md:left-[40%]">
+              <img
+                src={featured.photo}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover opacity-60 md:opacity-100"
+                style={{ objectPosition: featured.focus ?? '60% 40%' }}
+              />
+              <div className="from-ink via-ink/60 md:via-ink/30 absolute inset-0 bg-gradient-to-t to-transparent md:bg-gradient-to-r md:via-30%" />
+            </div>
+          )}
           <div className={`${WRAP} relative z-[3] py-16 md:py-24`}>
             <div className="font-heading flex items-center gap-3 text-[18px] tracking-[.06em] uppercase md:text-[22px]">
               <img src={starSvg} alt="" aria-hidden="true" className="h-8 w-8 invert" />

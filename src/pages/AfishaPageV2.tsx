@@ -5,7 +5,14 @@ import { upcomingAfisha } from '../data/afisha'
 import { shows } from '../data/shows'
 import { PrintFilters, BTN, RoughFrame, WRAP } from '../components/home2/parts'
 import { Torn } from '../components/home2/paper'
-import { TICKETS_URL, heroShows, longDate, showPath } from '../components/home2/homeData'
+import {
+  TICKETS_URL,
+  heroShows,
+  longDate,
+  showPath,
+  upcomingCards,
+} from '../components/home2/homeData'
+import { PosterArt } from '../components/home2/ShowPoster'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import starSvg from '../../assets/el-star.svg'
 import { PHONE, PLACE, TICKETS_WHERE, telHref } from '../data/contacts'
@@ -46,7 +53,15 @@ const WD: Record<string, string> = {
 const byTitle = (t: string) => shows.find((s) => s.title.toLowerCase() === t.toLowerCase())
 const months = [...new Set(upcomingAfisha.map((i) => i.mon))]
 // the nearest show that has a proper photo picked for the homepage
-const featured = heroShows[0]
+// the very next show on the schedule; its first-screen photo from the admin
+// when it has one, else its own photo, else a drawn poster
+const nearest = upcomingCards[0]
+const heroPick = nearest && heroShows.find((h) => h.item.title === nearest.item.title)
+const featured = nearest && {
+  ...nearest,
+  photo: heroPick?.photo || nearest.photo,
+  focus: heroPick?.focus,
+}
 
 // A theatre season runs September to August: "2026 / 2027" until next summer.
 function season(now = new Date()) {
@@ -169,12 +184,23 @@ function Featured({ dark }: { dark: boolean }) {
   return (
     <div className="grid items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
       <RoughFrame>
-        <img
-          src={featured.photo}
-          alt={`«${featured.item.title}»`}
-          className="aspect-[16/10] w-full object-cover"
-          style={{ objectPosition: featured.focus ?? '60% 40%' }}
-        />
+        {featured.photo ? (
+          <img
+            src={featured.photo}
+            alt={`«${featured.item.title}»`}
+            className="aspect-[16/10] w-full object-cover"
+            style={{ objectPosition: featured.focus ?? '60% 40%' }}
+          />
+        ) : (
+          <PosterArt
+            photo=""
+            n={Math.max(
+              0,
+              shows.findIndex((x) => x.title === featured.item.title),
+            )}
+            className="aspect-[16/10]"
+          />
+        )}
       </RoughFrame>
       <div className="relative">
         {dark && (
