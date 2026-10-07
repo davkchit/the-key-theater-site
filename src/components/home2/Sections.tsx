@@ -9,25 +9,13 @@ import { Modal } from '../ui/Modal'
 import { FestivalSignupForm } from '../about/FestivalSignupForm'
 import { Reveal } from '../ui/Reveal'
 import { SwallowIcon } from '../ui/SwallowIcon'
-import {
-  BTN,
-  Duotone,
-  Ink,
-  MoreLink,
-  Portrait,
-  RoughFrame,
-  SectionHead,
-  WRAP,
-  type Tone,
-} from './parts'
+import { BTN, Ink, MoreLink, Portrait, RoughFrame, SectionHead, WRAP } from './parts'
 import { Torn } from './paper'
 import { upcomingCards, shortDate, galleryPhoto, showPath } from './homeData'
+import { PosterArt } from './ShowPoster'
+import { shows } from '../../data/shows'
 import boyFence from '../../../assets/el-boy-fence.svg'
 import starSvg from '../../../assets/el-star.svg'
-import ladderSvg from '../../../assets/el-ladder.svg'
-import faceSvg from '../../../assets/el-face.svg'
-import flowerSvg from '../../../assets/el-flower.svg'
-import chairSvg from '../../../assets/el-chair.svg'
 import { CITY, VENUE } from '../../data/contacts'
 import { homePeople } from '../../data/people'
 
@@ -100,28 +88,6 @@ export function FestivalStrip() {
 
 /* ─────────────── nearest shows ─────────────── */
 
-// Colours in the mockup's order. Each poster gets its own ink drawings.
-const CARD_TONES: Tone[] = ['red', 'paper', 'blue', 'ink']
-const EMPTY_ART = [faceSvg, flowerSvg, chairSvg, faceSvg]
-
-function CardInk({ n, light }: { n: number; light: boolean }) {
-  switch (n % 4) {
-    case 0:
-      return <Ink src={starSvg} className="top-[6%] right-[5%] h-[34%] w-[34%]" />
-    case 1:
-      return (
-        <>
-          <Ink src={ladderSvg} className="top-[4%] right-[24%] h-[62%] w-[14%]" />
-          <SwallowIcon className="text-ink pointer-events-none absolute top-[22%] right-[4%] h-[16%] -rotate-12" />
-        </>
-      )
-    case 2:
-      return <Ink src={starSvg} className="top-[6%] right-[5%] h-[32%] w-[32%]" />
-    default:
-      return <Ink src={ladderSvg} light={light} className="top-[3%] right-[8%] h-[62%] w-[14%]" />
-  }
-}
-
 export function UpcomingShows() {
   if (!upcomingCards.length) return null
   return (
@@ -131,31 +97,19 @@ export function UpcomingShows() {
         <SectionHead title="Ближайшие спектакли" to="/afisha" link="Вся афиша" />
         <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-5 overflow-x-auto px-4 pb-2 sm:grid sm:grid-cols-2 sm:gap-x-0 sm:gap-y-10 sm:overflow-visible sm:px-0 lg:grid-cols-4">
           {upcomingCards.map((h, n) => {
-            const tone = CARD_TONES[n % 4] as Tone
-            const light = tone === 'ink'
             return (
               <Reveal
                 key={h.item.title}
                 index={n}
                 className="sm:border-ink/15 flex w-[78vw] max-w-[340px] flex-shrink-0 snap-start flex-col sm:w-auto sm:max-w-none sm:border-l sm:px-5 sm:pb-2 sm:odd:border-l-0 lg:[&:nth-child(3)]:border-l"
               >
-                <Duotone
-                  src={h.photo}
-                  tone={tone}
+                <PosterArt
+                  photo={h.photo}
+                  tint={h.show?.tint}
+                  n={h.show ? shows.indexOf(h.show) : n}
                   alt={h.photo ? `«${h.item.title}»` : ''}
                   className="aspect-[1/1]"
-                  position="50% 25%"
-                >
-                  {h.photo ? (
-                    <CardInk n={n} light={light} />
-                  ) : (
-                    <Ink
-                      src={EMPTY_ART[n % 4] as string}
-                      light={light}
-                      className="inset-0 m-auto h-3/5 w-3/5"
-                    />
-                  )}
-                </Duotone>
+                />
                 <h3 className="font-heading mt-5 min-h-[2em] max-w-[14ch] text-[28px] leading-[1.02] font-bold uppercase xl:text-[32px]">
                   <Link to={showPath(h.item.title)} className="hover:underline">
                     {h.item.title}

@@ -72,6 +72,18 @@ collections:
               - { label: Режиссёр, name: dir, widget: string, required: false }
               - { label: Длительность, name: dur, widget: string, required: false, hint: 'Например 1 ч 40 мин' }
               - { label: Фото со спектакля, name: photo, widget: image, required: false, hint: 'Если пусто — покажем фирменную заглушку' }
+              - label: Цвет поверх фото
+                name: tint
+                widget: select
+                required: false
+                default: ''
+                hint: 'Фото в карточках спектакля можно «напечатать» в два цвета в стиле афиши. По умолчанию — живые цвета фото'
+                options:
+                  - { label: Без цвета (живое фото), value: '' }
+                  - { label: Красный, value: red }
+                  - { label: Жёлтый, value: yellow }
+                  - { label: Синий, value: blue }
+                  - { label: Чёрно-белый, value: ink }
               - { label: Виджет Билетона (ссылка на билеты), name: ticketUrl, widget: string, required: false, pattern: ['^$|^https?://', 'Начните со https://'], hint: 'Ссылка на виджет этого спектакля, например https://bileton.ru/widget/teatr_kluch_Simon. По ней сайт сам берёт даты в афишу и открывает покупку поверх сайта. Новому спектаклю виджет делает Билетон — попросите в письме при заведении. Если пусто — «Купить» ведёт на общую витрину' }
               - label: Фото спектакля
                 name: photos

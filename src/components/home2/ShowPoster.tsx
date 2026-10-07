@@ -1,64 +1,61 @@
 import { Link } from 'react-router-dom'
 import type { Show } from '../../types/content'
-import { SwallowIcon } from '../ui/SwallowIcon'
 import { BTN, Duotone, Ink, type Tone } from './parts'
 import { showPath } from './homeData'
-import starSvg from '../../../assets/el-star.svg'
-import ladderSvg from '../../../assets/el-ladder.svg'
 import chairSvg from '../../../assets/el-chair.svg'
 import faceSvg from '../../../assets/el-face.svg'
 import flowerSvg from '../../../assets/el-flower.svg'
 
-// A show as a two-colour poster, the same on the homepage, the repertoire and
-// a show's own page. A show without a photo gets a big ink drawing instead of
-// an empty frame, so it still looks like a poster.
+// A show's card, the same on the homepage, the repertoire and a show's own
+// page. A show without a photo gets a big ink drawing instead of an empty
+// frame, so it still looks like a poster.
 
 const POSTER_TONES: Tone[] = ['red', 'paper', 'blue', 'ink']
 const EMPTY_ART = [faceSvg, flowerSvg, chairSvg, faceSvg]
 
-function PosterInk({ n, light }: { n: number; light: boolean }) {
-  switch (n % 4) {
-    case 0:
-      return <Ink src={starSvg} className="top-[6%] right-[5%] h-[34%] w-[34%]" />
-    case 1:
-      return (
-        <>
-          <Ink src={ladderSvg} className="top-[4%] right-[24%] h-[62%] w-[14%]" />
-          <SwallowIcon className="text-ink pointer-events-none absolute top-[22%] right-[4%] h-[16%] -rotate-12" />
-        </>
-      )
-    case 2:
-      return <Ink src={chairSvg} className="top-[6%] right-[6%] h-[30%] w-[22%]" light />
-    default:
-      return <Ink src={ladderSvg} light={light} className="top-[3%] right-[8%] h-[62%] w-[14%]" />
-  }
-}
-
-/** Just the picture part of a poster. */
+/**
+ * A show's picture, the same everywhere: the photo in live colour, or in two
+ * colours when the theatre picked one in the admin («Цвет поверх фото»). A show
+ * without a photo gets a drawn poster instead of an empty frame.
+ */
 export function PosterArt({
   photo,
   n,
+  tint,
   alt = '',
   className = '',
 }: {
   photo: string
   n: number
+  tint?: Show['tint']
   alt?: string
   className?: string
 }) {
-  const tone = POSTER_TONES[n % 4] as Tone
+  if (photo && !tint) {
+    return (
+      <div className={`bg-ink relative overflow-hidden ${className}`}>
+        <img
+          src={photo}
+          alt={alt}
+          loading="lazy"
+          style={{ objectPosition: '50% 25%' }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
+    )
+  }
+  if (photo && tint) {
+    return (
+      <Duotone src={photo} tone={tint as Tone} alt={alt} className={className} position="50% 25%" />
+    )
+  }
+  // the same colour for a show everywhere: its tint if picked, else by its
+  // place in the repertoire (callers pass that, not the card's position)
+  const tone = (tint || POSTER_TONES[n % 4]) as Tone
   const light = tone === 'ink' || tone === 'blue'
   return (
-    <Duotone src={photo} tone={tone} alt={alt} className={className} position="50% 25%">
-      {photo ? (
-        <PosterInk n={n} light={light} />
-      ) : (
-        <Ink
-          src={EMPTY_ART[n % 4] as string}
-          light={light}
-          className="inset-0 m-auto h-3/5 w-3/5"
-        />
-      )}
+    <Duotone src="" tone={tone} alt={alt} className={className}>
+      <Ink src={EMPTY_ART[n % 4] as string} light={light} className="inset-0 m-auto h-3/5 w-3/5" />
     </Duotone>
   )
 }
@@ -82,6 +79,7 @@ export function ShowPoster({ show, n }: { show: Show; n: number }) {
       <Link to={to} className="block" aria-label={`«${show.title}» — подробнее`}>
         <PosterArt
           photo={show.photo}
+          tint={show.tint}
           n={n}
           alt={show.photo ? `«${show.title}»` : ''}
           className="aspect-[1/1]"

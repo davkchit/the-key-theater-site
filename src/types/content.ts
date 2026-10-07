@@ -48,6 +48,8 @@ export interface Show {
    *  the theatre pastes one in, the bot and the site say where tickets are sold
    *  instead of linking to a guess. */
   ticketUrl?: string
+  /** a two-colour print over the photo, picked in the admin; empty = live colour */
+  tint?: 'red' | 'yellow' | 'blue' | 'ink' | ''
   bg: BrandColorKey
   /** stage photos for the show's own page; empty = the block is hidden */
   photos?: string[]

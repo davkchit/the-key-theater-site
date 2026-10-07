@@ -272,7 +272,7 @@ export default function ShowPageV2() {
                 return (
                   <div key={s.title} className="flex flex-col">
                     <Link to={showPath(s.title)}>
-                      <PosterArt photo={s.photo} n={n} className="aspect-[16/10]" />
+                      <PosterArt photo={s.photo} tint={s.tint} n={n} className="aspect-[16/10]" />
                     </Link>
                     <h3 className="font-heading mt-4 text-[24px] leading-tight font-bold uppercase">
                       <Link to={showPath(s.title)} className="hover:underline">
