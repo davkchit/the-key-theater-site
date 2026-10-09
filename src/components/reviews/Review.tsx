@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { REVIEW_LINKS } from '../../data/contacts'
 import { BTN, WRAP } from '../home2/parts'
-import { Grain, Torn } from '../home2/paper'
+import { Torn } from '../home2/paper'
 import { SPRING } from '../home2/motion'
 import { SwallowIcon } from '../ui/SwallowIcon'
 import { markReviewAsked, reviewDue, watchTicketClicks } from '../../lib/reviewNudge'
+import yandexIcon from '../../../assets/icon-yandex-maps.svg'
+import gisIcon from '../../../assets/icon-2gis.png'
+
+const ICON = { yandex: yandexIcon, '2gis': gisIcon }
 
 // «Были у нас на спектакле?»: links to the theatre's review pages on 2GIS and
 // Yandex Maps. A yellow band on the show and afisha pages, and a small card
@@ -15,15 +19,16 @@ import { markReviewAsked, reviewDue, watchTicketClicks } from '../../lib/reviewN
 function Buttons({ onPick, onRed = false }: { onPick?: () => void; onRed?: boolean }) {
   return (
     <div className="flex flex-wrap gap-3">
-      {REVIEW_LINKS.map((l, i) => (
+      {REVIEW_LINKS.map((l) => (
         <a
           key={l.href}
           href={l.href}
           target="_blank"
           rel="noopener noreferrer"
           onClick={onPick}
-          className={`${BTN} px-6 py-3.5 text-[15px] ${i === 0 ? (onRed ? 'bg-paper text-ink' : 'bg-ink text-paper') : onRed ? 'border-paper border-2 bg-transparent' : 'border-ink border-2 bg-transparent'}`}
+          className={`${BTN} bg-paper text-ink gap-3 border-2 px-5 py-3 text-[15px] ${onRed ? 'border-paper' : 'border-ink'}`}
         >
+          <img src={ICON[l.key]} alt="" aria-hidden="true" className="h-6 w-6 rounded-md" />
           {l.label}
         </a>
       ))}
@@ -59,16 +64,19 @@ export function ReviewBand({ red = false }: { red?: boolean }) {
   )
 }
 
+// "?otzyv" in the address shows the card at once, to see how it looks
+const preview = () => REVIEW_LINKS.length > 0 && /[?&]otzyv/.test(window.location.href)
+
 /** The once-only card, shown a few seconds after the page opens. */
 export function ReviewInvite() {
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(preview)
   const reduce = useReducedMotion()
 
   useEffect(() => watchTicketClicks(), [])
   // a few seconds in, and only once the first screen is scrolled past: on
   // the homepage it would otherwise sit right on the hero's ticket button
   useEffect(() => {
-    if (!REVIEW_LINKS.length || !reviewDue()) return
+    if (!REVIEW_LINKS.length || preview() || !reviewDue()) return
     let waited = false
     let scrolled = false
     const maybe = () => waited && scrolled && setShow(true)
@@ -108,7 +116,6 @@ export function ReviewInvite() {
           transition={SPRING}
         >
           <Torn color="text-brand-yellow" seed={337} />
-          <Grain opacity={0.25} />
           <button
             type="button"
             onClick={close}

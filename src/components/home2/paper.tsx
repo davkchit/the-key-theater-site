@@ -48,11 +48,19 @@ interface TornProps {
  * The torn edge of a coloured band. Put it inside a `relative` band; it hangs
  * outside the band by its own height and covers the band next to it.
  */
+// The torn shape as a CSS mask, stretched to the edge's box like the SVG was.
+const maskOf = (d: string) =>
+  `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${W} ${H}' preserveAspectRatio='none'><path d='${d}'/></svg>`,
+  )}")`
+
 export function Torn({ color, side = 'top', seed = 1, rim = true }: TornProps) {
+  // The paper itself is a div in the band's colour with the band's own grain
+  // (.torn-paper shares it in index.css), cut to the tear by a mask: a flat
+  // SVG fill next to the grainy band read as a sticker.
+  const mask = maskOf(tornPath(seed))
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="none"
+    <div
       aria-hidden="true"
       className={[
         'pointer-events-none absolute left-0 z-[2] block h-[22px] w-full md:h-[30px]',
@@ -60,9 +68,28 @@ export function Torn({ color, side = 'top', seed = 1, rim = true }: TornProps) {
         color,
       ].join(' ')}
     >
-      {rim && <path d={tornPath(seed, 2.2)} fill="#fbf7ec" opacity=".9" />}
-      <path d={tornPath(seed)} fill="currentColor" />
-    </svg>
+      {rim && (
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          className="absolute inset-0 block h-full w-full"
+        >
+          <path d={tornPath(seed, 2.2)} fill="#fbf7ec" opacity=".9" />
+        </svg>
+      )}
+      <div
+        className="torn-paper absolute inset-0"
+        style={{
+          backgroundColor: 'currentColor',
+          maskImage: mask,
+          WebkitMaskImage: mask,
+          maskSize: '100% 100%',
+          WebkitMaskSize: '100% 100%',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+        }}
+      />
+    </div>
   )
 }
 

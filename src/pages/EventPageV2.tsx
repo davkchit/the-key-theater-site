@@ -12,7 +12,7 @@ import {
   SectionHead,
   WRAP,
 } from '../components/home2/parts'
-import { Grain, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { PosterArt } from '../components/home2/ShowPoster'
 import { longDate } from '../components/home2/homeData'
 import { DirectionForm } from '../components/directions/DirectionForm'
@@ -107,7 +107,6 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
 
       {/* first screen in the event's colour */}
       <section className={`${tone.band} relative isolate`}>
-        <Grain opacity={0.3} />
         <div
           className={`${WRAP} relative z-[2] grid items-center gap-10 py-14 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-14 md:py-20`}
         >

@@ -11,7 +11,7 @@ import {
   SectionHead,
   WRAP,
 } from '../components/home2/parts'
-import { Grain, Torn } from '../components/home2/paper'
+import { Torn } from '../components/home2/paper'
 import { galleryPhoto } from '../components/home2/homeData'
 import { FestivalSignupForm } from '../components/about/FestivalSignupForm'
 import { Reveal } from '../components/ui/Reveal'
@@ -79,7 +79,6 @@ export default function FestivalPageV2() {
 
       {/* first screen on red */}
       <section className="bg-brand-red text-paper relative isolate">
-        <Grain opacity={0.3} />
         <div
           className={`${WRAP} relative z-[2] grid items-center gap-10 py-14 md:grid-cols-[1fr_1.05fr] md:gap-14 md:py-20`}
         >

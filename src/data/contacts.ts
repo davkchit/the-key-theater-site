@@ -32,8 +32,8 @@ export const TICKETS_WHERE = s.ticketsWhere ?? ''
 
 /** the theatre's review pages on the maps; an empty one hides its button */
 export const REVIEW_LINKS = [
-  { label: '2ГИС', href: s.review2gis ?? '' },
-  { label: 'Яндекс Карты', href: s.reviewYandex ?? '' },
+  { key: 'yandex' as const, label: 'Яндекс Карты', href: s.reviewYandex ?? '' },
+  { key: '2gis' as const, label: '2ГИС', href: s.review2gis ?? '' },
 ].filter((l) => l.href)
 
 // The map in «Как нас найти»: Yandex's widget with the theatre's own card,
