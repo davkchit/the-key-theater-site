@@ -40,7 +40,8 @@ export default function ContactsPageV2() {
           </div>
         </div>
       </section>
-      <FindUs />
+      {/* paper right above: no torn edge, it read as a stray line */}
+      <FindUs torn={false} />
       <NewsletterBand />
       <div className="h-10" />
     </div>

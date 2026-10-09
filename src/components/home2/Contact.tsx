@@ -159,10 +159,11 @@ function MapFrame({ className = '' }: { className?: string }) {
   )
 }
 
-export function FindUs() {
+/** `torn`: a torn top edge, for when a band of another colour is above */
+export function FindUs({ torn = true }: { torn?: boolean }) {
   return (
     <section className="bg-paper relative">
-      <Torn color="text-paper" seed={79} />
+      {torn && <Torn color="text-paper" seed={79} />}
       <div className={`${WRAP} pt-16 pb-24 md:pt-24 md:pb-28`}>
         <SectionHead title="Как нас найти" />
         <div className="grid gap-10 md:grid-cols-[1.1fr_1.4fr] md:gap-12">
