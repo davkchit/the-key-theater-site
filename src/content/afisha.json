@@ -47,7 +47,7 @@
       "title": "Бесконечный апрель",
       "time": "18:00",
       "band": "paper",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_endless_April/event/?id_event=270390",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=270390",
       "age": "12+"
     },
     {
@@ -55,7 +55,7 @@
       "title": "Симон",
       "time": "18:00",
       "band": "paper",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Simon/event/?id_event=270401",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=270401",
       "age": "18+"
     },
     {
@@ -63,7 +63,7 @@
       "title": "Никаких последствий",
       "time": "18:00",
       "band": "red",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_no_consequences/event/?id_event=271406",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=271406",
       "age": "16+"
     },
     {
@@ -72,7 +72,7 @@
       "age": "16+",
       "time": "18:00",
       "band": "red",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Larisa/event/?id_event=272475"
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272475"
     },
     {
       "date": "2026-11-01",
@@ -80,7 +80,7 @@
       "age": "18+",
       "time": "18:00",
       "band": "blue",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Simon/event/?id_event=272476"
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272476"
     },
     {
       "date": "2026-11-14",
@@ -88,7 +88,7 @@
       "age": "16+",
       "time": "18:00",
       "band": "blue",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_no_consequences/event/?id_event=272477"
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272477"
     },
     {
       "date": "2026-11-15",
@@ -96,14 +96,14 @@
       "age": "18+",
       "time": "18:00",
       "band": "red",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Simon/event/?id_event=272478"
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272478"
     },
     {
       "date": "2026-11-21",
       "title": "Лариса",
       "time": "18:00",
       "band": "blue",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Larisa/event/?id_event=272479",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272479",
       "age": "16+"
     },
     {
@@ -112,7 +112,7 @@
       "age": "16+",
       "time": "18:00",
       "band": "paper",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_no_consequences/event/?id_event=272480"
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272480"
     },
     {
       "date": "2026-11-29",
@@ -120,14 +120,14 @@
       "age": "18+",
       "time": "18:00",
       "band": "red",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Simon/event/?id_event=272481"
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272481"
     },
     {
       "date": "2026-12-05",
       "title": "Лариса",
       "time": "18:00",
       "band": "paper",
-      "ticketUrl": "https://bileton.ru/widget/teatr_kluch_Larisa/event/?id_event=272482",
+      "ticketUrl": "https://bileton.ru/widget/teatr_kluch/event/?id_event=272482",
       "age": "16+"
     }
   ]
