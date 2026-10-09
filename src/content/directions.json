@@ -52,7 +52,7 @@
       "slug": "kvest",
       "page": {
         "kicker": "Квест в театре «Ключ»",
-        "intro": "Проходит только зимой.\nЗаписаться можно одному или командой, командой дешевле на 500 ₽.",
+        "intro": "Новогодняя квест-игра с переодеваниями, превращениями и чудесами. Проходит только зимой, в конце декабря: отдельно для детей и для подростков.\nЗаписаться можно одному или командой, командой дешевле на 500 ₽.",
         "facts": [],
         "steps": [
           {
@@ -70,8 +70,13 @@
         ],
         "program": [],
         "faq": [],
-        "photos": [],
-        "tone": "red"
+        "photos": [
+          "/uploads/events/kvest/2.jpg",
+          "/uploads/events/kvest/3.jpg",
+          "/uploads/events/kvest/4.jpg"
+        ],
+        "tone": "red",
+        "photo": "/uploads/events/kvest/1.jpg"
       }
     },
     {
@@ -91,7 +96,7 @@
       "slug": "karnavalnaya-noch",
       "page": {
         "kicker": "Зимний праздник в театре «Ключ»",
-        "intro": "Зимний праздник в театре «Ключ».\nДату и условия театр объявит заранее: когда откроется запись, здесь появится форма. Вопросы — администратору по телефону.",
+        "intro": "Новогодний вечер-перформанс для взрослых, где каждый сможет сыграть роль: театральная программа на 2,5 часа, праздничные столики, поздравление Деда Мороза и Снегурочки, караоке, танцы и игры — и вместе загадаем желания на грядущий год.\nДату и условия театр объявит заранее: когда откроется запись, здесь появится форма.",
         "facts": [],
         "steps": [
           {
@@ -109,8 +114,13 @@
         ],
         "program": [],
         "faq": [],
-        "photos": [],
-        "tone": "ink"
+        "photos": [
+          "/uploads/events/karnaval/2.jpg",
+          "/uploads/events/karnaval/3.jpg",
+          "/uploads/events/karnaval/4.jpg"
+        ],
+        "tone": "ink",
+        "photo": "/uploads/events/karnaval/1.jpg"
       }
     },
     {
@@ -187,11 +197,12 @@
         ],
         "program": [],
         "faq": [],
-        "photo": "/uploads/gallery/lager-1.jpg",
+        "photo": "/uploads/events/lager/1.jpg",
         "photos": [
-          "/uploads/gallery/lager-1.jpg",
-          "/uploads/gallery/lager-2.jpg",
-          "/uploads/gallery/lager-3.jpg"
+          "/uploads/events/lager/2.jpg",
+          "/uploads/events/lager/3.jpg",
+          "/uploads/events/lager/4.jpg",
+          "/uploads/events/lager/5.jpg"
         ],
         "tone": "blue"
       }
