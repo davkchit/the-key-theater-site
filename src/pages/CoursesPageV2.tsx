@@ -332,7 +332,11 @@ export default function CoursesPageV2() {
               light
               className="top-12 right-4 h-16 w-16 md:right-10 md:h-24 md:w-24"
             />
-            <SectionHead title="Ещё можно записаться" dark />
+            {/* "можно записаться" only while something is open: closed events stay as a preview */}
+            <SectionHead
+              title={more.some((d) => d.open) ? 'Ещё можно записаться' : 'Ещё в театре'}
+              dark
+            />
             <div className="grid gap-5 md:grid-cols-3">
               {more.map((d) => (
                 <div

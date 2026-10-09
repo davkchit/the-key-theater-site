@@ -64,6 +64,13 @@ const DIRECTIONS = [
 
 export default function AboutPageV2() {
   const years = new Date().getFullYear() - 2003
+  // 21 год, 23 года, 25 лет
+  const plural = (n: number, one: string, few: string, many: string) => {
+    const t = n % 100
+    const u = n % 10
+    if (t >= 11 && t <= 14) return many
+    return u === 1 ? one : u >= 2 && u <= 4 ? few : many
+  }
 
   return (
     <div className="bg-paper relative overflow-x-clip">
@@ -150,9 +157,9 @@ export default function AboutPageV2() {
           <SectionHead title="Театр в цифрах" dark />
           <dl className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
             {[
-              [String(productions.length), 'постановки'],
+              [String(productions.length), plural(productions.length, 'постановка', 'постановки', 'постановок')],
               ['5', 'стран гастролей'],
-              [`${years}`, 'лет театру'],
+              [`${years}`, `${plural(years, 'год', 'года', 'лет')} театру`],
               ['с 2004', 'свой фестиваль'],
             ].map(([big, note]) => (
               <div key={note}>

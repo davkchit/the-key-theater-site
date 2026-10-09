@@ -29,3 +29,6 @@ const all: SocialLink[] = [
 ]
 
 export const socials: SocialLink[] = all.filter((l) => l.href)
+
+/** the theatre's VK group, '' when not set */
+export const VK_URL = links.vk ?? ''

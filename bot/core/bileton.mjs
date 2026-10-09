@@ -65,7 +65,30 @@ export const sessionIdOf = (url) => {
 }
 
 const short = (iso) => `${iso.slice(8)}.${iso.slice(5, 7)}`
-const sameTitle = (a, title) => String(a.title || '').trim().toLowerCase() === String(title).trim().toLowerCase()
+/** a title for comparing: no case, ё = е, no quotes, single spaces */
+export const normTitle = (t) =>
+  String(t || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[«»"„“”']/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+const sameTitle = (a, title) => normTitle(a.title) === normTitle(title)
+
+/**
+ * Bileton's name of a session, as the site's title: «Спектакль «Симон»» →
+ * «Симон». `isShow` says Bileton itself called it a show, which is what lets
+ * the sync start a page for a show the site does not know yet.
+ */
+export function biletonTitle(name) {
+  const raw = String(name || '').trim()
+  const isShow = /^спектакль(\s|$)/i.test(raw)
+  const title = raw
+    .replace(/^спектакль\s*/i, '')
+    .replace(/^[«"„“]\s*|\s*[»"”]$/g, '')
+    .trim()
+  return { title: title || raw, isShow }
+}
 
 /**
  * Makes one show's upcoming dates exactly its widget's: Bileton is the one

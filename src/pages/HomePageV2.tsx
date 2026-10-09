@@ -4,7 +4,6 @@ import { PrintFilters } from '../components/home2/parts'
 import {
   CoursesBand,
   FestivalStrip,
-  InkStrip,
   MoreThanShows,
   NumbersBand,
   PeopleSection,
@@ -34,7 +33,6 @@ export default function HomePageV2() {
       <NumbersBand />
       <PeopleSection />
       <MoreThanShows />
-      <InkStrip />
       <GalleryCarousel />
       <NewsletterBand />
       <FindUs />

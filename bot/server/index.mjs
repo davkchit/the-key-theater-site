@@ -245,12 +245,20 @@ function checkBileton() {
   const stale = Date.now() - Date.parse(st.checkedAt || 0)
   if (stale > 3 * 3600e3) broken.unshift('Синхронизация не запускалась с ' + new Date(Date.parse(st.checkedAt || 0)).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' }))
   const gone = st.removed || []
-  // a run's removals are news once; a lasting failure is news until fixed
-  const sig = broken.join('\n') + '|' + (gone.length ? st.checkedAt : '')
+  const fresh = st.newShows || []
+  // a run's news (removals, new shows) is news once; a lasting failure is
+  // news until fixed
+  const sig = broken.join('\n') + '|' + (gone.length || fresh.length ? st.checkedAt : '')
   if (store.getKv('biletonSig') === sig) return
   store.putKv('biletonSig', sig)
-  if (!broken.length && !gone.length) return
+  if (!broken.length && !gone.length && !fresh.length) return
   const parts = []
+  if (fresh.length)
+    parts.push(
+      'На Билетоне появился новый спектакль — на сайте он уже есть в афише и в «Спектаклях»:\n- ' +
+        fresh.map((t) => `«${t}»`).join('\n- ') +
+        '\nДобавьте ему описание, жанр, режиссёра и фото: админка → «Репертуар» → «Спектакли».',
+    )
   if (gone.length) parts.push('С сайта убраны даты, которых нет на Билетоне (отменены, перенесены или не заводились):\n- ' + gone.join('\n- '))
   if (broken.length) parts.push('Не получилось прочитать Билетон, даты этих спектаклей на сайте сейчас не обновляются:\n- ' + broken.join('\n- '))
   const text = 'Афиша сайта берётся с Билетона и обновляется каждый час.\n\n' + parts.join('\n\n')

@@ -57,8 +57,13 @@ export default function ShowPageV2() {
   const ticket = show.ticketUrl || TICKETS_URL
   const nextTicket = next?.ticketUrl || ticket
   const hero = heroPhotoFor(show.title, show.photo)
-  const others = shows
-    .filter((s) => s.title !== show.title && upcomingAfisha.some((a) => a.title === s.title))
+  // the other shows on the schedule, the soonest first
+  const others = [
+    ...new Set(upcomingAfisha.map((a) => a.title.toLowerCase())),
+  ]
+    .filter((t) => t !== show.title.toLowerCase())
+    .map((t) => shows.find((s) => s.title.toLowerCase() === t))
+    .filter((s): s is NonNullable<typeof s> => !!s)
     .slice(0, 3)
   const facts: [string, string | undefined][] = [
     ['Жанр', show.genre],
@@ -267,7 +272,7 @@ export default function ShowPageV2() {
             <SectionHead title="Ещё спектакли" to="/repertuar" link="Все спектакли" />
             <div className="grid gap-10 sm:grid-cols-3 sm:gap-6">
               {others.map((s) => {
-                const d = upcomingAfisha.find((a) => a.title === s.title)
+                const d = upcomingAfisha.find((a) => a.title.toLowerCase() === s.title.toLowerCase())
                 const n = shows.indexOf(s)
                 return (
                   <div key={s.title} className="flex flex-col">

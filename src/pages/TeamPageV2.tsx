@@ -148,7 +148,7 @@ export default function TeamPageV2() {
       {staff.length > 0 && (
         <section className={`${WRAP} pb-24`}>
           <div className="border-ink/15 border-t pt-14 md:pt-20">
-            <SectionHead title="Руководство и педагоги" />
+            <SectionHead title="Руководство и команда" />
             <div className="grid grid-cols-2 gap-x-5 gap-y-12 md:grid-cols-4 md:gap-x-8">
               {staff.map((m, i) => (
                 <Person key={m.name} m={m} i={i + 1} big onOpen={openPerson} />

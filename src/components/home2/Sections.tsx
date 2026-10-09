@@ -18,6 +18,7 @@ import boyFence from '../../../assets/el-boy-fence.svg'
 import starSvg from '../../../assets/el-star.svg'
 import { CITY, VENUE } from '../../data/contacts'
 import { homePeople } from '../../data/people'
+import { productions } from '../../data/productions'
 
 const courses = coursesContent.items as Course[]
 
@@ -212,7 +213,11 @@ const BUILDING = mediaUrl('/uploads/building/nur.jpg')
 
 const NUMBERS: { value?: number; prefix?: string; text?: string; note: string }[] = [
   { value: 2003, note: 'год основания' },
-  { value: 32, note: 'постановки' },
+  // from «Все постановки» on the about page, so a new show counts itself
+  {
+    value: productions.length,
+    note: [2, 3, 4].includes(productions.length % 10) && ![12, 13, 14].includes(productions.length % 100) ? 'постановки' : 'постановок',
+  },
   { value: 5, note: 'стран гастролей' },
   { value: 2004, prefix: 'с ', note: 'свой фестиваль' },
   { text: 'Народный театр', note: 'звание с 2005 года' },

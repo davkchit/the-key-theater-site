@@ -21,6 +21,8 @@ import { scrollToId } from '../lib/scrollToId'
 import { CITY, PHONE, VENUE, telHref } from '../data/contacts'
 import NotFoundPageV2 from './NotFoundPageV2'
 import starSvg from '../../assets/el-star.svg'
+import { VkFollow } from '../components/home2/VkFollow'
+import { VK_URL } from '../data/socials'
 
 // A seasonal event's page — the lab, the camp, the quest, the carnival night —
 // built like the festival's from what the admin holds under «Направления»:
@@ -141,8 +143,20 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
                 </span>
               </a>
             ) : (
-              <p className="mt-8 inline-block border-2 border-current px-5 py-3 text-[15px] font-semibold">
-                Запись пока закрыта — следите за новостями
+              <p className="mt-8 text-[16px] font-semibold md:text-[17px]">
+                Запись пока закрыта
+                {VK_URL && (
+                  <>
+                    {' — '}
+                    <a
+                      href="#zapis"
+                      onClick={scrollToId('zapis')}
+                      className="underline underline-offset-4"
+                    >
+                      узнать об открытии первыми
+                    </a>
+                  </>
+                )}
               </p>
             )}
           </div>
@@ -319,7 +333,7 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
             <p className="mt-5 max-w-md text-[17px] md:text-[19px]">
               {open
                 ? 'Оставьте заявку, и мы перезвоним: расскажем о датах, цене и условиях.'
-                : 'Когда откроется запись, мы объявим об этом. А пока все вопросы — по телефону.'}
+                : 'Когда откроется запись, театр сразу напишет об этом в группе ВКонтакте. Подпишитесь, чтобы не пропустить. А вопросы — по телефону.'}
             </p>
             <a
               href={telHref(PHONE)}
@@ -330,10 +344,13 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
           </div>
           <div className="border-ink bg-paper relative border-2 p-5 shadow-[6px_6px_0_#1a1a1a] md:p-7">
             {!open ? (
-              <p className="text-[17px] font-semibold">
-                Запись пока закрыта. Следите за новостями театра — или спросите кота в углу
-                страницы.
-              </p>
+              <div className="flex flex-col items-start gap-5">
+                <p className="text-[17px] font-semibold">
+                  Запись пока закрыта. Об открытии театр объявит во ВКонтакте, а на любой вопрос
+                  уже сейчас ответит кот в углу страницы.
+                </p>
+                <VkFollow />
+              </div>
             ) : sent ? (
               <p className="text-[17px] font-semibold">
                 ✳ Спасибо! Заявка отправлена, мы свяжемся с вами.

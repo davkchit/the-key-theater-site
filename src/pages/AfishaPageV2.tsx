@@ -10,13 +10,13 @@ import {
   heroShows,
   longDate,
   showPath,
-  upcomingCards,
 } from '../components/home2/homeData'
 import { PosterArt } from '../components/home2/ShowPoster'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import starSvg from '../../assets/el-star.svg'
 import { PHONE, PLACE, TICKETS_WHERE, telHref } from '../data/contacts'
 import { ReviewBand } from '../components/reviews/Review'
+import { directionPathByTitle } from '../data/directions'
 
 // «Афиша» from the approved mockup, in two versions the visitor can switch
 // between: «тёмный зал» (the schedule on a black band, like an auditorium
@@ -52,16 +52,22 @@ const WD: Record<string, string> = {
 
 const byTitle = (t: string) => shows.find((s) => s.title.toLowerCase() === t.toLowerCase())
 const months = [...new Set(upcomingAfisha.map((i) => i.mon))]
-// the nearest show that has a proper photo picked for the homepage
-// the very next show on the schedule; its first-screen photo from the admin
-// when it has one, else its own photo, else a drawn poster
-const nearest = upcomingCards[0]
-const heroPick = nearest && heroShows.find((h) => h.item.title === nearest.item.title)
-const featured = nearest && {
-  ...nearest,
-  photo: heroPick?.photo || nearest.photo,
-  focus: heroPick?.focus,
+// The first show of the month on screen; its first-screen photo from the
+// admin when it has one, else its own photo, else a drawn poster.
+function featuredOf(item?: AfishaItem) {
+  if (!item) return null
+  const show = byTitle(item.title)
+  const heroPick = heroShows.find((h) => h.item.title.toLowerCase() === item.title.toLowerCase())
+  return {
+    item,
+    show,
+    photo: heroPick?.photo || show?.photo || '',
+    focus: heroPick?.focus,
+    ticketUrl: item.ticketUrl || show?.ticketUrl || TICKETS_URL,
+  }
 }
+// "ноября" → "в ноябре"
+const inMonth = (mon: string) => 'в ' + mon.replace(/[ая]$/, 'е')
 
 // A theatre season runs September to August: "2026 / 2027" until next summer.
 function season(now = new Date()) {
@@ -116,7 +122,8 @@ function AgeRing({ age, dark }: { age?: string; dark: boolean }) {
 function Row({ item, dark }: { item: AfishaItem; dark: boolean }) {
   const show = byTitle(item.title)
   const ticket = item.ticketUrl || show?.ticketUrl || TICKETS_URL
-  const to = show ? showPath(show.title) : null
+  // a show's page, or an event's own page (a carnival night sold on Bileton)
+  const to = show ? showPath(show.title) : (directionPathByTitle(item.title) ?? null)
   return (
     <li
       className={`grid grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-2 py-5 sm:grid-cols-[88px_auto_1fr_auto_auto] sm:gap-x-6 md:gap-x-8 ${
@@ -179,7 +186,8 @@ function Row({ item, dark }: { item: AfishaItem; dark: boolean }) {
   )
 }
 
-function Featured({ dark }: { dark: boolean }) {
+function Featured({ item, first, dark }: { item?: AfishaItem; first: boolean; dark: boolean }) {
+  const featured = featuredOf(item)
   if (!featured) return null
   return (
     <div className="grid items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
@@ -212,7 +220,7 @@ function Featured({ dark }: { dark: boolean }) {
           />
         )}
         <span className="bg-brand-red text-paper font-heading inline-block px-3 py-1 text-[13px] font-semibold tracking-[.06em] uppercase">
-          Ближайший спектакль
+          {first ? 'Ближайший спектакль' : `Первый ${inMonth(featured.item.mon)}`}
         </span>
         <h2 className="font-heading mt-4 text-[clamp(44px,6vw,84px)] leading-[.95] font-bold uppercase">
           {featured.item.title}
@@ -293,7 +301,7 @@ export default function AfishaPageV2() {
     <>
       <Months month={month} setMonth={setMonth} dark={dark} />
       <div className="mt-10">
-        <Featured dark={dark} />
+        <Featured item={items[0]} first={month === months[0]} dark={dark} />
       </div>
       <ul className={`mt-12 border-t ${dark ? 'border-paper/25' : 'border-ink/30'}`}>
         {items.map((item) => (

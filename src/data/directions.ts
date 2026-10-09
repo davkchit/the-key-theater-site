@@ -97,6 +97,13 @@ export const directionPath = (type: Direction['type']): string | undefined => {
   return d ? '/' + d.slug : undefined
 }
 
+/** An event's page by its title as it stands in the afisha («Карнавальная ночь»). */
+export function directionPathByTitle(title: string): string | undefined {
+  const norm = (t: string) => t.toLowerCase().replace(/ё/g, 'е').replace(/[«»"]/g, '').trim()
+  const d = all.find((x) => x.slug && x.page && x.title && norm(x.title) === norm(title))
+  return d ? '/' + d.slug : undefined
+}
+
 export const DIRECTION_TYPE_LABEL: Record<Direction['type'], string> = {
   prep: 'Подготовительная группа',
   festival: 'Фестиваль',
