@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { createPortal } from 'react-dom'
+import { toBody } from '../../lib/toBody'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
@@ -7,6 +7,7 @@ import { useLockBodyScroll } from '../../hooks/useLockBodyScroll'
 import { mediaUrl } from '../../lib/mediaUrl'
 import { frameOf, type TeamEntry } from '../../data/people'
 import { Portrait } from '../home2/parts'
+import { TornSheet } from '../home2/paper'
 import { SPRING } from '../home2/motion'
 
 // A person from «Команда» in a sheet of paper over the page: photo on the
@@ -29,7 +30,7 @@ export function PersonModal({ person, block, shows, onClose }: PersonModalProps)
   useFocusTrap(cardRef, open)
   useLockBodyScroll(open)
 
-  return createPortal(
+  return toBody(
     <AnimatePresence>
       {person && (
         <motion.div
@@ -54,10 +55,11 @@ export function PersonModal({ person, block, shows, onClose }: PersonModalProps)
           >
             {/* the sheet itself: torn outline and shadow on the paper only,
                 so the text and the photo on it stay crisp */}
-            <div
-              aria-hidden="true"
-              className="bg-paper absolute inset-0"
-              style={{ filter: 'url(#torn-photo)' }}
+            <TornSheet
+              color="text-paper"
+              seed={211}
+              m={14}
+              className="absolute inset-0 drop-shadow-[0_4px_4px_rgba(0,0,0,.35)]"
             />
 
             <button
@@ -128,6 +130,5 @@ export function PersonModal({ person, block, shows, onClose }: PersonModalProps)
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
   )
 }

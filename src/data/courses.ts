@@ -8,7 +8,14 @@ import coursesContent from '../content/courses.json'
 // Icons are a fixed design-system asset per course key, not editorial
 // content, so they stay code-side -- everything else in
 // src/content/courses.json is Decap CMS-managed (see public/admin/config.yml).
-const icons: Record<string, string> = { malyshi: elStar, deti: elFlower, podrostki: elLadder, vzroslye: elKey }
+const icons: Record<string, string> = {
+  malyshi: elStar,
+  deti: elFlower,
+  podrostki: elLadder,
+  vzroslye: elKey,
+  'pervye-roli': elKey,
+  premiera: elStar,
+}
 
 export const courses: Course[] = (coursesContent.items as Omit<Course, 'icon'>[]).map((c) => ({
   ...c,

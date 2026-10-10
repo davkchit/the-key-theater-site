@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { navItems } from '../../data/nav'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useLockBodyScroll } from '../../hooks/useLockBodyScroll'
-import logoWordmark from '../../../assets/logo-wordmark.png'
+import logoKluch from '../../../assets/logo-kluch-light.png'
 
 interface MobileMenuProps {
   open: boolean
@@ -25,7 +25,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
         >
           <div className="flex items-center justify-between">
-            <img src={logoWordmark} alt="Театр Ключ" className="h-[46px] w-auto object-contain" />
+            <img src={logoKluch} alt="Театр «Ключ»" className="h-14 w-auto object-contain" />
             <button
               onClick={onClose}
               aria-label="Закрыть меню"

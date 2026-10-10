@@ -6,7 +6,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent,
 } from 'react'
-import { createPortal } from 'react-dom'
+import { toBody } from '../../lib/toBody'
 import {
   AnimatePresence,
   animate,
@@ -102,7 +102,7 @@ export function Lightbox({
     return () => window.removeEventListener('keydown', onKey)
   }, [onMove])
 
-  return createPortal(
+  return toBody(
     <motion.div
       role="dialog"
       aria-modal="true"
@@ -152,7 +152,6 @@ export function Lightbox({
         </div>
       </div>
     </motion.div>,
-    document.body,
   )
 }
 

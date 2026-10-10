@@ -7,6 +7,7 @@ import { HeaderV2 } from './components/home2/HeaderV2'
 import { FooterV2 } from './components/home2/FooterV2'
 import { ReviewInvite } from './components/reviews/Review'
 import { TicketOverlay } from './components/tickets/TicketOverlay'
+import { RouteMeta } from './seo/RouteMeta'
 import bgPattern from '../assets/bg-pattern.png'
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             }
       }
     >
+      <RouteMeta />
       {redesign ? <HeaderV2 /> : <Header />}
       <PageTransition />
       {redesign ? <FooterV2 /> : <Footer />}

@@ -182,7 +182,7 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
       </section>
 
       {/* about */}
-      {(page.intro.length > 0 || page.facts.length > 0) && (
+      {(page.intro.length > 0 || page.facts.length > 0 || page.posters.length > 0) && (
         <section className={`${WRAP} pt-20 pb-16 md:pt-24`}>
           <div className="grid gap-12 md:grid-cols-[1fr_auto] md:gap-16">
             <div>
@@ -193,17 +193,43 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
                 ))}
               </div>
             </div>
-            {page.facts.length > 0 && (
-              <dl className="md:border-ink flex flex-wrap gap-x-10 gap-y-6 md:flex-col md:border-l-2 md:pl-10">
-                {page.facts.map((s) => (
-                  <div key={s.note}>
-                    <dt className="font-heading text-[56px] leading-none font-bold md:text-[72px]">
-                      {s.big}
-                    </dt>
-                    <dd className="mt-1 text-[14px] tracking-[.04em] uppercase">{s.note}</dd>
+            {(page.facts.length > 0 || page.posters.length > 0) && (
+              <div className="md:border-ink md:max-w-[340px] md:border-l-2 md:pl-10">
+                {page.facts.length > 0 && (
+                  <dl className="flex flex-wrap gap-x-10 gap-y-6 md:flex-col">
+                    {page.facts.map((s) => (
+                      <div key={s.note}>
+                        <dt className="font-heading text-[56px] leading-none font-bold md:text-[72px]">
+                          {s.big}
+                        </dt>
+                        <dd className="mt-1 text-[14px] tracking-[.04em] uppercase">{s.note}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                {/* the printed posters, whole; a tap opens one full size */}
+                {page.posters.length > 0 && (
+                  <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-1">
+                    {page.posters.map((p) => (
+                      <a
+                        key={p}
+                        href={p}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Афиша крупно"
+                        className="block transition-transform hover:-translate-y-1"
+                      >
+                        <img
+                          src={p}
+                          alt={`Афиша: ${d.title}`}
+                          loading="lazy"
+                          className="w-full shadow-[0_10px_30px_rgba(0,0,0,.25)]"
+                        />
+                      </a>
+                    ))}
                   </div>
-                ))}
-              </dl>
+                )}
+              </div>
             )}
           </div>
         </section>
@@ -345,8 +371,8 @@ function EventPage({ d, page }: { d: Direction; page: DirectionPage }) {
             {!open ? (
               <div className="flex flex-col items-start gap-5">
                 <p className="text-[17px] font-semibold">
-                  Запись пока закрыта. Об открытии театр объявит во ВКонтакте, а на любой вопрос
-                  уже сейчас ответит кот в углу страницы.
+                  Запись пока закрыта. Об открытии театр объявит во ВКонтакте, а на любой вопрос уже
+                  сейчас ответит кот в углу страницы.
                 </p>
                 <VkFollow />
               </div>

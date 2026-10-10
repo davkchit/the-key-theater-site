@@ -28,7 +28,9 @@ SITE {
 
     handle {
         root * /opt/kluch/site
-        try_files {path} /index.html
+        # /afisha -> afisha.html: each page has its own file with its text
+        # (scripts/prerender.mjs); any other address gets the site, which says 404
+        try_files {path} {path}.html /index.html
         file_server
     }
 }

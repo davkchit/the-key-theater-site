@@ -6,7 +6,11 @@
 // rights) come from that article, not house style. The organisation's details
 // come from «Настройки сайта» in the admin; ИНН and ОГРН show once filled in.
 
+import settings from '../content/settings.json'
 import { ADDRESS, EMAIL, LEGAL, PHONE, VENUE } from './contacts'
+
+// with a Yandex Metrica counter on the site, the policy says so
+const METRIKA = /^\d+$/.test(String((settings as { metrikaId?: string }).metrikaId ?? '').trim())
 
 const POSTAL = `Республика Татарстан, г. ${ADDRESS}, ${VENUE}`
 const IDS = [LEGAL.inn && `ИНН ${LEGAL.inn}`, LEGAL.ogrn && `ОГРН ${LEGAL.ogrn}`]
@@ -51,6 +55,11 @@ export const PRIVACY_SECTIONS: { title: string; body: string[] }[] = [
       'Трансграничная передача персональных данных не осуществляется.',
       'Для ответов на вопросы о спектаклях и курсах используется сервис генерации текста, размещённый на территории РФ. Имена, телефоны и другие персональные данные в этот сервис не передаются.',
       'Оператор не передаёт персональные данные третьим лицам, за исключением случаев, прямо предусмотренных законодательством РФ.',
+      ...(METRIKA
+        ? [
+            'Для подсчёта посещений Сайт использует сервис «Яндекс Метрика» (ООО «Яндекс», Россия), который с помощью файлов cookie собирает обезличенные сведения: какие страницы просмотрены, тип устройства и браузера, примерный город. Эти сведения не позволяют установить личность посетителя. Отключить cookie можно в настройках браузера.',
+          ]
+        : []),
     ],
   },
   {

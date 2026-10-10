@@ -48,6 +48,8 @@ const GROUP_PHOTO: Record<string, string> = {
   deti: 'lager-2',
   podrostki: 'spektakl-1',
   vzroslye: 'posledstviy-2',
+  'pervye-roli': 'simon-2',
+  premiera: 'posledstviy-4',
 }
 const MORE_TYPES: Direction['type'][] = ['prep', 'quest', 'carnival', 'camp', 'other']
 
@@ -253,7 +255,7 @@ export default function CoursesPageV2() {
       {/* groups */}
       <section className={`${WRAP} pt-16 pb-16 md:pt-24`}>
         <SectionHead title="Группы" />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((c, i) => {
             const tone = GROUP_TONES[i % 4] as Tone
             const dark = tone !== 'paper'
@@ -283,6 +285,9 @@ export default function CoursesPageV2() {
                   {c.ageRange} <span className="mx-1.5 opacity-50">|</span>{' '}
                   {c.price.replace(' / мес', '/мес')}
                 </div>
+                {c.schedule && (
+                  <div className="mt-1 text-[14px] font-semibold opacity-90">{c.schedule}</div>
+                )}
                 <p className="mt-4 flex-1 text-[15px] leading-[1.5] opacity-90">{c.desc}</p>
                 <button
                   onClick={() => setCourse(c)}
@@ -295,7 +300,7 @@ export default function CoursesPageV2() {
           })}
         </div>
         <p className="text-ink/65 mt-4 text-[14px]">
-          Цены ориентировочные, точную стоимость и расписание администратор скажет при записи.
+          Стоимость детских групп ориентировочная: точную администратор скажет при записи.
         </p>
       </section>
 

@@ -150,7 +150,7 @@ export default function AboutPageV2() {
           src={mediaUrl('/uploads/building/nur.jpg')}
           alt=""
           loading="lazy"
-          className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_35%] opacity-45"
+          className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_60%] opacity-45"
         />
         <div className="from-ink/85 via-ink/50 to-ink/90 absolute inset-0 -z-10 bg-gradient-to-b" />
         <div className={`${WRAP} relative z-[2] py-20 md:py-28`}>

@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
+import { useTornMask } from '../../lib/torn'
 import { Link } from 'react-router-dom'
 
 // Small pieces the new homepage repeats: the two-tone photo, section headings,
@@ -56,36 +57,6 @@ export function PrintFilters() {
           </filter>
         )
       })}
-      {/* ragged edge for the black frame behind live photos */}
-      {/* a photo torn out of a print: the tear eats into the picture itself
-          (only its outline is displaced, the image is not distorted), and it
-          casts a soft shadow like paper lying on the page */}
-      <filter
-        id="torn-photo"
-        x="-4%"
-        y="-4%"
-        width="108%"
-        height="112%"
-        colorInterpolationFilters="sRGB"
-      >
-        <feTurbulence
-          type="fractalNoise"
-          baseFrequency="0.022"
-          numOctaves="4"
-          seed="3"
-          result="noise"
-        />
-        <feDisplacementMap
-          in="SourceAlpha"
-          in2="noise"
-          scale="26"
-          xChannelSelector="R"
-          yChannelSelector="G"
-          result="edge"
-        />
-        <feComposite in="SourceGraphic" in2="edge" operator="in" />
-        <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000" floodOpacity=".35" />
-      </filter>
     </svg>
   )
 }
@@ -175,7 +146,8 @@ export function Portrait({
   )
 }
 
-/** A live photo torn out of a print, with a soft paper shadow. */
+/** A live photo torn out of a print, with a soft paper shadow. Each photo
+ *  on a page gets its own tear. */
 export function RoughFrame({
   children,
   className = '',
@@ -183,9 +155,29 @@ export function RoughFrame({
   children: ReactNode
   className?: string
 }) {
+  const id = useId()
+  const seed = [...id].reduce((a, c) => a * 31 + c.charCodeAt(0), 7)
+  const { ref, mask } = useTornMask(seed, 14)
   return (
-    <div className={`relative ${className}`} style={{ filter: 'url(#torn-photo)' }}>
-      {children}
+    <div
+      ref={ref}
+      className={`relative ${className}`}
+      style={{ filter: 'drop-shadow(0 4px 4px rgba(0,0,0,.35))' }}
+    >
+      <div
+        style={
+          mask
+            ? {
+                maskImage: mask,
+                WebkitMaskImage: mask,
+                maskRepeat: 'no-repeat',
+                WebkitMaskRepeat: 'no-repeat',
+              }
+            : undefined
+        }
+      >
+        {children}
+      </div>
     </div>
   )
 }

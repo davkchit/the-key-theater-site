@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { toBody } from '../../lib/toBody'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
@@ -60,7 +60,7 @@ export function Mascot() {
   const walkSpots = viewportW < 640 ? [24] : BASE_WALK_SPOTS.map((s) => Math.min(s, maxRight))
   const right = open ? 24 : walkSpots[spotIndex % walkSpots.length]
 
-  return createPortal(
+  return toBody(
     <>
       <AnimatePresence>
         {open && (
@@ -102,6 +102,5 @@ export function Mascot() {
         </button>
       </motion.div>
     </>,
-    document.body,
   )
 }

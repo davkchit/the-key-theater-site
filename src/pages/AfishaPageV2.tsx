@@ -5,12 +5,7 @@ import { upcomingAfisha } from '../data/afisha'
 import { shows } from '../data/shows'
 import { PrintFilters, BTN, RoughFrame, WRAP } from '../components/home2/parts'
 import { Torn } from '../components/home2/paper'
-import {
-  TICKETS_URL,
-  heroShows,
-  longDate,
-  showPath,
-} from '../components/home2/homeData'
+import { TICKETS_URL, heroShows, longDate, showPath } from '../components/home2/homeData'
 import { PosterArt } from '../components/home2/ShowPoster'
 import { SwallowIcon } from '../components/ui/SwallowIcon'
 import starSvg from '../../assets/el-star.svg'
@@ -186,30 +181,49 @@ function Row({ item, dark }: { item: AfishaItem; dark: boolean }) {
   )
 }
 
+// The stage photo sells the live show; the printed poster stands in only
+// for a show that has no photo of its own yet.
+const posterOnly = (f: NonNullable<ReturnType<typeof featuredOf>>) =>
+  f.show?.poster && (!f.photo || f.photo === f.show.poster) ? f.show.poster : undefined
+
 function Featured({ item, first, dark }: { item?: AfishaItem; first: boolean; dark: boolean }) {
   const featured = featuredOf(item)
   if (!featured) return null
+  const poster = posterOnly(featured)
   return (
     <div className="grid items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
-      <RoughFrame>
-        {featured.photo ? (
+      {poster ? (
+        <Link
+          to={showPath(featured.item.title)}
+          className="mx-auto block w-[min(100%,380px)] -rotate-1 shadow-[0_20px_50px_rgba(0,0,0,.35)] transition-transform hover:rotate-0"
+        >
           <img
-            src={featured.photo}
-            alt={`«${featured.item.title}»`}
-            className="aspect-[16/10] w-full object-cover"
-            style={{ objectPosition: featured.focus ?? '60% 40%' }}
+            src={poster}
+            alt={`Афиша спектакля «${featured.item.title}»`}
+            className="w-full"
           />
-        ) : (
-          <PosterArt
-            photo=""
-            n={Math.max(
-              0,
-              shows.findIndex((x) => x.title === featured.item.title),
-            )}
-            className="aspect-[16/10]"
-          />
-        )}
-      </RoughFrame>
+        </Link>
+      ) : (
+        <RoughFrame>
+          {featured.photo ? (
+            <img
+              src={featured.photo}
+              alt={`«${featured.item.title}»`}
+              className="aspect-[16/10] w-full object-cover"
+              style={{ objectPosition: featured.focus ?? '60% 40%' }}
+            />
+          ) : (
+            <PosterArt
+              photo=""
+              n={Math.max(
+                0,
+                shows.findIndex((x) => x.title === featured.item.title),
+              )}
+              className="aspect-[16/10]"
+            />
+          )}
+        </RoughFrame>
+      )}
       <div className="relative">
         {dark && (
           <img

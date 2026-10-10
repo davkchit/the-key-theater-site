@@ -1,16 +1,7 @@
+import { rng, tornRectPath, useTornMask } from '../../lib/torn'
 // Printed-paper look of the approved mockup: bands torn off by hand (uneven
 // edge with a light fibre rim), grain over the page, photos printed in two
 // inks with a rough edge. All of it is SVG made once at load; no images.
-
-// Small deterministic random, so an edge looks the same on every render and
-// the server-side build matches the browser.
-function rng(seed: number) {
-  let s = seed >>> 0
-  return () => {
-    s = (s * 1664525 + 1013904223) >>> 0
-    return s / 2 ** 32
-  }
-}
 
 const W = 1440
 const H = 30
@@ -18,7 +9,7 @@ const H = 30
 /** Path of a torn edge across [0, W]; the paper is below the line. */
 function tornPath(seed: number, lift = 0): string {
   const r = rng(seed)
-  const pts: string[] = []
+  const pts: [number, number][] = []
   let x = 0
   // two long, lazy waves plus short sharp teeth: that is what hand-torn paper does
   const a1 = r() * Math.PI * 2
@@ -27,11 +18,11 @@ function tornPath(seed: number, lift = 0): string {
     const wave = Math.sin(x / 210 + a1) * 5 + Math.sin(x / 67 + a2) * 2.5
     const tooth = (r() - 0.5) * 6
     const y = Math.max(1, Math.min(H - 2, 15 + wave + tooth - lift))
-    pts.push(`${x.toFixed(0)},${y.toFixed(1)}`)
+    pts.push([x, y])
     x += 6 + r() * 10
   }
-  pts.push(`${W},15`)
-  return `M0,${H} L${pts.join(' L')} L${W},${H} Z`
+  const all: [number, number][] = [[0, H], ...pts, [W, 15], [W, H]]
+  return 'M' + all.map(([a, b]) => `${a.toFixed(0)},${b.toFixed(1)}`).join(' L') + ' Z'
 }
 
 interface TornProps {
@@ -53,6 +44,47 @@ const maskOf = (d: string) =>
   `url("data:image/svg+xml,${encodeURIComponent(
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${W} ${H}' preserveAspectRatio='none'><path d='${d}'/></svg>`,
   )}")`
+
+/**
+ * A sheet torn on all four sides, as one piece, cut to the box's real size
+ * (no stretching, so the teeth are the same as on the bands). Put it as the
+ * first child of a `relative` box with `absolute` and a negative inset: the
+ * tear takes the outer `m` px.
+ */
+export function TornSheet({
+  color,
+  seed = 1,
+  m = 16,
+  className = '',
+}: {
+  color: string
+  seed?: number
+  m?: number
+  className?: string
+}) {
+  const { ref, w, h, mask } = useTornMask(seed, m)
+  return (
+    <div ref={ref} aria-hidden="true" className={`pointer-events-none ${color} ${className}`}>
+      {mask && (
+        <>
+          <svg width={w} height={h} className="absolute inset-0 block">
+            <path d={tornRectPath(w, h, seed, m, 2.2)} fill="#fbf7ec" opacity=".9" />
+          </svg>
+          <div
+            className="torn-paper absolute inset-0"
+            style={{
+              backgroundColor: 'currentColor',
+              maskImage: mask,
+              WebkitMaskImage: mask,
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+            }}
+          />
+        </>
+      )}
+    </div>
+  )
+}
 
 export function Torn({ color, side = 'top', seed = 1, rim = true }: TornProps) {
   // The paper itself is a div in the band's colour with the band's own grain
@@ -169,6 +201,30 @@ export function Grain({ opacity = 0.35 }: { opacity?: number }) {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-[1]"
       style={{ backgroundImage: GRAIN_URL, opacity }}
+    />
+  )
+}
+
+const FADE_TO = { left: 'to right', top: 'to bottom', bottom: 'to top' } as const
+
+/**
+ * A photo fading into the black band it lies on, in the band's own grainy
+ * ink: a plain gradient left the photo's black and the band's grain meeting
+ * in a visible line. Put it over the photo; size and place it by className.
+ */
+export function InkFade({
+  side,
+  className = '',
+}: {
+  side: keyof typeof FADE_TO
+  className?: string
+}) {
+  const mask = `linear-gradient(${FADE_TO[side]}, #000 15%, transparent)`
+  return (
+    <div
+      aria-hidden="true"
+      className={`bg-ink pointer-events-none absolute ${className}`}
+      style={{ maskImage: mask, WebkitMaskImage: mask }}
     />
   )
 }

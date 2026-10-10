@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { shows } from '../data/shows'
 import { PrintFilters, BTN, H2, WRAP } from '../components/home2/parts'
-import { Torn } from '../components/home2/paper'
+import { InkFade, Torn } from '../components/home2/paper'
 import { ShowPoster } from '../components/home2/ShowPoster'
 import { heroShows, longDate, showPath, upcomingCards } from '../components/home2/homeData'
 import { Reveal } from '../components/ui/Reveal'
@@ -94,7 +94,10 @@ export default function RepertoirePageV2() {
                 className="h-full w-full object-cover opacity-60 md:opacity-100"
                 style={{ objectPosition: featured.focus ?? '60% 40%' }}
               />
-              <div className="from-ink via-ink/60 md:via-ink/30 absolute inset-0 bg-gradient-to-t to-transparent md:bg-gradient-to-r md:via-30%" />
+              <div className="from-ink via-ink/60 absolute inset-0 bg-gradient-to-t to-transparent md:hidden" />
+              <InkFade side="left" className="inset-y-0 left-0 hidden w-[45%] md:block" />
+              <InkFade side="top" className="inset-x-0 top-0 h-20 md:h-28" />
+              <InkFade side="bottom" className="inset-x-0 bottom-0 h-20 md:h-28" />
             </div>
           )}
           <div className={`${WRAP} relative z-[3] py-16 md:py-24`}>

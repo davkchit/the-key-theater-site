@@ -71,7 +71,9 @@ collections:
               - { label: Описание, name: synopsis, widget: text, required: false }
               - { label: Режиссёр, name: dir, widget: string, required: false }
               - { label: Длительность, name: dur, widget: string, required: false, hint: 'Например 1 ч 40 мин' }
+              - { label: Цена билета, name: price, widget: string, required: false, hint: 'Например: 1 300 ₽, группам от 15 человек — 1 200 ₽' }
               - { label: Фото со спектакля, name: photo, widget: image, required: false, hint: 'Если пусто — покажем фирменную заглушку' }
+              - { label: Афиша (постер), name: poster, widget: image, required: false, hint: 'Печатная афиша спектакля целиком, вертикальная. Показывается на странице спектакля рядом с описанием' }
               - label: Цвет поверх фото
                 name: tint
                 widget: select
@@ -135,6 +137,7 @@ collections:
                   - { label: Чёрный, value: ink }
               - { label: Описание, name: desc, widget: text }
               - { label: Цена, name: price, widget: string }
+              - { label: Расписание, name: schedule, widget: string, required: false, hint: 'Дни, время и месяцы, например: пн и ср, 18:00–19:00 · с сентября по июнь' }
               - { label: Старт группы, name: start, widget: string }
               - { label: Детский курс, name: isChild, widget: boolean }
 
@@ -248,6 +251,12 @@ collections:
                       - { label: Синий, value: blue }
                       - { label: Чёрный, value: ink }
                   - { label: Главное фото, name: photo, widget: image, required: false, hint: 'Горизонтальное. Если пусто — будет рисунок тушью' }
+                  - label: Афиши (постеры)
+                    name: posters
+                    widget: list
+                    required: false
+                    hint: 'Печатные афиши целиком, вертикальные. Показываются рядом с описанием, по нажатию открываются крупно'
+                    field: { label: Афиша, name: poster, widget: image }
                   - { label: Текст о мероприятии, name: intro, widget: text, required: false, hint: 'Каждый абзац с новой строки' }
                   - label: Цифры сбоку
                     name: facts
@@ -547,6 +556,10 @@ collections:
               - { label: Название, name: title, widget: string, hint: 'Без кавычек — они добавятся сами' }
 , '13 цифр'], hint: 'Для «Политики обработки персональных данных». Если пусто — не показывается' }
           - { label: Ответственный за персональные данные, name: privacyOfficer, widget: string, required: false, hint: 'ФИО и должность, например: Иванова Мария Петровна, директор. Если пусто — в политике будет «руководитель организации»' }
+          - { label: Адрес сайта, name: siteUrl, widget: string, required: false, pattern: ['^$|^https://[^/]+$', 'Только адрес, например https://kluchtheatre.ru, без / на конце'], hint: 'Домен сайта, например https://kluchtheatre.ru. Пока пусто — поисковики сайт не индексируют (так задумано для временного адреса). Впишите, как только сайт переедет на свой домен' }
+          - { label: Код подтверждения Яндекс Вебмастера, name: yandexVerification, widget: string, required: false, hint: 'Из Вебмастера → «Права доступа» → способ «Мета-тег»: только значение content, например 1a2b3c4d5e6f7a8b' }
+          - { label: Код подтверждения Google Search Console, name: googleVerification, widget: string, required: false, hint: 'Из Search Console → способ «Тег HTML»: только значение content' }
+          - { label: Номер счётчика Яндекс Метрики, name: metrikaId, widget: string, required: false, pattern: ['^$|^[0-9]+$', 'Только цифры'], hint: 'Только цифры, например 98765432. Метрика считает посещения и помогает Яндексу понять, что сайт живой' }
       - name: home
         label: Главная страница
         file: src/content/home.json

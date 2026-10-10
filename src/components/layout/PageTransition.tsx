@@ -12,8 +12,11 @@ export function PageTransition() {
     // The old page fades out first, then the new one comes in: that is the
     // moment to jump to the top, or a link clicked in the footer opens the next
     // page scrolled to its bottom.
+    // initial={false}: the first page is already drawn in its HTML file, so it
+    // just stays; only moves inside the site fade
     <AnimatePresence
       mode="wait"
+      initial={false}
       onExitComplete={() => {
         // instant: the page has scroll-behavior: smooth, and a smooth trip up a
         // long page was still going when the next page appeared (and a touch on a

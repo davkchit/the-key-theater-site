@@ -13,24 +13,42 @@ import flowerSvg from '../../../assets/el-flower.svg'
 const POSTER_TONES: Tone[] = ['red', 'paper', 'blue', 'ink']
 const EMPTY_ART = [faceSvg, flowerSvg, chairSvg, faceSvg]
 
+/** A show's card picture: its printed poster in the poster's own shape. */
+export const POSTER_ASPECT = 'aspect-[5/7]'
+
 /**
- * A show's picture, the same everywhere: the photo in live colour, or in two
- * colours when the theatre picked one in the admin («Цвет поверх фото»). A show
- * without a photo gets a drawn poster instead of an empty frame.
+ * A show's picture, the same everywhere: its printed poster when the theatre
+ * has one, else the photo in live colour, or in two colours when the theatre
+ * picked one in the admin («Цвет поверх фото»). A show without either gets a
+ * drawn poster instead of an empty frame.
  */
 export function PosterArt({
   photo,
+  poster,
   n,
   tint,
   alt = '',
   className = '',
 }: {
   photo: string
+  poster?: string
   n: number
   tint?: Show['tint']
   alt?: string
   className?: string
 }) {
+  if (poster) {
+    return (
+      <div className={`bg-ink relative overflow-hidden ${className}`}>
+        <img
+          src={poster}
+          alt={alt}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
+      </div>
+    )
+  }
   if (photo && !tint) {
     return (
       <div className={`bg-ink relative overflow-hidden ${className}`}>
@@ -79,10 +97,11 @@ export function ShowPoster({ show, n }: { show: Show; n: number }) {
       <Link to={to} className="block" aria-label={`«${show.title}» — подробнее`}>
         <PosterArt
           photo={show.photo}
+          poster={show.poster}
           tint={show.tint}
           n={n}
-          alt={show.photo ? `«${show.title}»` : ''}
-          className="aspect-[1/1]"
+          alt={show.photo || show.poster ? `«${show.title}»` : ''}
+          className={POSTER_ASPECT}
         />
       </Link>
       {show.genre && (

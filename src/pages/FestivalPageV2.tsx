@@ -67,6 +67,8 @@ function Arrow() {
   )
 }
 
+const FESTIVAL_LOGO = mediaUrl('/uploads/festival-logo.png')
+
 export default function FestivalPageV2() {
   const festival = directionByType('festival')
   const open = festival?.open !== false
@@ -77,12 +79,17 @@ export default function FestivalPageV2() {
     <div className="bg-paper relative overflow-x-clip">
       <PrintFilters />
 
-      {/* first screen on red */}
-      <section className="bg-brand-red text-paper relative isolate">
+      {/* first screen on black, the festival's own emblem beside the title */}
+      <section className="bg-ink text-paper relative isolate">
         <div
           className={`${WRAP} relative z-[2] grid items-center gap-10 py-14 md:grid-cols-[1fr_1.05fr] md:gap-14 md:py-20`}
         >
-          <div>
+          <div className="relative">
+            <img
+              src={FESTIVAL_LOGO}
+              alt="Эмблема фестиваля «Действующие лица»"
+              className="absolute right-0 bottom-0 h-20 w-20 md:right-2 md:bottom-2 md:h-36 md:w-36"
+            />
             <div className="font-heading text-[15px] tracking-[.06em] uppercase md:text-[18px]">
               Всероссийский театральный фестиваль
             </div>
@@ -129,15 +136,15 @@ export default function FestivalPageV2() {
                 />
               </div>
             </RoughFrame>
-            {/* the doodle sits on the red, beside the photo, not glued to its corner */}
+            {/* the doodle above the photo's corner, clear of the emblem */}
             <Ink
               src={starSvg}
               light
-              className="-bottom-24 -left-20 hidden h-20 w-20 -rotate-12 md:block"
+              className="-top-16 -right-6 hidden h-20 w-20 rotate-12 md:block"
             />
           </Reveal>
         </div>
-        <Torn color="text-brand-red" side="bottom" seed={201} />
+        <Torn color="text-ink" side="bottom" seed={201} />
       </section>
 
       {/* about */}

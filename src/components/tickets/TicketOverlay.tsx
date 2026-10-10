@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { toBody } from '../../lib/toBody'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
@@ -35,7 +35,7 @@ export function TicketOverlay() {
     return () => document.removeEventListener('click', onClick)
   }, [])
 
-  return createPortal(
+  return toBody(
     <AnimatePresence>
       {url && (
         <motion.div
@@ -101,6 +101,5 @@ export function TicketOverlay() {
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
   )
 }

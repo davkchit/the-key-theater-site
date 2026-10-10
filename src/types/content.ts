@@ -51,6 +51,10 @@ export interface Show {
   /** a two-colour print over the photo, picked in the admin; empty = live colour */
   tint?: 'red' | 'yellow' | 'blue' | 'ink' | ''
   bg: BrandColorKey
+  /** "1 300 ₽, группам от 15 человек — 1 200 ₽"; empty = not shown */
+  price?: string
+  /** the printed A1 poster, shown whole on the show's page */
+  poster?: string
   /** stage photos for the show's own page; empty = the block is hidden */
   photos?: string[]
   /** who plays; empty = the block is hidden */
@@ -72,6 +76,8 @@ export interface Course {
   bg: BrandColorKey
   icon: string
   desc: string
+  /** "пн и ср, 18:00–19:00 · с сентября по июнь"; empty = not shown */
+  schedule?: string
   price: string
   start: string
   isChild: boolean
@@ -109,6 +115,8 @@ export interface DirectionPage {
   program: { day: string; items: string[] }[]
   faq: { q: string; a: string }[]
   photo?: string
+  /** printed posters, shown whole beside the description */
+  posters: string[]
   photos: string[]
   tone: 'red' | 'yellow' | 'blue' | 'ink'
 }

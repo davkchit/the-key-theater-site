@@ -28,6 +28,7 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
     ...(s.dir ? { dir: s.dir } : {}),
     ...(s.dur ? { dur: s.dur } : {}),
     ...(s.synopsis ? { synopsis: s.synopsis } : {}),
+    ...(s.price ? { price: s.price } : {}),
     ...(s.ticketUrl ? { ticketUrl: s.ticketUrl } : {}),
     // «В ролях» from the admin: names, and the part when the theatre gave it
     ...(Array.isArray(s.cast) && s.cast.some((c) => c && c.name)
@@ -39,6 +40,7 @@ export function buildKnowledge(repoRoot, nowMs = Date.now()) {
     name: c.name,
     ageRange: c.ageRange,
     desc: c.desc,
+    ...(c.schedule ? { schedule: c.schedule } : {}),
     ...(c.price ? { price: c.price } : {}),
     ...(c.start ? { start: c.start } : {}),
   }))

@@ -10,8 +10,8 @@ import {
   SectionHead,
   WRAP,
 } from '../components/home2/parts'
-import { Torn } from '../components/home2/paper'
-import { AgeBadge, PosterArt } from '../components/home2/ShowPoster'
+import { InkFade, Torn } from '../components/home2/paper'
+import { AgeBadge, POSTER_ASPECT, PosterArt } from '../components/home2/ShowPoster'
 import { TICKETS_URL, longDate, shortDate, showPath } from '../components/home2/homeData'
 import { Reveal } from '../components/ui/Reveal'
 import home from '../content/home.json'
@@ -31,6 +31,29 @@ function heroPhotoFor(title: string, fallback: string) {
   return pick
     ? { src: mediaUrl(pick.photo), focus: pick.focus || '60% 40%' }
     : { src: fallback, focus: '50% 25%' }
+}
+
+/** The printed poster, whole and upright; a tap opens it full size. */
+function PosterThumb({ src, title }: { src: string; title: string }) {
+  return (
+    <a
+      href={src}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group mt-8 block w-[min(100%,300px)]"
+      aria-label={`Афиша спектакля «${title}» крупно`}
+    >
+      <img
+        src={src}
+        alt={`Афиша спектакля «${title}»`}
+        loading="lazy"
+        className="w-full shadow-[0_10px_30px_rgba(0,0,0,.25)] transition-transform group-hover:-translate-y-1"
+      />
+      <span className="text-ink/65 mt-2 block text-[14px]">
+        Афиша — нажмите, чтобы открыть крупно
+      </span>
+    </a>
+  )
 }
 
 export default function ShowPageV2() {
@@ -58,18 +81,17 @@ export default function ShowPageV2() {
   const nextTicket = next?.ticketUrl || ticket
   const hero = heroPhotoFor(show.title, show.photo)
   // the other shows on the schedule, the soonest first
-  const others = [
-    ...new Set(upcomingAfisha.map((a) => a.title.toLowerCase())),
-  ]
+  const others = [...new Set(upcomingAfisha.map((a) => a.title.toLowerCase()))]
     .filter((t) => t !== show.title.toLowerCase())
     .map((t) => shows.find((s) => s.title.toLowerCase() === t))
     .filter((s): s is NonNullable<typeof s> => !!s)
-    .slice(0, 3)
+    .slice(0, 4)
   const facts: [string, string | undefined][] = [
     ['Жанр', show.genre],
     ['Возраст', show.age],
     ['Длительность', show.dur],
     ['Режиссёр', show.dir],
+    ['Билет', show.price],
     ['Где', PLACE],
   ]
 
@@ -80,16 +102,30 @@ export default function ShowPageV2() {
       {/* first screen: the show on stage, title on the dark side */}
       <section className="bg-ink text-paper relative isolate">
         <div className="relative min-h-[520px] overflow-hidden md:h-[min(72svh,720px)]">
-          {hero.src && (
-            <div className="absolute inset-0 md:left-[35%]">
+          {/* no stage photo yet, only the printed poster: it stands whole on the
+              right, its own lettering kept clear of the title */}
+          {hero.src && hero.src === show.poster ? (
+            <div className="absolute inset-y-8 right-4 hidden items-center md:flex lg:right-12">
               <img
                 src={hero.src}
                 alt=""
-                className="h-full w-full object-cover"
-                style={{ objectPosition: hero.focus }}
+                className="h-full w-auto rotate-2 object-contain shadow-[0_20px_50px_rgba(0,0,0,.5)]"
               />
-              <div className="from-ink absolute inset-y-0 left-0 hidden w-[40%] bg-gradient-to-r to-transparent md:block" />
             </div>
+          ) : (
+            hero.src && (
+              <div className="absolute inset-0 md:left-[35%]">
+                <img
+                  src={hero.src}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: hero.focus }}
+                />
+                <InkFade side="left" className="inset-y-0 left-0 hidden w-[45%] md:block" />
+                <InkFade side="top" className="inset-x-0 top-0 h-20 md:h-28" />
+                <InkFade side="bottom" className="inset-x-0 bottom-0 h-20 md:h-28" />
+              </div>
+            )
           )}
           <div className="from-ink via-ink/60 absolute inset-0 bg-gradient-to-t to-transparent md:hidden" />
           <div
@@ -173,6 +209,7 @@ export default function ShowPageV2() {
                   </div>
                 ))}
             </dl>
+            {show.poster && <PosterThumb src={show.poster} title={show.title} />}
           </Reveal>
         </div>
       </section>
@@ -270,14 +307,22 @@ export default function ShowPageV2() {
         <section className={`${WRAP} pb-24`}>
           <div className="border-ink/15 border-t pt-12 md:pt-16">
             <SectionHead title="Ещё спектакли" to="/repertuar" link="Все спектакли" />
-            <div className="grid gap-10 sm:grid-cols-3 sm:gap-6">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-6 lg:grid-cols-4">
               {others.map((s) => {
-                const d = upcomingAfisha.find((a) => a.title.toLowerCase() === s.title.toLowerCase())
+                const d = upcomingAfisha.find(
+                  (a) => a.title.toLowerCase() === s.title.toLowerCase(),
+                )
                 const n = shows.indexOf(s)
                 return (
                   <div key={s.title} className="flex flex-col">
                     <Link to={showPath(s.title)}>
-                      <PosterArt photo={s.photo} tint={s.tint} n={n} className="aspect-[16/10]" />
+                      <PosterArt
+                        photo={s.photo}
+                        poster={s.poster}
+                        tint={s.tint}
+                        n={n}
+                        className={POSTER_ASPECT}
+                      />
                     </Link>
                     <h3 className="font-heading mt-4 text-[24px] leading-tight font-bold uppercase">
                       <Link to={showPath(s.title)} className="hover:underline">

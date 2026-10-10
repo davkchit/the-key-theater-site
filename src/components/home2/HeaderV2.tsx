@@ -4,7 +4,8 @@ import { Burger } from '../layout/Burger'
 import { MobileMenu } from '../layout/MobileMenu'
 import { WRAP } from './parts'
 import { HeaderEdge } from './paper'
-import logoWordmark from '../../../assets/logo-wordmark.png'
+// the theatre's logo letters in cream (its black round melts into the menu), 3x for sharp screens
+import logoKluch from '../../../assets/logo-kluch-light.png'
 import { navItems } from '../../data/nav'
 
 // Menu of the approved mockup: wordmark, six sections, red "Купить билет",
@@ -21,7 +22,7 @@ export function HeaderV2() {
         <HeaderEdge />
         <div className={`flex h-[72px] items-center gap-8 md:h-[96px] ${WRAP}`}>
           <Link to="/" className="flex-shrink-0" aria-label="Театр «Ключ», на главную">
-            <img src={logoWordmark} alt="Театр Ключ" className="h-11 w-auto md:h-15" />
+            <img src={logoKluch} alt="Театр «Ключ»" className="h-14 w-auto md:h-[72px]" />
           </Link>
 
           <nav className="ml-auto hidden items-center gap-9 lg:flex">

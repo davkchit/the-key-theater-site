@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import { createPortal } from 'react-dom'
+import { toBody } from '../../lib/toBody'
 import { AnimatePresence, motion, useAnimationControls } from 'motion/react'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
@@ -34,7 +34,7 @@ export function Modal({ open, onClose, children, labelledBy, shakeKey }: ModalPr
     void shakeControls.start({ x: [0, -8, 8, -8, 8, 0], transition: { duration: 0.4 } })
   }, [shakeKey, shakeControls])
 
-  return createPortal(
+  return toBody(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -62,6 +62,5 @@ export function Modal({ open, onClose, children, labelledBy, shakeKey }: ModalPr
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
   )
 }

@@ -433,9 +433,9 @@ function knowledgeBlocks(knowledge, nowMs, question) {
     // out so far", never "all there will be".
     afisha: '## Афиша (все опубликованные показы. Театр может добавить новые, поэтому не говори, что других не будет)\n' + (all_or_none(afishaByMonth(knowledge, nowMs, question))),
     shows: '## Спектакли в репертуаре\n' + knowledge.shows
-      .map((s) => '- «' + s.title + '»: ' + [s.age ? 'возраст ' + s.age : 'возраст уточняется у администратора', s.genre, s.based, s.dir && 'режиссёр ' + s.dir, s.dur && 'длительность ' + s.dur].filter(Boolean).join('; ') + (s.synopsis ? '. Сюжет: ' + s.synopsis : '') + ((s.cast || []).length ? '. В ролях: ' + s.cast.join(', ') : '') + (s.ticketUrl ? '. Страница билетов: ' + s.ticketUrl : '') + '. ' + showDates(knowledge, nowMs, s.title))
+      .map((s) => '- «' + s.title + '»: ' + [s.age ? 'возраст ' + s.age : 'возраст уточняется у администратора', s.genre, s.based, s.dir && 'режиссёр ' + s.dir, s.dur && 'длительность ' + s.dur, s.price && 'билет ' + s.price].filter(Boolean).join('; ') + (s.synopsis ? '. Сюжет: ' + s.synopsis : '') + ((s.cast || []).length ? '. В ролях: ' + s.cast.join(', ') : '') + (s.ticketUrl ? '. Страница билетов: ' + s.ticketUrl : '') + '. ' + showDates(knowledge, nowMs, s.title))
       .join('\n'),
-    courses: '## Курсы (группы по возрасту)\n' + knowledge.courses.map((c) => '- «' + c.name + '», ' + c.ageRange + ': ' + c.desc + (c.price ? '. Стоимость: ' + c.price : '')).join('\n'),
+    courses: '## Курсы (группы по возрасту)\n' + knowledge.courses.map((c) => '- «' + c.name + '», ' + c.ageRange + ': ' + c.desc + (c.schedule ? '. Расписание: ' + c.schedule : '') + (c.price ? '. Стоимость: ' + c.price : '')).join('\n'),
   }
   for (const s of knowledge.faq) blocks[s.id] = '## ' + s.title + '\n' + s.body
   const dirs = directionsBlock(knowledge, nowMs)

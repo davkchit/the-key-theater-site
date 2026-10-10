@@ -12,7 +12,7 @@ import { SwallowIcon } from '../ui/SwallowIcon'
 import { BTN, Ink, MoreLink, Portrait, RoughFrame, SectionHead, WRAP } from './parts'
 import { Torn } from './paper'
 import { upcomingCards, shortDate, galleryPhoto, showPath } from './homeData'
-import { PosterArt } from './ShowPoster'
+import { POSTER_ASPECT, PosterArt } from './ShowPoster'
 import { shows } from '../../data/shows'
 import boyFence from '../../../assets/el-boy-fence.svg'
 import starSvg from '../../../assets/el-star.svg'
@@ -104,13 +104,16 @@ export function UpcomingShows() {
                 index={n}
                 className="sm:border-ink/15 flex w-[78vw] max-w-[340px] flex-shrink-0 snap-start flex-col sm:w-auto sm:max-w-none sm:border-l sm:px-5 sm:pb-2 sm:odd:border-l-0 lg:[&:nth-child(3)]:border-l"
               >
-                <PosterArt
-                  photo={h.photo}
-                  tint={h.show?.tint}
-                  n={h.show ? shows.indexOf(h.show) : n}
-                  alt={h.photo ? `«${h.item.title}»` : ''}
-                  className="aspect-[1/1]"
-                />
+                <Link to={showPath(h.item.title)} className="block">
+                  <PosterArt
+                    photo={h.photo}
+                    poster={h.show?.poster}
+                    tint={h.show?.tint}
+                    n={h.show ? shows.indexOf(h.show) : n}
+                    alt={h.photo || h.show?.poster ? `«${h.item.title}»` : ''}
+                    className={POSTER_ASPECT}
+                  />
+                </Link>
                 <h3 className="font-heading mt-5 min-h-[2em] max-w-[14ch] text-[28px] leading-[1.02] font-bold uppercase xl:text-[32px]">
                   <Link to={showPath(h.item.title)} className="hover:underline">
                     {h.item.title}
@@ -216,7 +219,11 @@ const NUMBERS: { value?: number; prefix?: string; text?: string; note: string }[
   // from «Все постановки» on the about page, so a new show counts itself
   {
     value: productions.length,
-    note: [2, 3, 4].includes(productions.length % 10) && ![12, 13, 14].includes(productions.length % 100) ? 'постановки' : 'постановок',
+    note:
+      [2, 3, 4].includes(productions.length % 10) &&
+      ![12, 13, 14].includes(productions.length % 100)
+        ? 'постановки'
+        : 'постановок',
   },
   { value: 5, note: 'стран гастролей' },
   { value: 2004, prefix: 'с ', note: 'свой фестиваль' },
@@ -252,7 +259,7 @@ export function NumbersBand() {
         src={BUILDING}
         alt=""
         loading="lazy"
-        className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_35%] opacity-55 grayscale-[.3]"
+        className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_60%] opacity-55 grayscale-[.3]"
       />
       <div className="from-ink/85 via-ink/50 to-ink/95 absolute inset-0 -z-10 bg-gradient-to-b" />
       <div

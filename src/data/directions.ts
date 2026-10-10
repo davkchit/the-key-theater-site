@@ -26,6 +26,10 @@ function pageOf(raw: unknown): DirectionPage | undefined {
     })),
     faq: (list('faq') as DirectionPage['faq']).filter((f) => f?.q),
     photo: p.photo ? mediaUrl(String(p.photo)) : undefined,
+    posters: list('posters')
+      .map((v) => str(v, 'poster'))
+      .filter(Boolean)
+      .map(mediaUrl),
     photos: list('photos')
       .map((v) => str(v, 'photo'))
       .filter(Boolean)
@@ -114,3 +118,6 @@ export const DIRECTION_TYPE_LABEL: Record<Direction['type'], string> = {
   newsletter: 'Рассылка',
   other: 'Событие',
 }
+
+/** Events with a page of their own (/lager, /kvest…); the pages stay all year. */
+export const directionPages = (): Direction[] => all.filter((d) => d.slug && d.page && d.title)

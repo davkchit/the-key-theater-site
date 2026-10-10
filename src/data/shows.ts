@@ -8,6 +8,7 @@ import { mediaUrl } from '../lib/mediaUrl'
 export const shows: Show[] = (showsContent.shows as Show[]).map((s) => ({
   ...s,
   photo: mediaUrl(s.photo),
+  poster: s.poster ? mediaUrl(s.poster) : undefined,
   photos: (s.photos ?? [])
     .map((p) => mediaUrl(typeof p === 'string' ? p : ((p as { photo?: string }).photo ?? '')))
     .filter(Boolean),

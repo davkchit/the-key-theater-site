@@ -33,6 +33,9 @@ while :; do
   # the bot reads knowledge.json from the site, so it is rebuilt together
   node bot/scripts/publish-knowledge.mjs
   VITE_BASE=/ node node_modules/vite/bin/vite.js build --logLevel warn
+  # a page of its own for each address, sitemap.xml and robots.txt; if that
+  # fails the site still works as before, just without the ready-made pages
+  VITE_BASE=/ node scripts/prerender.mjs || echo "пререндер не удался, сайт собран без готовых страниц"
   # something saved while we were building? build that too
   [ "$(git rev-parse HEAD)" = "$head" ] && break
   echo "новые правки во время сборки, собираю ещё раз"
