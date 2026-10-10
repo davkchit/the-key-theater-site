@@ -446,6 +446,9 @@ function knowledgeBlocks(knowledge, nowMs, question) {
   const links = (knowledge.shows || []).filter((sh) => sh.ticketUrl).map((sh) => '- «' + sh.title + '»: ' + sh.ticketUrl)
   if (knowledge.ticketsUrl && blocks.tickets) blocks.tickets += '\nСтраница продажи билетов театра, там все показы и места, билет можно купить сразу: ' + knowledge.ticketsUrl
   if (links.length && blocks.tickets) blocks.tickets += '\nСтраницы покупки билетов на отдельные спектакли:\n' + links.join('\n')
+  // the price is asked as a ticket question, so it lives here as well as under shows
+  const prices = (knowledge.shows || []).filter((sh) => sh.price).map((sh) => '- «' + sh.title + '»: ' + sh.price)
+  if (prices.length && blocks.tickets) blocks.tickets += '\nЦены билетов:\n' + prices.join('\n')
   return blocks
 }
 
@@ -538,7 +541,7 @@ const PARSER_TOPICS = {
   shows: 'сами спектакли: сюжет, жанр, длительность, режиссёр, возрастная маркировка',
   courses: 'студия и курсы: группы по возрасту, чему учат, стоимость занятий, скидки и оплата занятий',
   signup: 'как записаться на курс, что будет после заявки',
-  tickets: 'где купить билет, ссылки, Пушкинская карта',
+  tickets: 'где купить билет, сколько стоит билет, скидки группам, ссылки, Пушкинская карта',
   festival: 'фестиваль «Действующие лица», как стать участником',
   camp: 'летний лагерь «Солнечная пыль»',
   lab: 'лаборатория современной драматургии «ЛСД»',
