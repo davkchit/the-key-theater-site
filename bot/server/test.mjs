@@ -22,9 +22,18 @@ import { createWebChat } from './webchat.mjs'
 const lib = loadBotLib()
 const knowledge = buildKnowledge(repoRoot)
 const ADMIN = '-100777'
+// Directions the theatre may switch off in the admin at any time; the tests
+// that check how the bot handles them bring their own.
+const withDirections = {
+  ...knowledge,
+  directions: knowledge.directions.concat([
+    { id: 'preparatory', type: 'prep', title: 'Подготовительная группа', desc: 'Занятия для самых маленьких, по устройству как курсы.', open: true, askPhone: true, fields: [{ label: 'Возраст ребёнка', kind: 'number', ask: 'Сколько лет ребёнку?' }] },
+    { id: 'newsletter', type: 'newsletter', title: 'Рассылка театра', desc: 'Афиша и новости театра на электронную почту.', open: true, askPhone: false, fields: [{ label: 'Email', kind: 'email', ask: 'На какую почту присылать рассылку?' }] },
+  ]),
+}
 let updateId = 1000
 
-function rig({ llm, parser = false } = {}) {
+function rig({ llm, parser = false, know = knowledge } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kluch-test-'))
   const store = openStore(dir)
   const sent = []
@@ -32,7 +41,7 @@ function rig({ llm, parser = false } = {}) {
   const env = { ADMIN_CHAT_ID: ADMIN, BOT_PARSER: parser ? '1' : '0', LLM_MODEL: 'm', LLM_PARSER_MODEL: 'p' }
   const turn = createTurn({
     env, lib, store,
-    getKnowledge: () => knowledge,
+    getKnowledge: () => know,
     llm: llm || (async () => { throw new Error('модель не должна вызываться') }),
     send: async (item) => { sent.push(item) },
     log: (...a) => logs.push(a.join(' ')),
@@ -167,7 +176,7 @@ test('закрытый квест: формы нет, отвечает моде�
 })
 
 test('рассылка: телефон не спрашивается, заявка без него', async () => {
-  const t = rig()
+  const t = rig({ know: withDirections })
   await t.say(22, 'хочу записаться на рассылку')
   await t.tap(22, 'consent:yes')
   await t.say(22, 'Олег')
@@ -181,7 +190,7 @@ test('рассылка: телефон не спрашивается, заявк
 })
 
 test('«давай» после предложения записаться на подготовительную группу открывает именно её', async () => {
-  const t = rig({ llm: async () => ({ choices: [{ message: { content: 'Есть подготовительная группа для малышей. Оформить заявку можно прямо в чате.' } }] }) })
+  const t = rig({ know: withDirections, llm: async () => ({ choices: [{ message: { content: 'Есть подготовительная группа для малышей. Оформить заявку можно прямо в чате.' } }] }) })
   await t.say(23, 'а есть подготовительная группа?')
   const btn = t.sent.flatMap((s) => (s.payload.reply_markup && s.payload.reply_markup.inline_keyboard ? s.payload.reply_markup.inline_keyboard.flat() : [])).find((b) => /signup:dir:/.test(b.callback_data || ''))
   assert.ok(btn, 'кнопки записи на направление нет')

@@ -109,7 +109,7 @@ console.log('\n«ещё дочку запишите» при открытой з
   const c = chat(3)
   signUp(c)
   const r = c.text('запишите ещё дочку, ей 12')
-  check('ребёнок добавлен без лишних вопросов', r.effects.some((e) => e.type === 'leadSave' && e.lead.children?.some((c) => c.includes('12 лет') && c.includes('Дети'))), r)
+  check('ребёнок добавлен без лишних вопросов', r.effects.some((e) => e.type === 'leadSave' && e.lead.children?.some((c) => c.startsWith('12 лет · ') && c.includes('(12'))), r)
 }
 
 console.log('\nСкриншот: «отмена заявки» посреди записи')
